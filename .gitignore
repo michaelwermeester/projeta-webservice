@@ -1,0 +1,14 @@
+/target/
+
+# NetBeans
+#nbproject/
+#nbactions.xml
+
+# Java
+#*.class
+
+# Maven
+#target/
+
+# Mac OS X noise
+#.DS_Store
