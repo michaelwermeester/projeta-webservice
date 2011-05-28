@@ -30,7 +30,7 @@ import javax.persistence.SequenceGenerator;
 @Entity
 @Table(name = "users")
 @XmlRootElement
-@SequenceGenerator(name = "sequenceUsers", sequenceName = "users_user_id_seq", allocationSize = 1)
+//@SequenceGenerator(name = "sequenceUsers", sequenceName = "users_user_id_seq", allocationSize = 1)
 @NamedQueries({
     @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u"),
     @NamedQuery(name = "Users.findByUserId", query = "SELECT u FROM Users u WHERE u.userId = :userId"),
@@ -39,7 +39,8 @@ import javax.persistence.SequenceGenerator;
 public class Users implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(generator = "sequenceUsers", strategy = GenerationType.SEQUENCE)
+    //@GeneratedValue(generator = "sequenceUsers", strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @NotNull
     @Column(name = "user_id")
