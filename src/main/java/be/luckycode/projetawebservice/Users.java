@@ -9,6 +9,8 @@ import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
@@ -19,6 +21,8 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import javax.persistence.SequenceGenerator;
+
 /**
  *
  * @author michael
@@ -26,6 +30,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(name = "users")
 @XmlRootElement
+@SequenceGenerator(name = "sequenceUsers", sequenceName = "users_user_id_seq", allocationSize = 1)
 @NamedQueries({
     @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u"),
     @NamedQuery(name = "Users.findByUserId", query = "SELECT u FROM Users u WHERE u.userId = :userId"),
@@ -34,10 +39,11 @@ import javax.xml.bind.annotation.XmlTransient;
 public class Users implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(generator = "sequenceUsers", strategy = GenerationType.SEQUENCE)
     @Basic(optional = false)
     @NotNull
     @Column(name = "user_id")
-    private Long userId;
+    private Integer userId;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
@@ -54,21 +60,21 @@ public class Users implements Serializable {
     public Users() {
     }
 
-    public Users(Long userId) {
+    public Users(Integer userId) {
         this.userId = userId;
     }
 
-    public Users(Long userId, String username, String password) {
+    public Users(Integer userId, String username, String password) {
         this.userId = userId;
         this.username = username;
         this.password = password;
     }
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 

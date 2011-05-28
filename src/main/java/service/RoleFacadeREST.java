@@ -49,7 +49,7 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
     @DELETE
     @Path("{id}")
     public void remove(@PathParam("id")
-    Long id) {
+    Integer id) {
         super.remove(super.find(id));
     }
 
@@ -57,7 +57,7 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
     @Path("{id}")
     @Produces({"application/xml", "application/json"})
     public Role find(@PathParam("id")
-    Long id) {
+    Integer id) {
         return super.find(id);
     }
 

@@ -18,21 +18,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import javax.ws.rs.Produces;
-//roles
-import javax.annotation.security.PermitAll;
-import javax.annotation.security.DenyAll;
-import javax.annotation.security.RolesAllowed;
-import javax.annotation.security.DeclareRoles;
-import javax.annotation.security.RunAs;
-
 /**
  *
  * @author michael
  */
 @Stateless
 @Path("be.luckycode.projetawebservice.users")
-@RolesAllowed("group_1")
 public class UsersFacadeREST extends AbstractFacade<Users> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
@@ -43,14 +34,20 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
 
     @POST
     @Override
-    @Consumes({"application/xml", "application/json"})
+    @Consumes("application/json")
     public void create(Users entity) {
+    //public String create(Users entity) {
+        //entity.setUsername("manual");
+        
+        //entity.setUsername(entity.getUsername());
         super.create(entity);
+        
+        //return entity.getUsername();
     }
 
     @PUT
     @Override
-    @Consumes({"application/xml", "application/json"})
+    @Consumes("application/json")
     public void edit(Users entity) {
         super.edit(entity);
     }
@@ -58,28 +55,28 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @DELETE
     @Path("{id}")
     public void remove(@PathParam("id")
-    Long id) {
+    Integer id) {
         super.remove(super.find(id));
     }
 
     @GET
     @Path("{id}")
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public Users find(@PathParam("id")
-    Long id) {
+    Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public List<Users> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public List<Users> findRange(@PathParam("from")
     Integer from, @PathParam("to")
     Integer to) {
