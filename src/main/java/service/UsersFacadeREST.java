@@ -51,6 +51,14 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     public void edit(Users entity) {
         super.edit(entity);
     }
+    
+    /*@PUT
+    @Override
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Users edit(Users entity) {
+        return super.edit(entity);
+    }*/
 
     @DELETE
     @Path("{id}")
