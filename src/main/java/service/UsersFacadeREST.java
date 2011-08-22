@@ -36,13 +36,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @Override
     @Consumes("application/json")
     public void create(Users entity) {
-    //public String create(Users entity) {
-        //entity.setUsername("manual");
-        
-        //entity.setUsername(entity.getUsername());
         super.create(entity);
-        
-        //return entity.getUsername();
     }
 
     @PUT
@@ -51,27 +45,17 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     public void edit(Users entity) {
         super.edit(entity);
     }
-    
-    /*@PUT
-    @Override
-    @Consumes("application/json")
-    @Produces("application/json")
-    public Users edit(Users entity) {
-        return super.edit(entity);
-    }*/
 
     @DELETE
     @Path("{id}")
-    public void remove(@PathParam("id")
-    Integer id) {
+    public void remove(@PathParam("id") Integer id) {
         super.remove(super.find(id));
     }
 
     @GET
     @Path("{id}")
     @Produces("application/json")
-    public Users find(@PathParam("id")
-    Integer id) {
+    public Users find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
@@ -85,9 +69,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @GET
     @Path("{from}/{to}")
     @Produces("application/json")
-    public List<Users> findRange(@PathParam("from")
-    Integer from, @PathParam("to")
-    Integer to) {
+    public List<Users> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 

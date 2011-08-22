@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -37,6 +38,8 @@ import javax.persistence.SequenceGenerator;
     @NamedQuery(name = "Users.findByUsername", query = "SELECT u FROM Users u WHERE u.username = :username"),
     @NamedQuery(name = "Users.findByPassword", query = "SELECT u FROM Users u WHERE u.password = :password")})
 public class Users implements Serializable {
+    @OneToMany(mappedBy = "userCreated")
+    private Collection<Project> projectCollection;
     private static final long serialVersionUID = 1L;
     @Id
     //@GeneratedValue(generator = "sequenceUsers", strategy = GenerationType.SEQUENCE)
@@ -127,6 +130,15 @@ public class Users implements Serializable {
     @Override
     public String toString() {
         return "be.luckycode.projetawebservice.Users[ userId=" + userId + " ]";
+    }
+
+    @XmlTransient
+    public Collection<Project> getProjectCollection() {
+        return projectCollection;
+    }
+
+    public void setProjectCollection(Collection<Project> projectCollection) {
+        this.projectCollection = projectCollection;
     }
     
 }

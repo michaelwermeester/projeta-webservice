@@ -4,7 +4,7 @@
  */
 package service;
 
-import be.luckycode.projetawebservice.Role;
+import be.luckycode.projetawebservice.Project;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -23,26 +23,26 @@ import javax.ws.rs.Produces;
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.role")
-public class RoleFacadeREST extends AbstractFacade<Role> {
+@Path("be.luckycode.projetawebservice.project")
+public class ProjectFacadeREST extends AbstractFacade<Project> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
 
-    public RoleFacadeREST() {
-        super(Role.class);
+    public ProjectFacadeREST() {
+        super(Project.class);
     }
 
     @POST
     @Override
     @Consumes({"application/xml", "application/json"})
-    public void create(Role entity) {
+    public void create(Project entity) {
         super.create(entity);
     }
 
     @PUT
     @Override
     @Consumes({"application/xml", "application/json"})
-    public void edit(Role entity) {
+    public void edit(Project entity) {
         super.edit(entity);
     }
 
@@ -55,21 +55,21 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
     @GET
     @Path("{id}")
     @Produces({"application/xml", "application/json"})
-    public Role find(@PathParam("id") Integer id) {
+    public Project find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({"application/xml", "application/json"})
-    public List<Role> findAll() {
+    public List<Project> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({"application/xml", "application/json"})
-    public List<Role> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<Project> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 
