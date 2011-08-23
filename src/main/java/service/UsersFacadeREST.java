@@ -6,6 +6,7 @@ package service;
 
 import be.luckycode.projetawebservice.Users;
 import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -62,6 +63,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @GET
     @Override
     @Produces("application/json")
+    //@RolesAllowed("UsersRead")
     public List<Users> findAll() {
         return super.findAll();
     }
