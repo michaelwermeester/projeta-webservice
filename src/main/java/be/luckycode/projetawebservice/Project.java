@@ -33,8 +33,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Project.findAll", query = "SELECT p FROM Project p"),
     @NamedQuery(name = "Project.findByProjectId", query = "SELECT p FROM Project p WHERE p.projectId = :projectId"),
-    @NamedQuery(name = "Project.findByTitle", query = "SELECT p FROM Project p WHERE p.title = :title"),
-    @NamedQuery(name = "Project.findByDescription", query = "SELECT p FROM Project p WHERE p.description = :description"),
+    @NamedQuery(name = "Project.findByProjectTitle", query = "SELECT p FROM Project p WHERE p.projectTitle = :projectTitle"),
+    @NamedQuery(name = "Project.findByProjectDescription", query = "SELECT p FROM Project p WHERE p.projectDescription = :projectDescription"),
     @NamedQuery(name = "Project.findByDateCreated", query = "SELECT p FROM Project p WHERE p.dateCreated = :dateCreated"),
     @NamedQuery(name = "Project.findByStartDate", query = "SELECT p FROM Project p WHERE p.startDate = :startDate"),
     @NamedQuery(name = "Project.findByEndDate", query = "SELECT p FROM Project p WHERE p.endDate = :endDate"),
@@ -50,11 +50,11 @@ public class Project implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
-    @Column(name = "title")
-    private String title;
+    @Column(name = "project_title")
+    private String projectTitle;
     @Size(max = 2147483647)
-    @Column(name = "description")
-    private String description;
+    @Column(name = "project_description")
+    private String projectDescription;
     @Column(name = "date_created")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreated;
@@ -79,9 +79,9 @@ public class Project implements Serializable {
         this.projectId = projectId;
     }
 
-    public Project(Integer projectId, String title, boolean flagPublic) {
+    public Project(Integer projectId, String projectTitle, boolean flagPublic) {
         this.projectId = projectId;
-        this.title = title;
+        this.projectTitle = projectTitle;
         this.flagPublic = flagPublic;
     }
 
@@ -93,20 +93,20 @@ public class Project implements Serializable {
         this.projectId = projectId;
     }
 
-    public String getTitle() {
-        return title;
+    public String getProjectTitle() {
+        return projectTitle;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setProjectTitle(String projectTitle) {
+        this.projectTitle = projectTitle;
     }
 
-    public String getDescription() {
-        return description;
+    public String getProjectDescription() {
+        return projectDescription;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setProjectDescription(String projectDescription) {
+        this.projectDescription = projectDescription;
     }
 
     public Date getDateCreated() {
