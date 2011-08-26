@@ -23,7 +23,7 @@
         </web-resource-collection>
         <auth-constraint>
             <description/>
-            <role-name>group_1</role-name>
+            <role-name>admin</role-name>
         </auth-constraint>
     </security-constraint>
     <login-config>
@@ -32,14 +32,14 @@
     </login-config>
     <security-role>
         <description/>
-        <role-name>group_1</role-name>
+        <role-name>developer</role-name>
     </security-role>
     <security-role>
         <description/>
-        <role-name>group_2</role-name>
+        <role-name>user</role-name>
     </security-role>
     <security-role>
         <description/>
-        <role-name>group_3</role-name>
+        <role-name>admin</role-name>
     </security-role>
 </web-app>
