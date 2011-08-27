@@ -91,7 +91,11 @@ public class Users implements Serializable {
     }
 
     public String getPassword() {
-        return password;
+        
+        //return password;
+        
+        // Don't return the password (for security reasons)
+        return "";
     }
 
     public void setPassword(String password) {
