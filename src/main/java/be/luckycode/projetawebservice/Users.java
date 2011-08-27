@@ -5,6 +5,8 @@
 package be.luckycode.projetawebservice;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -98,8 +100,22 @@ public class Users implements Serializable {
         return "";
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String password) throws NoSuchAlgorithmException {
+        
+        // encode password using SHA-256 algorithm
+        
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(password.getBytes());
+ 
+        byte byteData[] = md.digest();
+ 
+        // convert the byte to hex format method
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < byteData.length; i++) {
+            sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        
+        this.password = sb.toString(); 
     }
 
     @XmlTransient
