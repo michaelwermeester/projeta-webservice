@@ -9,6 +9,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,6 +41,26 @@ import javax.persistence.SequenceGenerator;
     @NamedQuery(name = "Users.findByUsername", query = "SELECT u FROM Users u WHERE u.username = :username"),
     @NamedQuery(name = "Users.findByPassword", query = "SELECT u FROM Users u WHERE u.password = :password")})
 public class Users implements Serializable {
+    @ManyToMany(mappedBy = "usersCollection")
+    private Collection<Usergroup> usergroupCollection;
+    @OneToMany(mappedBy = "userCreated")
+    private Collection<BugProgress> bugProgressCollection;
+    @OneToMany(mappedBy = "userCreated")
+    private Collection<ProjectProgress> projectProgressCollection;
+    @OneToMany(mappedBy = "userAssigned")
+    private Collection<Task> taskCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userCreated")
+    private Collection<Task> taskCollection1;
+    @OneToMany(mappedBy = "userId")
+    private Collection<Contact> contactCollection;
+    @OneToMany(mappedBy = "userCreated")
+    private Collection<TaskProgress> taskProgressCollection;
+    @OneToMany(mappedBy = "userAssigned")
+    private Collection<Bug> bugCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userReported")
+    private Collection<Bug> bugCollection1;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userCreated")
+    private Collection<Comment> commentCollection;
     @OneToMany(mappedBy = "userCreated")
     private Collection<Project> projectCollection;
     private static final long serialVersionUID = 1L;
@@ -159,6 +180,96 @@ public class Users implements Serializable {
 
     public void setProjectCollection(Collection<Project> projectCollection) {
         this.projectCollection = projectCollection;
+    }
+
+    @XmlTransient
+    public Collection<Usergroup> getUsergroupCollection() {
+        return usergroupCollection;
+    }
+
+    public void setUsergroupCollection(Collection<Usergroup> usergroupCollection) {
+        this.usergroupCollection = usergroupCollection;
+    }
+
+    @XmlTransient
+    public Collection<BugProgress> getBugProgressCollection() {
+        return bugProgressCollection;
+    }
+
+    public void setBugProgressCollection(Collection<BugProgress> bugProgressCollection) {
+        this.bugProgressCollection = bugProgressCollection;
+    }
+
+    @XmlTransient
+    public Collection<ProjectProgress> getProjectProgressCollection() {
+        return projectProgressCollection;
+    }
+
+    public void setProjectProgressCollection(Collection<ProjectProgress> projectProgressCollection) {
+        this.projectProgressCollection = projectProgressCollection;
+    }
+
+    @XmlTransient
+    public Collection<Task> getTaskCollection() {
+        return taskCollection;
+    }
+
+    public void setTaskCollection(Collection<Task> taskCollection) {
+        this.taskCollection = taskCollection;
+    }
+
+    @XmlTransient
+    public Collection<Task> getTaskCollection1() {
+        return taskCollection1;
+    }
+
+    public void setTaskCollection1(Collection<Task> taskCollection1) {
+        this.taskCollection1 = taskCollection1;
+    }
+
+    @XmlTransient
+    public Collection<Contact> getContactCollection() {
+        return contactCollection;
+    }
+
+    public void setContactCollection(Collection<Contact> contactCollection) {
+        this.contactCollection = contactCollection;
+    }
+
+    @XmlTransient
+    public Collection<TaskProgress> getTaskProgressCollection() {
+        return taskProgressCollection;
+    }
+
+    public void setTaskProgressCollection(Collection<TaskProgress> taskProgressCollection) {
+        this.taskProgressCollection = taskProgressCollection;
+    }
+
+    @XmlTransient
+    public Collection<Bug> getBugCollection() {
+        return bugCollection;
+    }
+
+    public void setBugCollection(Collection<Bug> bugCollection) {
+        this.bugCollection = bugCollection;
+    }
+
+    @XmlTransient
+    public Collection<Bug> getBugCollection1() {
+        return bugCollection1;
+    }
+
+    public void setBugCollection1(Collection<Bug> bugCollection1) {
+        this.bugCollection1 = bugCollection1;
+    }
+
+    @XmlTransient
+    public Collection<Comment> getCommentCollection() {
+        return commentCollection;
+    }
+
+    public void setCommentCollection(Collection<Comment> commentCollection) {
+        this.commentCollection = commentCollection;
     }
     
 }

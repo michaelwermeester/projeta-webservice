@@ -5,17 +5,26 @@
 package be.luckycode.projetawebservice;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -28,6 +37,45 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Task.findAll", query = "SELECT t FROM Task t"),
     @NamedQuery(name = "Task.findByTaskId", query = "SELECT t FROM Task t WHERE t.taskId = :taskId")})
 public class Task implements Serializable {
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "is_personal")
+    private boolean isPersonal;
+    @Column(name = "priority")
+    private Short priority;
+    @Column(name = "start_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startDate;
+    @Column(name = "end_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date endDate;
+    @Column(name = "start_date_real")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startDateReal;
+    @Column(name = "end_date_real")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date endDateReal;
+    @Column(name = "canceled")
+    private Boolean canceled;
+    @Column(name = "completed")
+    private Boolean completed;
+    @Column(name = "deleted")
+    private Boolean deleted;
+    @JoinColumn(name = "user_assigned", referencedColumnName = "user_id")
+    @ManyToOne
+    private Users userAssigned;
+    @JoinColumn(name = "user_created", referencedColumnName = "user_id")
+    @ManyToOne(optional = false)
+    private Users userCreated;
+    @OneToMany(mappedBy = "parentTaskId")
+    private Collection<Task> taskCollection;
+    @JoinColumn(name = "parent_task_id", referencedColumnName = "task_id")
+    @ManyToOne
+    private Task parentTaskId;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "taskId")
+    private Collection<TaskProgress> taskProgressCollection;
+    @OneToMany(mappedBy = "taskId")
+    private Collection<Comment> commentCollection;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -74,6 +122,129 @@ public class Task implements Serializable {
     @Override
     public String toString() {
         return "be.luckycode.projetawebservice.Task[ taskId=" + taskId + " ]";
+    }
+
+    public boolean getIsPersonal() {
+        return isPersonal;
+    }
+
+    public void setIsPersonal(boolean isPersonal) {
+        this.isPersonal = isPersonal;
+    }
+
+    public Short getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Short priority) {
+        this.priority = priority;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public Date getStartDateReal() {
+        return startDateReal;
+    }
+
+    public void setStartDateReal(Date startDateReal) {
+        this.startDateReal = startDateReal;
+    }
+
+    public Date getEndDateReal() {
+        return endDateReal;
+    }
+
+    public void setEndDateReal(Date endDateReal) {
+        this.endDateReal = endDateReal;
+    }
+
+    public Boolean getCanceled() {
+        return canceled;
+    }
+
+    public void setCanceled(Boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    public Boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public Users getUserAssigned() {
+        return userAssigned;
+    }
+
+    public void setUserAssigned(Users userAssigned) {
+        this.userAssigned = userAssigned;
+    }
+
+    public Users getUserCreated() {
+        return userCreated;
+    }
+
+    public void setUserCreated(Users userCreated) {
+        this.userCreated = userCreated;
+    }
+
+    @XmlTransient
+    public Collection<Task> getTaskCollection() {
+        return taskCollection;
+    }
+
+    public void setTaskCollection(Collection<Task> taskCollection) {
+        this.taskCollection = taskCollection;
+    }
+
+    public Task getParentTaskId() {
+        return parentTaskId;
+    }
+
+    public void setParentTaskId(Task parentTaskId) {
+        this.parentTaskId = parentTaskId;
+    }
+
+    @XmlTransient
+    public Collection<TaskProgress> getTaskProgressCollection() {
+        return taskProgressCollection;
+    }
+
+    public void setTaskProgressCollection(Collection<TaskProgress> taskProgressCollection) {
+        this.taskProgressCollection = taskProgressCollection;
+    }
+
+    @XmlTransient
+    public Collection<Comment> getCommentCollection() {
+        return commentCollection;
+    }
+
+    public void setCommentCollection(Collection<Comment> commentCollection) {
+        this.commentCollection = commentCollection;
     }
     
 }

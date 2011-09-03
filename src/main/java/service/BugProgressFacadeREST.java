@@ -4,7 +4,7 @@
  */
 package service;
 
-import be.luckycode.projetawebservice.Users;
+import be.luckycode.projetawebservice.BugProgress;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -23,26 +23,26 @@ import javax.ws.rs.Produces;
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.users")
-public class UsersFacadeREST extends AbstractFacade<Users> {
+@Path("be.luckycode.projetawebservice.bugprogress")
+public class BugProgressFacadeREST extends AbstractFacade<BugProgress> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
 
-    public UsersFacadeREST() {
-        super(Users.class);
+    public BugProgressFacadeREST() {
+        super(BugProgress.class);
     }
 
     @POST
     @Override
-    @Consumes("application/json")
-    public void create(Users entity) {
+    @Consumes({"application/xml", "application/json"})
+    public void create(BugProgress entity) {
         super.create(entity);
     }
 
     @PUT
     @Override
-    @Consumes("application/json")
-    public void edit(Users entity) {
+    @Consumes({"application/xml", "application/json"})
+    public void edit(BugProgress entity) {
         super.edit(entity);
     }
 
@@ -54,22 +54,22 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
 
     @GET
     @Path("{id}")
-    @Produces("application/json")
-    public Users find(@PathParam("id") Integer id) {
+    @Produces({"application/xml", "application/json"})
+    public BugProgress find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
-    @Produces("application/json")
-    public List<Users> findAll() {
+    @Produces({"application/xml", "application/json"})
+    public List<BugProgress> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
-    @Produces("application/json")
-    public List<Users> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    @Produces({"application/xml", "application/json"})
+    public List<BugProgress> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 

@@ -24,10 +24,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -73,7 +69,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
     /*@GET
     @Override
-    @Produces("application/json")
+    @Produces({"application/xml", "application/json"})
     public List<Project> findAll() {
         return super.findAll();
     }*/

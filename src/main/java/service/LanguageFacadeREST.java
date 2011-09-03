@@ -4,7 +4,7 @@
  */
 package service;
 
-import be.luckycode.projetawebservice.Users;
+import be.luckycode.projetawebservice.Language;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -23,53 +23,53 @@ import javax.ws.rs.Produces;
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.users")
-public class UsersFacadeREST extends AbstractFacade<Users> {
+@Path("be.luckycode.projetawebservice.language")
+public class LanguageFacadeREST extends AbstractFacade<Language> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
 
-    public UsersFacadeREST() {
-        super(Users.class);
+    public LanguageFacadeREST() {
+        super(Language.class);
     }
 
     @POST
     @Override
-    @Consumes("application/json")
-    public void create(Users entity) {
+    @Consumes({"application/xml", "application/json"})
+    public void create(Language entity) {
         super.create(entity);
     }
 
     @PUT
     @Override
-    @Consumes("application/json")
-    public void edit(Users entity) {
+    @Consumes({"application/xml", "application/json"})
+    public void edit(Language entity) {
         super.edit(entity);
     }
 
     @DELETE
     @Path("{id}")
-    public void remove(@PathParam("id") Integer id) {
+    public void remove(@PathParam("id") String id) {
         super.remove(super.find(id));
     }
 
     @GET
     @Path("{id}")
-    @Produces("application/json")
-    public Users find(@PathParam("id") Integer id) {
+    @Produces({"application/xml", "application/json"})
+    public Language find(@PathParam("id") String id) {
         return super.find(id);
     }
 
     @GET
     @Override
-    @Produces("application/json")
-    public List<Users> findAll() {
+    @Produces({"application/xml", "application/json"})
+    public List<Language> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
-    @Produces("application/json")
-    public List<Users> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    @Produces({"application/xml", "application/json"})
+    public List<Language> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 
