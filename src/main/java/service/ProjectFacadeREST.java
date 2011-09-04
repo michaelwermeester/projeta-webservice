@@ -77,6 +77,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         return super.findAll();
     }*/
     
+    // returns parent objects including its children
     @GET
     @Produces("application/json")
     public String findAll4() {
@@ -97,7 +98,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         prjList = q.getResultList();
         
         
-        // get projects and its childs
+        // get projects and its children
         getProjects(prjList, projectList);
         
         
@@ -187,6 +188,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         }
     }
     
+    // returns parent objects including its children
     /*@GET
     @Produces("application/json")
     public String findAll3() {
@@ -273,6 +275,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
  
     }*/
     
+    // returns all projects (ignores if the project is a child or parent)
     /*@GET
     @Produces("application/json")
     public String findAll2() {
