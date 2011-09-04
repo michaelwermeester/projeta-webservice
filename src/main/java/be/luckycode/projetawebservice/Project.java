@@ -44,6 +44,10 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Project.findByDateCreated", query = "SELECT p FROM Project p WHERE p.dateCreated = :dateCreated"),
     @NamedQuery(name = "Project.findByStartDate", query = "SELECT p FROM Project p WHERE p.startDate = :startDate"),
     @NamedQuery(name = "Project.findByEndDate", query = "SELECT p FROM Project p WHERE p.endDate = :endDate"),
+    // get root projects (projects which have no parent)
+    @NamedQuery(name = "Project.getParentProjects", query = "SELECT p FROM Project p WHERE p.parentProjectId IS NULL"),
+    // get child projects
+    @NamedQuery(name = "Project.getChildProjects", query = "SELECT p FROM Project p WHERE p.parentProjectId = ?1"),
     @NamedQuery(name = "Project.findByFlagPublic", query = "SELECT p FROM Project p WHERE p.flagPublic = :flagPublic")})
 public class Project implements Serializable {
     @Column(name = "date_created")
