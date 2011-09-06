@@ -23,6 +23,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -37,12 +38,6 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Task.findAll", query = "SELECT t FROM Task t"),
     @NamedQuery(name = "Task.findByTaskId", query = "SELECT t FROM Task t WHERE t.taskId = :taskId")})
 public class Task implements Serializable {
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "is_personal")
-    private boolean isPersonal;
-    @Column(name = "priority")
-    private Short priority;
     @Column(name = "start_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDate;
@@ -55,6 +50,20 @@ public class Task implements Serializable {
     @Column(name = "end_date_real")
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDateReal;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 1024)
+    @Column(name = "task_title")
+    private String taskTitle;
+    @Size(max = 2147483647)
+    @Column(name = "task_description")
+    private String taskDescription;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "is_personal")
+    private boolean isPersonal;
+    @Column(name = "priority")
+    private Short priority;
     @Column(name = "canceled")
     private Boolean canceled;
     @Column(name = "completed")
@@ -245,6 +254,22 @@ public class Task implements Serializable {
 
     public void setCommentCollection(Collection<Comment> commentCollection) {
         this.commentCollection = commentCollection;
+    }
+
+    public String getTaskTitle() {
+        return taskTitle;
+    }
+
+    public void setTaskTitle(String taskTitle) {
+        this.taskTitle = taskTitle;
+    }
+
+    public String getTaskDescription() {
+        return taskDescription;
+    }
+
+    public void setTaskDescription(String taskDescription) {
+        this.taskDescription = taskDescription;
     }
     
 }

@@ -40,13 +40,13 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Bug.findAll", query = "SELECT b FROM Bug b"),
     @NamedQuery(name = "Bug.findByBugId", query = "SELECT b FROM Bug b WHERE b.bugId = :bugId")})
 public class Bug implements Serializable {
-    @Column(name = "priority")
-    private Short priority;
     @Basic(optional = false)
     @NotNull
     @Column(name = "date_reported")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateReported;
+    @Column(name = "priority")
+    private Short priority;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
@@ -268,5 +268,5 @@ public class Bug implements Serializable {
     public void setCommentCollection(Collection<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
-    
+
 }

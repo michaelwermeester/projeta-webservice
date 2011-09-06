@@ -50,19 +50,19 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Project.getChildProjects", query = "SELECT p FROM Project p WHERE p.parentProjectId = ?1"),
     @NamedQuery(name = "Project.findByFlagPublic", query = "SELECT p FROM Project p WHERE p.flagPublic = :flagPublic")})
 public class Project implements Serializable {
-    @Column(name = "date_created")
+    @Column(name =     "date_created")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreated;
-    @Column(name = "start_date")
+    @Column(name =     "start_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDate;
-    @Column(name = "end_date")
+    @Column(name =     "end_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
-    @Column(name = "start_date_real")
+    @Column(name =     "start_date_real")
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDateReal;
-    @Column(name = "end_date_real")
+    @Column(name =     "end_date_real")
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDateReal;
     @Column(name = "completed")

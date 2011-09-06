@@ -36,6 +36,11 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Comment.findByComment", query = "SELECT c FROM Comment c WHERE c.comment = :comment"),
     @NamedQuery(name = "Comment.findByDateCreated", query = "SELECT c FROM Comment c WHERE c.dateCreated = :dateCreated")})
 public class Comment implements Serializable {
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "date_created")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateCreated;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,11 +53,6 @@ public class Comment implements Serializable {
     @Size(min = 1, max = 2147483647)
     @Column(name = "comment")
     private String comment;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "date_created")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dateCreated;
     @JoinColumn(name = "user_created", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private Users userCreated;

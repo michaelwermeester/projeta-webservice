@@ -35,12 +35,12 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "TaskProgress.findByProgressComment", query = "SELECT t FROM TaskProgress t WHERE t.progressComment = :progressComment"),
     @NamedQuery(name = "TaskProgress.findByTaskProgressId", query = "SELECT t FROM TaskProgress t WHERE t.taskProgressId = :taskProgressId")})
 public class TaskProgress implements Serializable {
-    private static final long serialVersionUID = 1L;
     @Basic(optional = false)
     @NotNull
     @Column(name = "date_created")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreated;
+    private static final long serialVersionUID = 1L;
     @Column(name = "percentage_complete")
     private Short percentageComplete;
     @Size(max = 2147483647)
