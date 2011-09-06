@@ -112,7 +112,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
  
     }
     
-    private void getTasks(List<Task> taskList, List<Map> projectMapList) {
+    private void getTasks(List<Task> taskList, List<Map> taskMapList) {
         // if list is not empty
         if (taskList.isEmpty() == false) {
             for (Task t : taskList) {
@@ -133,7 +133,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                 // get child projects, if any
                 getChildTasks(t, userStruct, taskData);
 
-                projectMapList.add(taskData);
+                taskMapList.add(taskData);
             }
         }
     }
