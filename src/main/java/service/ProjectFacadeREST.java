@@ -126,10 +126,13 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                 userStruct.put("userId", p.getUserCreated().getUserId().toString());
                 userStruct.put("username", p.getUserCreated().getUsername());
                 projectData.put("userCreated", userStruct);
-                projectData.put("dateCreated", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getDateCreated()));
+                projectData.put("dateCreated", CommonMethods.convertDate(p.getDateCreated()));
+                //projectData.put("dateCreated", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getDateCreated()));
                 projectData.put("flagPublic", p.getFlagPublic());
-                projectData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getEndDate()));
-                projectData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getStartDate()));
+                //projectData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getEndDate()));
+                projectData.put("endDate", CommonMethods.convertDate(p.getEndDate()));
+                //projectData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getStartDate()));
+                projectData.put("startDate", CommonMethods.convertDate(p.getStartDate()));
                 projectData.put("projectDescription", p.getProjectDescription());
                 projectData.put("projectId", p.getProjectId().toString());
                 projectData.put("projectTitle", p.getProjectTitle());
