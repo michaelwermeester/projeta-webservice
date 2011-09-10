@@ -8,6 +8,7 @@ import be.luckycode.projetawebservice.Task;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,9 +124,11 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                 userStruct.put("userId", t.getUserCreated().getUserId().toString());
                 userStruct.put("username", t.getUserCreated().getUsername());
                 taskData.put("userCreated", userStruct);
-                //taskData.put("dateCreated", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getDateCreated()));
-                taskData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getEndDate()));
-                taskData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getStartDate()));
+                
+                taskData.put("endDate", CommonMethods.convertDate(t.getEndDate()));
+                taskData.put("startDate", CommonMethods.convertDate(t.getStartDate()));
+                //taskData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getEndDate()));
+                //taskData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getStartDate()));
                 taskData.put("taskDescription", t.getTaskDescription());
                 taskData.put("taskId", t.getTaskId().toString());
                 taskData.put("taskTitle", t.getTaskTitle());
@@ -158,6 +161,8 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             taskData.put("childTask", childTaskMapList);
         }
     }
+    
+    
 
     @GET
     @Path("{from}/{to}")
