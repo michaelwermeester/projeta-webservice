@@ -70,6 +70,8 @@ public class Task implements Serializable {
     private Short priority;
     @Column(name = "canceled")
     private Boolean canceled;
+    @Basic(optional = false)
+    @NotNull
     @Column(name = "completed")
     private Boolean completed;
     @Column(name = "deleted")
