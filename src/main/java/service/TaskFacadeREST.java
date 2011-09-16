@@ -132,6 +132,8 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                 taskData.put("taskDescription", t.getTaskDescription());
                 taskData.put("taskId", t.getTaskId().toString());
                 taskData.put("taskTitle", t.getTaskTitle());
+                
+                taskData.put("completed", t.getCompleted());
 
                 // get child projects, if any
                 getChildTasks(t, userStruct, taskData);
