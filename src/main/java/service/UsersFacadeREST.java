@@ -4,9 +4,11 @@
  */
 package service;
 
+import be.luckycode.projetawebservice.Role;
 import be.luckycode.projetawebservice.Users;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +70,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         return super.find(id);
     }
     
+    // return user by specifying username
     @GET
     @Path("username/{username}")
     @Produces("application/json")
@@ -109,6 +112,60 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
                     
     }
 
+    // return user by specifying username
+    @GET
+    @Path("username/{username}/roles")
+    @Produces("application/json")
+    public String roleByUsername(@PathParam("username") String username) {
+        
+        Query q = em.createNamedQuery("Users.findByUsername");
+        q.setParameter("username", username);
+        
+        List<Users> userList = new ArrayList<Users>();
+        userList = q.getResultList();
+               
+        if (userList.size() == 1) {
+
+            // user
+            Users u = userList.get(0);
+            
+            // get roles for user
+            Collection<Role> roleList = u.getRoleCollection();
+            
+            ObjectMapper mapper = new ObjectMapper();
+        
+            List<Map> roleMap = new ArrayList<Map>();
+            
+            
+            for (Role r : roleList) {
+                
+                Map<String, Object> roleData = new HashMap<String, Object>();
+                
+                roleData.put("roleId", r.getRoleId().toString());
+                roleData.put("code", r.getCode());
+                        
+                roleMap.add(roleData);
+            }
+            
+            
+            String retVal = "";
+            
+            HashMap<String, Object> retUserRoles = new HashMap<String, Object>();
+            retUserRoles.put("role", roleMap);
+        
+            try {
+                retVal = mapper.writeValueAsString(retUserRoles);
+            } catch (IOException ex) {
+                Logger.getLogger(UsersFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        
+            return retVal;
+        } else {
+            return "";
+        }
+                    
+    }
+    
     /*@GET
     @Override
     @Produces("application/json")
