@@ -18,7 +18,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -27,6 +26,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -39,6 +40,9 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
 
+    @Context
+    SecurityContext security;
+    
     public UsersFacadeREST() {
         super(Users.class);
     }
@@ -164,6 +168,17 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
             return "";
         }
                     
+    }
+    
+    // returns the logged in user
+    @GET
+    @Produces("application/json")
+    @Path("getLoggedInUser")
+    public String getLoggedInUser() {
+        
+        String loggedInUsername = security.getUserPrincipal().getName();
+        
+        return this.findByUsername(loggedInUsername);
     }
     
     /*@GET
