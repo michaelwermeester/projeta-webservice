@@ -176,8 +176,10 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @Path("getLoggedInUser")
     public String getLoggedInUser() {
         
+        // get username of logged in user
         String loggedInUsername = security.getUserPrincipal().getName();
         
+        // get and return logged in User from username
         return this.findByUsername(loggedInUsername);
     }
     
