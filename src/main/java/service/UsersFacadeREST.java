@@ -54,11 +54,45 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         super.create(entity);
     }
 
-    @PUT
+    /*@PUT
     @Override
     @Consumes("application/json")
     public void edit(Users entity) {
         super.edit(entity);
+    }*/
+    
+    @PUT
+    @Override
+    @Consumes("application/json")
+    public void edit(Users entity) {
+        
+        if (entity.getUserId() != null) {
+            // fetch user to be updated.
+            Users user = super.find(entity.getUserId());
+            
+            // if a new first name has been provided...
+            if (entity.getFirstName() != null)
+                // set new first name.
+                user.setFirstName(entity.getFirstName());
+                        
+            // if a new last name has been provided...
+            if (entity.getLastName() != null)
+                // set new last name.
+                user.setLastName(entity.getLastName());
+            
+            // same for email address.
+            if (entity.getEmailAddress() != null)
+                user.setEmailAddress(entity.getEmailAddress());
+            
+            // username.
+            if (entity.getUsername() != null)
+                user.setUsername(entity.getUsername());
+            
+            // update
+            super.edit(user);
+        }
+        
+        //super.edit(entity);
     }
 
     @DELETE
@@ -116,7 +150,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
                     
     }
 
-    // return user by specifying username
+    /*// return user roles by specifying username
     @GET
     @Path("username/{username}/roles")
     @Produces("application/json")
@@ -168,7 +202,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
             return "";
         }
                     
-    }
+    }*/
     
     // returns the logged in user
     @GET
