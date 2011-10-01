@@ -26,6 +26,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -35,7 +36,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.users")
+@Path("users")
 public class UsersFacadeREST extends AbstractFacade<Users> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
@@ -110,12 +111,27 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     
     // return user by specifying username
     @GET
-    @Path("username/{username}")
     @Produces("application/json")
-    public String findByUsername(@PathParam("username") String username) {
+    public String findByUsername(@QueryParam("username") String username, @QueryParam("userId") Integer userId) {
         
-        Query q = em.createNamedQuery("Users.findByUsername");
-        q.setParameter("username", username);
+        
+        if (username == null && userId == null) {
+            // get username of logged in user
+            String loggedInUsername = security.getUserPrincipal().getName();
+        
+            // get and return logged in User from username
+            //return this.findByUsername(loggedInUsername, null);
+            username = loggedInUsername;
+        }
+        
+        Query q;
+        if (userId == null) {
+            q = em.createNamedQuery("Users.findByUsername");
+            q.setParameter("username", username);
+        } else {
+            q = em.createNamedQuery("Users.findByUserId");
+            q.setParameter("userId", userId);
+        }
         
         List<Users> userList = new ArrayList<Users>();
         userList = q.getResultList();
@@ -205,7 +221,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     }*/
     
     // returns the logged in user
-    @GET
+    /*@GET
     @Produces("application/json")
     @Path("getLoggedInUser")
     public String getLoggedInUser() {
@@ -215,7 +231,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         
         // get and return logged in User from username
         return this.findByUsername(loggedInUsername);
-    }
+    }*/
     
     /*@GET
     @Override
@@ -226,6 +242,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     
     @GET
     @Produces("application/json")
+    @Path("all")
     public String findAll2() {
         List<Users> users = super.findAll();
 
