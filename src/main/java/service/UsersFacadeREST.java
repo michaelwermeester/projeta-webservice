@@ -57,12 +57,18 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     }*/
     
     @POST
-    @Override
+    //@Override
     @Path("create")
     @RolesAllowed("administrator")
     @Consumes("application/json")
-    public void create(Users entity) {
-        //super.create(entity);
+    @Produces("application/json")
+    public String createNewUser(Users entity) {
+        
+        em.persist(entity);
+        
+        em.flush();
+        // return newly created user.        
+        return this.findByUsername(entity.getUsername(), null);
     }
 
     /*@PUT
@@ -82,7 +88,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
 
             // user may only update its own user details.
             // administrators may update all.
-            if ((this.getCurrentUser().getUserId() == entity.getUserId())
+            if ((this.getAuthenticatedUser().getUserId() == entity.getUserId())
                     || security.isUserInRole("administrator")) {
 
                 // fetch user to be updated.
@@ -330,7 +336,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     }
     
     // returns user ID of the authenticated user.
-    public Users getCurrentUser() {
+    public Users getAuthenticatedUser() {
         String username;
         username = security.getUserPrincipal().getName();
         

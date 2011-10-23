@@ -21,6 +21,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -34,6 +35,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(name = "users")
 @XmlRootElement
+@SequenceGenerator(name = "sequenceUser", sequenceName = "users_user_id_seq", allocationSize = 1)
 @NamedQueries({
     @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u"),
     @NamedQuery(name = "Users.findByUserId", query = "SELECT u FROM Users u WHERE u.userId = :userId"),
@@ -48,10 +50,14 @@ import javax.xml.bind.annotation.XmlTransient;
 public class Users implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @NotNull
-    @Column(name = "user_id")
+    // http://forums.netbeans.org/topic38907.html
+    // remove @NotNull from the entity bean. 
+    @NotNull 
+    //@Column(name = "user_id")
+    @Column(name = "user_id", nullable = false, unique = true)
+    @GeneratedValue(generator = "sequenceUser")
     private Integer userId;
     @Basic(optional = false)
     @NotNull
