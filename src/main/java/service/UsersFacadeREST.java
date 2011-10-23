@@ -49,11 +49,20 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         super(Users.class);
     }
 
-    @POST
+    /*@POST
     @Override
     @Consumes("application/json")
     public void create(Users entity) {
         super.create(entity);
+    }*/
+    
+    @POST
+    @Override
+    @Path("create")
+    @RolesAllowed("administrator")
+    @Consumes("application/json")
+    public void create(Users entity) {
+        //super.create(entity);
     }
 
     /*@PUT
@@ -65,35 +74,47 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     
     @PUT
     @Override
+    @Path("update")
     @Consumes("application/json")
     public void edit(Users entity) {
-        
+
         if (entity.getUserId() != null) {
-            // fetch user to be updated.
-            Users user = super.find(entity.getUserId());
-            
-            // if a new first name has been provided...
-            if (entity.getFirstName() != null)
-                // set new first name.
-                user.setFirstName(entity.getFirstName());
-                        
-            // if a new last name has been provided...
-            if (entity.getLastName() != null)
-                // set new last name.
-                user.setLastName(entity.getLastName());
-            
-            // same for email address.
-            if (entity.getEmailAddress() != null)
-                user.setEmailAddress(entity.getEmailAddress());
-            
-            // username.
-            if (entity.getUsername() != null)
-                user.setUsername(entity.getUsername());
-            
-            // update
-            super.edit(user);
+
+            // user may only update its own user details.
+            // administrators may update all.
+            if ((this.getCurrentUser().getUserId() == entity.getUserId())
+                    || security.isUserInRole("administrator")) {
+
+                // fetch user to be updated.
+                Users user = super.find(entity.getUserId());
+
+                // if a new first name has been provided...
+                if (entity.getFirstName() != null) // set new first name.
+                {
+                    user.setFirstName(entity.getFirstName());
+                }
+
+                // if a new last name has been provided...
+                if (entity.getLastName() != null) // set new last name.
+                {
+                    user.setLastName(entity.getLastName());
+                }
+
+                // same for email address.
+                if (entity.getEmailAddress() != null) {
+                    user.setEmailAddress(entity.getEmailAddress());
+                }
+
+                // username.
+                if (entity.getUsername() != null) {
+                    user.setUsername(entity.getUsername());
+                }
+
+                // update
+                super.edit(user);
+            }
         }
-        
+
         //super.edit(entity);
     }
 
@@ -308,4 +329,22 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         return em;
     }
     
+    // returns user ID of the authenticated user.
+    public Users getCurrentUser() {
+        String username;
+        username = security.getUserPrincipal().getName();
+        
+        Query q = em.createNamedQuery("Users.findByUsername");
+        q.setParameter("username", username);
+        
+        List<Users> userList = new ArrayList<Users>();
+        userList = q.getResultList();
+               
+        if (userList.size() == 1) {
+            return userList.get(0);
+        } else {
+            return null;
+        }
+    }
+  
 }
