@@ -172,7 +172,11 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @RolesAllowed("administrator")
     @Path("exists/{username}")
     @Produces("application/json")
-    public String findByUsername(@PathParam("username") String username) {
+    public String userExists(@PathParam("username") String username) {
+        
+        // minimum length of 2 characters.
+        //if (username.length() < 2)
+        //    return "1";
         
         Query q = em.createNamedQuery("Users.findByUsername");
         q.setParameter("username", username);
@@ -180,7 +184,8 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         List<Users> userList = new ArrayList<Users>();
         userList = q.getResultList();
                
-        if (userList.size() == 1) {
+        // if username exists, return 1
+        if (userList.size() == 1 ) {
             return "1";
         } else {
             return "0";
