@@ -68,7 +68,36 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         
         em.flush();
         // return newly created user.        
-        return this.findByUsername(entity.getUsername(), null);
+        //return this.findByUsername(entity.getUsername(), null);
+        return generateUserJSONString(entity);
+        
+    }
+
+    // creates JSON ready to be returned from web-service from a given user.
+    private String generateUserJSONString(Users entity) {
+        
+        ObjectMapper mapper = new ObjectMapper();
+        
+        List<Map> userMap = new ArrayList<Map>();
+        
+        // generate JSON representation for USER object.
+        Map<String, Object> userData = generateUserJSON(entity);
+        
+        userMap.add(userData);
+        
+        String retVal = "";
+        
+        HashMap<String, Object> retUsers = new HashMap<String, Object>();
+        
+        retUsers.put("users", userMap);
+        
+        try {
+            retVal = mapper.writeValueAsString(retUsers);
+        } catch (IOException ex) {
+            Logger.getLogger(UsersFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return retVal;
     }
 
     /*@PUT
@@ -136,6 +165,28 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     public Users find(@PathParam("id") Integer id) {
         return super.find(id);
     }
+    
+    // checks if a username exists.
+    // returns 1 if username exists and 0 if it doesn't.
+    @GET
+    @RolesAllowed("administrator")
+    @Path("exists/{username}")
+    @Produces("application/json")
+    public String findByUsername(@PathParam("username") String username) {
+        
+        Query q = em.createNamedQuery("Users.findByUsername");
+        q.setParameter("username", username);
+        
+        List<Users> userList = new ArrayList<Users>();
+        userList = q.getResultList();
+               
+        if (userList.size() == 1) {
+            return "1";
+        } else {
+            return "0";
+        }
+    }
+    
     
     // return user by specifying username
     @GET
