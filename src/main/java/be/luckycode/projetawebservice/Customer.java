@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Customer.findByCustomerId", query = "SELECT c FROM Customer c WHERE c.customerId = :customerId"),
     @NamedQuery(name = "Customer.findByCustomerName", query = "SELECT c FROM Customer c WHERE c.customerName = :customerName"),
     @NamedQuery(name = "Customer.findByComment", query = "SELECT c FROM Customer c WHERE c.comment = :comment"),
-    @NamedQuery(name = "Customer.findByVATnumber", query = "SELECT c FROM Customer c WHERE c.vATnumber = :vATnumber"),
+    @NamedQuery(name = "Customer.findByVatNumber", query = "SELECT c FROM Customer c WHERE c.vatNumber = :vatNumber"),
     @NamedQuery(name = "Customer.findByPhoneNumber", query = "SELECT c FROM Customer c WHERE c.phoneNumber = :phoneNumber"),
     @NamedQuery(name = "Customer.findByFaxNumber", query = "SELECT c FROM Customer c WHERE c.faxNumber = :faxNumber"),
     @NamedQuery(name = "Customer.findByAddress", query = "SELECT c FROM Customer c WHERE c.address = :address")})
@@ -57,8 +57,8 @@ public class Customer implements Serializable {
     @Column(name = "comment")
     private String comment;
     @Size(max = 50)
-    @Column(name = "VAT_number")
-    private String vATnumber;
+    @Column(name = "vat_number")
+    private String vatNumber;
     @Size(max = 50)
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -115,12 +115,12 @@ public class Customer implements Serializable {
         this.comment = comment;
     }
 
-    public String getVATnumber() {
-        return vATnumber;
+    public String getVatNumber() {
+        return vatNumber;
     }
 
-    public void setVATnumber(String vATnumber) {
-        this.vATnumber = vATnumber;
+    public void setVatNumber(String vATnumber) {
+        this.vatNumber = vATnumber;
     }
 
     public String getPhoneNumber() {
