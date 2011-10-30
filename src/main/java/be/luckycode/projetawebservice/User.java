@@ -37,17 +37,17 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @SequenceGenerator(name = "sequenceUser", sequenceName = "users_user_id_seq", allocationSize = 1)
 @NamedQueries({
-    @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u"),
-    @NamedQuery(name = "Users.findByUserId", query = "SELECT u FROM Users u WHERE u.userId = :userId"),
-    @NamedQuery(name = "Users.findByUsername", query = "SELECT u FROM Users u WHERE u.username = :username"),
-    @NamedQuery(name = "Users.findByPassword", query = "SELECT u FROM Users u WHERE u.password = :password"),
-    @NamedQuery(name = "Users.findByFirstName", query = "SELECT u FROM Users u WHERE u.firstName = :firstName"),
-    @NamedQuery(name = "Users.findByLastName", query = "SELECT u FROM Users u WHERE u.lastName = :lastName"),
-    @NamedQuery(name = "Users.findByEmailAddress", query = "SELECT u FROM Users u WHERE u.emailAddress = :emailAddress"),
-    @NamedQuery(name = "Users.findByAddress", query = "SELECT u FROM Users u WHERE u.address = :address"),
-    @NamedQuery(name = "Users.findByPhoneNumber", query = "SELECT u FROM Users u WHERE u.phoneNumber = :phoneNumber"),
-    @NamedQuery(name = "Users.findByJobTitle", query = "SELECT u FROM Users u WHERE u.jobTitle = :jobTitle")})
-public class Users implements Serializable {
+    @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u"),
+    @NamedQuery(name = "User.findByUserId", query = "SELECT u FROM User u WHERE u.userId = :userId"),
+    @NamedQuery(name = "User.findByUsername", query = "SELECT u FROM User u WHERE u.username = :username"),
+    @NamedQuery(name = "User.findByPassword", query = "SELECT u FROM User u WHERE u.password = :password"),
+    @NamedQuery(name = "User.findByFirstName", query = "SELECT u FROM User u WHERE u.firstName = :firstName"),
+    @NamedQuery(name = "User.findByLastName", query = "SELECT u FROM User u WHERE u.lastName = :lastName"),
+    @NamedQuery(name = "User.findByEmailAddress", query = "SELECT u FROM User u WHERE u.emailAddress = :emailAddress"),
+    @NamedQuery(name = "User.findByAddress", query = "SELECT u FROM User u WHERE u.address = :address"),
+    @NamedQuery(name = "User.findByPhoneNumber", query = "SELECT u FROM User u WHERE u.phoneNumber = :phoneNumber"),
+    @NamedQuery(name = "User.findByJobTitle", query = "SELECT u FROM User u WHERE u.jobTitle = :jobTitle")})
+public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -87,11 +87,11 @@ public class Users implements Serializable {
     @Size(max = 100)
     @Column(name = "job_title")
     private String jobTitle;
-    @ManyToMany(mappedBy = "usersCollection")
+    @ManyToMany(mappedBy = "userCollection")
     private Collection<Usergroup> usergroupCollection;
-    @ManyToMany(mappedBy = "usersCollection")
+    @ManyToMany(mappedBy = "userCollection")
     private Collection<Project> projectCollection;
-    @ManyToMany(mappedBy = "usersCollection")
+    @ManyToMany(mappedBy = "userCollection")
     private Collection<Role> roleCollection;
     @JoinColumn(name = "language", referencedColumnName = "language_code")
     @ManyToOne
@@ -115,14 +115,14 @@ public class Users implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userCreated")
     private Collection<Comment> commentCollection;
 
-    public Users() {
+    public User() {
     }
 
-    public Users(Integer userId) {
+    public User(Integer userId) {
         this.userId = userId;
     }
 
-    public Users(Integer userId, String username, String password) {
+    public User(Integer userId, String username, String password) {
         this.userId = userId;
         this.username = username;
         this.password = password;
@@ -340,10 +340,10 @@ public class Users implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Users)) {
+        if (!(object instanceof User)) {
             return false;
         }
-        Users other = (Users) object;
+        User other = (User) object;
         if ((this.userId == null && other.userId != null) || (this.userId != null && !this.userId.equals(other.userId))) {
             return false;
         }
@@ -352,7 +352,7 @@ public class Users implements Serializable {
 
     @Override
     public String toString() {
-        return "be.luckycode.projetawebservice.Users[ userId=" + userId + " ]";
+        return "be.luckycode.projetawebservice.User[ userId=" + userId + " ]";
     }
     
 }

@@ -55,7 +55,7 @@ public class Comment implements Serializable {
     private String comment;
     @JoinColumn(name = "user_created", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
-    private Users userCreated;
+    private User userCreated;
     @JoinColumn(name = "task_id", referencedColumnName = "task_id")
     @ManyToOne
     private Task taskId;
@@ -100,11 +100,11 @@ public class Comment implements Serializable {
         this.dateCreated = dateCreated;
     }
 
-    public Users getUserCreated() {
+    public User getUserCreated() {
         return userCreated;
     }
 
-    public void setUserCreated(Users userCreated) {
+    public void setUserCreated(User userCreated) {
         this.userCreated = userCreated;
     }
 

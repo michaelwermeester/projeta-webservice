@@ -5,7 +5,7 @@
 package service;
 
 import be.luckycode.projetawebservice.Role;
-import be.luckycode.projetawebservice.Users;
+import be.luckycode.projetawebservice.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,15 +38,15 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 @Stateless
 @Path("users")
-public class UsersFacadeREST extends AbstractFacade<Users> {
+public class UserFacadeREST extends AbstractFacade<User> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
 
     @Context
     SecurityContext security;
     
-    public UsersFacadeREST() {
-        super(Users.class);
+    public UserFacadeREST() {
+        super(User.class);
     }
 
     /*@POST
@@ -62,7 +62,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @RolesAllowed("administrator")
     @Consumes("application/json")
     @Produces("application/json")
-    public String createNewUser(Users entity) {
+    public String createNewUser(User entity) {
         
         em.persist(entity);
         
@@ -74,7 +74,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     }
 
     // creates JSON ready to be returned from web-service from a given user.
-    private String generateUserJSONString(Users entity) {
+    private String generateUserJSONString(User entity) {
         
         ObjectMapper mapper = new ObjectMapper();
         
@@ -94,7 +94,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         try {
             retVal = mapper.writeValueAsString(retUsers);
         } catch (IOException ex) {
-            Logger.getLogger(UsersFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return retVal;
@@ -111,7 +111,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @Override
     @Path("update")
     @Consumes("application/json")
-    public void edit(Users entity) {
+    public void edit(User entity) {
 
         if (entity.getUserId() != null) {
 
@@ -121,7 +121,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
                     || security.isUserInRole("administrator")) {
 
                 // fetch user to be updated.
-                Users user = super.find(entity.getUserId());
+                User user = super.find(entity.getUserId());
 
                 // if a new first name has been provided...
                 if (entity.getFirstName() != null) // set new first name.
@@ -162,7 +162,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @GET
     @Path("{id}")
     @Produces("application/json")
-    public Users find(@PathParam("id") Integer id) {
+    public User find(@PathParam("id") Integer id) {
         return super.find(id);
     }
     
@@ -178,10 +178,10 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         //if (username.length() < 2)
         //    return "1";
         
-        Query q = em.createNamedQuery("Users.findByUsername");
+        Query q = em.createNamedQuery("User.findByUsername");
         q.setParameter("username", username);
         
-        List<Users> userList = new ArrayList<Users>();
+        List<User> userList = new ArrayList<User>();
         userList = q.getResultList();
                
         // if username exists, return 1
@@ -210,19 +210,19 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         
         Query q;
         if (userId == null) {
-            q = em.createNamedQuery("Users.findByUsername");
+            q = em.createNamedQuery("User.findByUsername");
             q.setParameter("username", username);
         } else {
-            q = em.createNamedQuery("Users.findByUserId");
+            q = em.createNamedQuery("User.findByUserId");
             q.setParameter("userId", userId);
         }
         
-        List<Users> userList = new ArrayList<Users>();
+        List<User> userList = new ArrayList<User>();
         userList = q.getResultList();
                
         if (userList.size() == 1) {
             
-            Users u = userList.get(0);
+            User u = userList.get(0);
             
             ObjectMapper mapper = new ObjectMapper();
         
@@ -240,7 +240,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
             try {
                 retVal = mapper.writeValueAsString(retUsers);
             } catch (IOException ex) {
-                Logger.getLogger(UsersFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
             }
         
             return retVal;
@@ -328,7 +328,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @Produces("application/json")
     @Path("all")
     public String findAll2() {
-        List<Users> users = super.findAll();
+        List<User> users = super.findAll();
 
         String retVal = "";
         
@@ -336,7 +336,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         
         List<Map> userList = new ArrayList<Map>();
                 
-        for (Users u : users) {
+        for (User u : users) {
             
             Map<String, Object> userData = generateUserJSON(u);
             
@@ -349,13 +349,13 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
         try {
             retVal = mapper.writeValueAsString(retUsers);
         } catch (IOException ex) {
-            Logger.getLogger(UsersFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return retVal;
     }
 
-    private Map<String, Object> generateUserJSON(Users u) {
+    private Map<String, Object> generateUserJSON(User u) {
         
         Map<String, Object> userData = new HashMap<String, Object>();
         
@@ -375,7 +375,7 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     @GET
     @Path("{from}/{to}")
     @Produces("application/json")
-    public List<Users> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<User> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 
@@ -392,14 +392,14 @@ public class UsersFacadeREST extends AbstractFacade<Users> {
     }
     
     // returns user ID of the authenticated user.
-    public Users getAuthenticatedUser() {
+    public User getAuthenticatedUser() {
         String username;
         username = security.getUserPrincipal().getName();
         
-        Query q = em.createNamedQuery("Users.findByUsername");
+        Query q = em.createNamedQuery("User.findByUsername");
         q.setParameter("username", username);
         
-        List<Users> userList = new ArrayList<Users>();
+        List<User> userList = new ArrayList<User>();
         userList = q.getResultList();
                
         if (userList.size() == 1) {

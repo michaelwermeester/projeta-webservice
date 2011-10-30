@@ -78,10 +78,10 @@ public class Task implements Serializable {
     private Boolean deleted;
     @JoinColumn(name = "user_assigned", referencedColumnName = "user_id")
     @ManyToOne
-    private Users userAssigned;
+    private User userAssigned;
     @JoinColumn(name = "user_created", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
-    private Users userCreated;
+    private User userCreated;
     @OneToMany(mappedBy = "parentTaskId")
     private Collection<Task> taskCollection;
     @JoinColumn(name = "parent_task_id", referencedColumnName = "task_id")
@@ -211,19 +211,19 @@ public class Task implements Serializable {
         this.deleted = deleted;
     }
 
-    public Users getUserAssigned() {
+    public User getUserAssigned() {
         return userAssigned;
     }
 
-    public void setUserAssigned(Users userAssigned) {
+    public void setUserAssigned(User userAssigned) {
         this.userAssigned = userAssigned;
     }
 
-    public Users getUserCreated() {
+    public User getUserCreated() {
         return userCreated;
     }
 
-    public void setUserCreated(Users userCreated) {
+    public void setUserCreated(User userCreated) {
         this.userCreated = userCreated;
     }
 

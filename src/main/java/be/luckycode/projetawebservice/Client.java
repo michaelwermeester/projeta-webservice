@@ -29,30 +29,30 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author michael
  */
 @Entity
-@Table(name = "customer")
+@Table(name = "client")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Customer.findAll", query = "SELECT c FROM Customer c"),
-    @NamedQuery(name = "Customer.findByCustomerId", query = "SELECT c FROM Customer c WHERE c.customerId = :customerId"),
-    @NamedQuery(name = "Customer.findByCustomerName", query = "SELECT c FROM Customer c WHERE c.customerName = :customerName"),
-    @NamedQuery(name = "Customer.findByComment", query = "SELECT c FROM Customer c WHERE c.comment = :comment"),
-    @NamedQuery(name = "Customer.findByVatNumber", query = "SELECT c FROM Customer c WHERE c.vatNumber = :vatNumber"),
-    @NamedQuery(name = "Customer.findByPhoneNumber", query = "SELECT c FROM Customer c WHERE c.phoneNumber = :phoneNumber"),
-    @NamedQuery(name = "Customer.findByFaxNumber", query = "SELECT c FROM Customer c WHERE c.faxNumber = :faxNumber"),
-    @NamedQuery(name = "Customer.findByAddress", query = "SELECT c FROM Customer c WHERE c.address = :address")})
-public class Customer implements Serializable {
+    @NamedQuery(name = "Client.findAll", query = "SELECT c FROM Client c"),
+    @NamedQuery(name = "Client.findByClientId", query = "SELECT c FROM Client c WHERE c.clientId = :clientId"),
+    @NamedQuery(name = "Client.findByClientName", query = "SELECT c FROM Client c WHERE c.clientName = :clientName"),
+    @NamedQuery(name = "Client.findByComment", query = "SELECT c FROM Client c WHERE c.comment = :comment"),
+    @NamedQuery(name = "Client.findByVatNumber", query = "SELECT c FROM Client c WHERE c.vatNumber = :vatNumber"),
+    @NamedQuery(name = "Client.findByPhoneNumber", query = "SELECT c FROM Client c WHERE c.phoneNumber = :phoneNumber"),
+    @NamedQuery(name = "Client.findByFaxNumber", query = "SELECT c FROM Client c WHERE c.faxNumber = :faxNumber"),
+    @NamedQuery(name = "Client.findByAddress", query = "SELECT c FROM Client c WHERE c.address = :address")})
+public class Client implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @NotNull
-    @Column(name = "customer_id")
-    private Integer customerId;
+    @Column(name = "client_id")
+    private Integer clientId;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
-    @Column(name = "customer_name")
-    private String customerName;
+    @Column(name = "client_name")
+    private String clientName;
     @Size(max = 2147483647)
     @Column(name = "comment")
     private String comment;
@@ -68,43 +68,46 @@ public class Customer implements Serializable {
     @Size(max = 25)
     @Column(name = "address")
     private String address;
-    @JoinTable(name = "project_customer", joinColumns = {
-        @JoinColumn(name = "customer_id", referencedColumnName = "customer_id")}, inverseJoinColumns = {
+    @JoinTable(name = "project_client", joinColumns = {
+        @JoinColumn(name = "client_id", referencedColumnName = "client_id")}, inverseJoinColumns = {
         @JoinColumn(name = "project_id", referencedColumnName = "project_id")})
     @ManyToMany
     private Collection<Project> projectCollection;
-    @ManyToMany(mappedBy = "customerCollection")
+    @JoinTable(name = "client_contact", joinColumns = {
+        @JoinColumn(name = "client_id", referencedColumnName = "client_id")}, inverseJoinColumns = {
+        @JoinColumn(name = "contact_id", referencedColumnName = "contact_id")})
+    @ManyToMany
     private Collection<Contact> contactCollection;
     @JoinColumn(name = "primary_contact_id", referencedColumnName = "contact_id")
     @ManyToOne
     private Contact primaryContactId;
 
-    public Customer() {
+    public Client() {
     }
 
-    public Customer(Integer customerId) {
-        this.customerId = customerId;
+    public Client(Integer clientId) {
+        this.clientId = clientId;
     }
 
-    public Customer(Integer customerId, String customerName) {
-        this.customerId = customerId;
-        this.customerName = customerName;
+    public Client(Integer clientId, String clientName) {
+        this.clientId = clientId;
+        this.clientName = clientName;
     }
 
-    public Integer getCustomerId() {
-        return customerId;
+    public Integer getClientId() {
+        return clientId;
     }
 
-    public void setCustomerId(Integer customerId) {
-        this.customerId = customerId;
+    public void setClientId(Integer clientId) {
+        this.clientId = clientId;
     }
 
-    public String getCustomerName() {
-        return customerName;
+    public String getClientName() {
+        return clientName;
     }
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
     }
 
     public String getComment() {
@@ -119,8 +122,8 @@ public class Customer implements Serializable {
         return vatNumber;
     }
 
-    public void setVatNumber(String vATnumber) {
-        this.vatNumber = vATnumber;
+    public void setVatNumber(String vatNumber) {
+        this.vatNumber = vatNumber;
     }
 
     public String getPhoneNumber() {
@@ -176,18 +179,18 @@ public class Customer implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (customerId != null ? customerId.hashCode() : 0);
+        hash += (clientId != null ? clientId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Customer)) {
+        if (!(object instanceof Client)) {
             return false;
         }
-        Customer other = (Customer) object;
-        if ((this.customerId == null && other.customerId != null) || (this.customerId != null && !this.customerId.equals(other.customerId))) {
+        Client other = (Client) object;
+        if ((this.clientId == null && other.clientId != null) || (this.clientId != null && !this.clientId.equals(other.clientId))) {
             return false;
         }
         return true;
@@ -195,7 +198,7 @@ public class Customer implements Serializable {
 
     @Override
     public String toString() {
-        return "be.luckycode.projetawebservice.Customer[ customerId=" + customerId + " ]";
+        return "be.luckycode.projetawebservice.Client[ clientId=" + clientId + " ]";
     }
     
 }

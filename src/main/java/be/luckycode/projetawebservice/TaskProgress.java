@@ -53,7 +53,7 @@ public class TaskProgress implements Serializable {
     private Integer taskProgressId;
     @JoinColumn(name = "user_created", referencedColumnName = "user_id")
     @ManyToOne
-    private Users userCreated;
+    private User userCreated;
     @JoinColumn(name = "task_id", referencedColumnName = "task_id")
     @ManyToOne(optional = false)
     private Task taskId;
@@ -105,11 +105,11 @@ public class TaskProgress implements Serializable {
         this.taskProgressId = taskProgressId;
     }
 
-    public Users getUserCreated() {
+    public User getUserCreated() {
         return userCreated;
     }
 
-    public void setUserCreated(Users userCreated) {
+    public void setUserCreated(User userCreated) {
         this.userCreated = userCreated;
     }
 

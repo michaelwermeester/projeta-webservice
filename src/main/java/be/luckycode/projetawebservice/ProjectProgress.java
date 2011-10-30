@@ -56,7 +56,7 @@ public class ProjectProgress implements Serializable {
     private Integer projectProgressId;
     @JoinColumn(name = "user_created", referencedColumnName = "user_id")
     @ManyToOne
-    private Users userCreated;
+    private User userCreated;
     @JoinColumn(name = "status_id", referencedColumnName = "status_id")
     @ManyToOne(optional = false)
     private Status statusId;
@@ -108,11 +108,11 @@ public class ProjectProgress implements Serializable {
         this.projectProgressId = projectProgressId;
     }
 
-    public Users getUserCreated() {
+    public User getUserCreated() {
         return userCreated;
     }
 
-    public void setUserCreated(Users userCreated) {
+    public void setUserCreated(User userCreated) {
         this.userCreated = userCreated;
     }
 

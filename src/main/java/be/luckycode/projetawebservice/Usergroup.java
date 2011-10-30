@@ -51,7 +51,7 @@ public class Usergroup implements Serializable {
         @JoinColumn(name = "usergroup_id", referencedColumnName = "usergroup_id")}, inverseJoinColumns = {
         @JoinColumn(name = "user_id", referencedColumnName = "user_id")})
     @ManyToMany
-    private Collection<Users> usersCollection;
+    private Collection<User> userCollection;
     @ManyToMany(mappedBy = "usergroupCollection")
     private Collection<Project> projectCollection;
 
@@ -84,12 +84,12 @@ public class Usergroup implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Users> getUsersCollection() {
-        return usersCollection;
+    public Collection<User> getUserCollection() {
+        return userCollection;
     }
 
-    public void setUsersCollection(Collection<Users> usersCollection) {
-        this.usersCollection = usersCollection;
+    public void setUserCollection(Collection<User> userCollection) {
+        this.userCollection = userCollection;
     }
 
     @XmlTransient

@@ -51,7 +51,7 @@ public class Role implements Serializable {
         @JoinColumn(name = "role_id", referencedColumnName = "role_id")}, inverseJoinColumns = {
         @JoinColumn(name = "user_id", referencedColumnName = "user_id")})
     @ManyToMany
-    private Collection<Users> usersCollection;
+    private Collection<User> userCollection;
 
     public Role() {
     }
@@ -82,12 +82,12 @@ public class Role implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Users> getUsersCollection() {
-        return usersCollection;
+    public Collection<User> getUserCollection() {
+        return userCollection;
     }
 
-    public void setUsersCollection(Collection<Users> usersCollection) {
-        this.usersCollection = usersCollection;
+    public void setUserCollection(Collection<User> userCollection) {
+        this.userCollection = userCollection;
     }
 
     @Override

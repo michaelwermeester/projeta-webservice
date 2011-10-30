@@ -80,9 +80,9 @@ public class Project implements Serializable {
         @JoinColumn(name = "project_id", referencedColumnName = "project_id")}, inverseJoinColumns = {
         @JoinColumn(name = "user_id", referencedColumnName = "user_id")})
     @ManyToMany
-    private Collection<Users> usersCollection;
+    private Collection<User> userCollection;
     @ManyToMany(mappedBy = "projectCollection")
-    private Collection<Customer> customerCollection;
+    private Collection<Client> clientCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "projectId")
     private Collection<ProjectProgress> projectProgressCollection;
     @OneToMany(mappedBy = "parentProjectId")
@@ -115,7 +115,7 @@ public class Project implements Serializable {
     private boolean flagPublic;
     @JoinColumn(name = "user_created", referencedColumnName = "user_id")
     @ManyToOne
-    private Users userCreated;
+    private User userCreated;
 
     public Project() {
     }
@@ -162,11 +162,11 @@ public class Project implements Serializable {
         this.flagPublic = flagPublic;
     }
 
-    public Users getUserCreated() {
+    public User getUserCreated() {
         return userCreated;
     }
 
-    public void setUserCreated(Users userCreated) {
+    public void setUserCreated(User userCreated) {
         this.userCreated = userCreated;
     }
 
@@ -269,21 +269,21 @@ public class Project implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Users> getUsersCollection() {
-        return usersCollection;
+    public Collection<User> getUserCollection() {
+        return userCollection;
     }
 
-    public void setUsersCollection(Collection<Users> usersCollection) {
-        this.usersCollection = usersCollection;
+    public void setUserCollection(Collection<User> userCollection) {
+        this.userCollection = userCollection;
     }
 
     @XmlTransient
-    public Collection<Customer> getCustomerCollection() {
-        return customerCollection;
+    public Collection<Client> getClientCollection() {
+        return clientCollection;
     }
 
-    public void setCustomerCollection(Collection<Customer> customerCollection) {
-        this.customerCollection = customerCollection;
+    public void setClientCollection(Collection<Client> clientCollection) {
+        this.clientCollection = clientCollection;
     }
 
     @XmlTransient

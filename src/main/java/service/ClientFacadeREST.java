@@ -4,7 +4,7 @@
  */
 package service;
 
-import be.luckycode.projetawebservice.Customer;
+import be.luckycode.projetawebservice.Client;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -23,26 +23,26 @@ import javax.ws.rs.Produces;
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.customer")
-public class CustomerFacadeREST extends AbstractFacade<Customer> {
+@Path("be.luckycode.projetawebservice.client")
+public class ClientFacadeREST extends AbstractFacade<Client> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
 
-    public CustomerFacadeREST() {
-        super(Customer.class);
+    public ClientFacadeREST() {
+        super(Client.class);
     }
 
     @POST
     @Override
     @Consumes({"application/xml", "application/json"})
-    public void create(Customer entity) {
+    public void create(Client entity) {
         super.create(entity);
     }
 
     @PUT
     @Override
     @Consumes({"application/xml", "application/json"})
-    public void edit(Customer entity) {
+    public void edit(Client entity) {
         super.edit(entity);
     }
 
@@ -55,21 +55,21 @@ public class CustomerFacadeREST extends AbstractFacade<Customer> {
     @GET
     @Path("{id}")
     @Produces({"application/xml", "application/json"})
-    public Customer find(@PathParam("id") Integer id) {
+    public Client find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({"application/xml", "application/json"})
-    public List<Customer> findAll() {
+    public List<Client> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({"application/xml", "application/json"})
-    public List<Customer> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<Client> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 

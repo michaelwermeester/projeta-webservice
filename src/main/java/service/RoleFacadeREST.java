@@ -5,7 +5,7 @@
 package service;
 
 import be.luckycode.projetawebservice.Role;
-import be.luckycode.projetawebservice.Users;
+import be.luckycode.projetawebservice.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -76,23 +76,23 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
     @RolesAllowed("administrator")
     @Consumes("application/json")
     public void updateRolesForUser(@QueryParam("userId") Integer userId, ArrayList<Role> roles) {
-    //public String updateRolesForUser(Users user) {
+    //public String updateRolesForUser(User user) {
         //super.edit(entity);
         
         Query q;
         
         if (userId != null && security.isUserInRole("administrator")) {
-            q = em.createNamedQuery("Users.findByUserId");
+            q = em.createNamedQuery("User.findByUserId");
             q.setParameter("userId", userId);
         
         
-            List<Users> userList = new ArrayList<Users>();
+            List<User> userList = new ArrayList<User>();
             userList = q.getResultList();
             
             if (userList.size() == 1) {
 
                 // user
-                Users u = userList.get(0);
+                User u = userList.get(0);
                 
                 
                 //if (!roles.isEmpty()) {
@@ -138,7 +138,7 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
                                 
                                 //Collection ur = role.getUsersCollection();
                                 //ur.remove(u);
-                                role.getUsersCollection().remove(u);
+                                role.getUserCollection().remove(u);
                                 //u.setRoleCollection(null);
                                 
                                 
@@ -185,7 +185,7 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
                                 if (tmpRoleList.size() > 0 && tmpRoleList.get(0).getRoleId() != null) {
                                 
                                     Role role = tmpRoleList.get(0);
-                                    role.getUsersCollection().add(u);
+                                    role.getUserCollection().add(u);
                                 
                                     em.merge(role);
                                     //em.flush();
@@ -255,21 +255,21 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
         Query q;
         
         if (userId != null && security.isUserInRole("administrator")) {
-            q = em.createNamedQuery("Users.findByUserId");
+            q = em.createNamedQuery("User.findByUserId");
             q.setParameter("userId", userId);
         }
         else {
-            q = em.createNamedQuery("Users.findByUsername");
+            q = em.createNamedQuery("User.findByUsername");
             q.setParameter("username", username);
         }
         
-        List<Users> userList = new ArrayList<Users>();
+        List<User> userList = new ArrayList<User>();
         userList = q.getResultList();
                
         if (userList.size() == 1) {
 
             // user
-            Users u = userList.get(0);
+            User u = userList.get(0);
             
             // get roles by user.
             return getRoleByUser(u);
@@ -281,7 +281,7 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
 
     // get roles by user.
     // generates a hashmap and returns it as a String.
-    private String getRoleByUser(Users u) {
+    private String getRoleByUser(User u) {
         // get roles for user
         Collection<Role> roleList = u.getRoleCollection();
         ObjectMapper mapper = new ObjectMapper();
@@ -301,7 +301,7 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
         try {
             retVal = mapper.writeValueAsString(retUserRoles);
         } catch (IOException ex) {
-            Logger.getLogger(UsersFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
         return retVal;
     }

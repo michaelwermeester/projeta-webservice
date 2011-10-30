@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -35,6 +34,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Contact.findAll", query = "SELECT c FROM Contact c"),
     @NamedQuery(name = "Contact.findByContactId", query = "SELECT c FROM Contact c WHERE c.contactId = :contactId"),
+    @NamedQuery(name = "Contact.findByUserId", query = "SELECT c FROM Contact c WHERE c.userId = :userId"),
     @NamedQuery(name = "Contact.findByFirstName", query = "SELECT c FROM Contact c WHERE c.firstName = :firstName"),
     @NamedQuery(name = "Contact.findByLastName", query = "SELECT c FROM Contact c WHERE c.lastName = :lastName"),
     @NamedQuery(name = "Contact.findByEmailAddress", query = "SELECT c FROM Contact c WHERE c.emailAddress = :emailAddress"),
@@ -49,6 +49,8 @@ public class Contact implements Serializable {
     @NotNull
     @Column(name = "contact_id")
     private Integer contactId;
+    @Column(name = "user_id")
+    private Integer userId;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
@@ -71,16 +73,10 @@ public class Contact implements Serializable {
     @Size(max = 100)
     @Column(name = "job_title")
     private String jobTitle;
-    @JoinTable(name = "customer_contact", joinColumns = {
-        @JoinColumn(name = "contact_id", referencedColumnName = "contact_id")}, inverseJoinColumns = {
-        @JoinColumn(name = "customer_id", referencedColumnName = "customer_id")})
-    @ManyToMany
-    private Collection<Customer> customerCollection;
+    @ManyToMany(mappedBy = "contactCollection")
+    private Collection<Client> clientCollection;
     @OneToMany(mappedBy = "primaryContactId")
-    private Collection<Customer> customerCollection1;
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    @ManyToOne
-    private Users userId;
+    private Collection<Client> clientCollection1;
     @JoinColumn(name = "language", referencedColumnName = "language_code")
     @ManyToOne
     private Language language;
@@ -104,6 +100,14 @@ public class Contact implements Serializable {
 
     public void setContactId(Integer contactId) {
         this.contactId = contactId;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public String getFirstName() {
@@ -155,29 +159,21 @@ public class Contact implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Customer> getCustomerCollection() {
-        return customerCollection;
+    public Collection<Client> getClientCollection() {
+        return clientCollection;
     }
 
-    public void setCustomerCollection(Collection<Customer> customerCollection) {
-        this.customerCollection = customerCollection;
+    public void setClientCollection(Collection<Client> clientCollection) {
+        this.clientCollection = clientCollection;
     }
 
     @XmlTransient
-    public Collection<Customer> getCustomerCollection1() {
-        return customerCollection1;
+    public Collection<Client> getClientCollection1() {
+        return clientCollection1;
     }
 
-    public void setCustomerCollection1(Collection<Customer> customerCollection1) {
-        this.customerCollection1 = customerCollection1;
-    }
-
-    public Users getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Users userId) {
-        this.userId = userId;
+    public void setClientCollection1(Collection<Client> clientCollection1) {
+        this.clientCollection1 = clientCollection1;
     }
 
     public Language getLanguage() {

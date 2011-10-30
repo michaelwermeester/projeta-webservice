@@ -72,10 +72,10 @@ public class Bug implements Serializable {
     private Collection<BugProgress> bugProgressCollection;
     @JoinColumn(name = "user_assigned", referencedColumnName = "user_id")
     @ManyToOne
-    private Users userAssigned;
+    private User userAssigned;
     @JoinColumn(name = "user_reported", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
-    private Users userReported;
+    private User userReported;
     @JoinColumn(name = "project_id", referencedColumnName = "project_id")
     @ManyToOne
     private Project projectId;
@@ -211,19 +211,19 @@ public class Bug implements Serializable {
         this.bugProgressCollection = bugProgressCollection;
     }
 
-    public Users getUserAssigned() {
+    public User getUserAssigned() {
         return userAssigned;
     }
 
-    public void setUserAssigned(Users userAssigned) {
+    public void setUserAssigned(User userAssigned) {
         this.userAssigned = userAssigned;
     }
 
-    public Users getUserReported() {
+    public User getUserReported() {
         return userReported;
     }
 
-    public void setUserReported(Users userReported) {
+    public void setUserReported(User userReported) {
         this.userReported = userReported;
     }
 
