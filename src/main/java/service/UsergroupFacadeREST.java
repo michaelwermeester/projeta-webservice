@@ -24,7 +24,7 @@ import javax.ws.rs.Produces;
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.usergroup")
+@Path("usergroups")
 public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
@@ -61,9 +61,11 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
     public Usergroup find(@PathParam("id") Integer id) {
         return super.find(id);
     }
-
+    
+    // Returns all user groups.
     @GET
     @Override
+    @Path("all")
     @Produces("application/json")
     public List<Usergroup> findAll() {
         return super.findAll();
