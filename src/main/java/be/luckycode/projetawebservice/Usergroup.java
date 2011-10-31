@@ -33,7 +33,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Usergroup.findAll", query = "SELECT u FROM Usergroup u"),
     @NamedQuery(name = "Usergroup.findByUsergroupId", query = "SELECT u FROM Usergroup u WHERE u.usergroupId = :usergroupId"),
-    @NamedQuery(name = "Usergroup.findByCode", query = "SELECT u FROM Usergroup u WHERE u.code = :code")})
+    @NamedQuery(name = "Usergroup.findByCode", query = "SELECT u FROM Usergroup u WHERE u.code = :code"),
+    @NamedQuery(name = "Usergroup.findByComment", query = "SELECT u FROM Usergroup u WHERE u.comment = :comment")})
 public class Usergroup implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -47,6 +48,9 @@ public class Usergroup implements Serializable {
     @Size(min = 1, max = 50)
     @Column(name = "code")
     private String code;
+    @Size(max = 255)
+    @Column(name = "comment")
+    private String comment;
     @JoinTable(name = "user_usergroup", joinColumns = {
         @JoinColumn(name = "usergroup_id", referencedColumnName = "usergroup_id")}, inverseJoinColumns = {
         @JoinColumn(name = "user_id", referencedColumnName = "user_id")})
@@ -82,6 +86,15 @@ public class Usergroup implements Serializable {
     public void setCode(String code) {
         this.code = code;
     }
+    
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
 
     @XmlTransient
     public Collection<User> getUserCollection() {
