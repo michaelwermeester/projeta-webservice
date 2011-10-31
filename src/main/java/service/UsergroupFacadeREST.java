@@ -6,6 +6,7 @@ package service;
 
 import be.luckycode.projetawebservice.Usergroup;
 import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -34,14 +35,16 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
 
     @POST
     @Override
-    @Consumes({"application/xml", "application/json"})
+    @RolesAllowed({"administrator", "developer"})
+    @Consumes("application/json")
     public void create(Usergroup entity) {
         super.create(entity);
     }
 
     @PUT
     @Override
-    @Consumes({"application/xml", "application/json"})
+    @RolesAllowed({"administrator", "developer"})
+    @Consumes("application/json")
     public void edit(Usergroup entity) {
         super.edit(entity);
     }
@@ -54,21 +57,21 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
 
     @GET
     @Path("{id}")
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public Usergroup find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public List<Usergroup> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public List<Usergroup> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
