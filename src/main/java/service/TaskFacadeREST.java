@@ -33,7 +33,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.task")
+@Path("tasks")
 public class TaskFacadeREST extends AbstractFacade<Task> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;

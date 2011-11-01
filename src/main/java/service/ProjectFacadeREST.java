@@ -8,6 +8,7 @@ import be.luckycode.projetawebservice.Project;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +35,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.project")
+@Path("projects")
 public class ProjectFacadeREST extends AbstractFacade<Project> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
@@ -136,6 +137,20 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                 projectData.put("projectDescription", p.getProjectDescription());
                 projectData.put("projectId", p.getProjectId().toString());
                 projectData.put("projectTitle", p.getProjectTitle());
+                
+                // new/optional
+                if (p.getCompleted() != null)
+                    projectData.put("completed", p.getCompleted());
+                else
+                    projectData.put("completed", false);
+                if (p.getCanceled() != null)
+                    projectData.put("canceled", p.getCanceled());
+                else
+                    projectData.put("canceled", false);
+                //if (p.getStartDateReal() != null)
+                    projectData.put("startDateReal", CommonMethods.convertDate(p.getStartDateReal()));
+                //if (p.getEndDateReal() != null)
+                    projectData.put("endDateReal", CommonMethods.convertDate(p.getEndDateReal()));
 
                 // get child projects, if any
                 getChildProjects(p, userStruct, projectData);
