@@ -7,6 +7,7 @@ package service;
 import be.luckycode.projetawebservice.Role;
 import be.luckycode.projetawebservice.User;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -151,6 +152,28 @@ public class UserFacadeREST extends AbstractFacade<User> {
         }
 
         //super.edit(entity);
+    }
+    
+    @PUT
+    @Path("setPassword")
+    @RolesAllowed("administrator")
+    @Consumes("application/json")
+    @Produces("text/plain")
+    public String setPassword(User entity) throws NoSuchAlgorithmException {
+
+        // fetch user to be updated.
+        User user = super.find(entity.getUserId());
+
+        // if a new first name has been provided...
+        if (entity.getPassword() != null) // set new first name.
+        {
+            user.setPassword(entity.getPassword());
+        }
+
+        // update user.
+        super.edit(user);
+        
+        return "ok";
     }
 
     @DELETE
