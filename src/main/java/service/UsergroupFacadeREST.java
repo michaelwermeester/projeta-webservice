@@ -186,6 +186,7 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
 
     @PUT
     @RolesAllowed("administrator")
+    @Path("update")
     @Consumes("application/json")
     public void updateUsergroupsForUser(@QueryParam("userId") Integer userId, ArrayList<Usergroup> usergroups) {
         //public String updateRolesForUser(User user) {
