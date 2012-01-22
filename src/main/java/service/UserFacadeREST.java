@@ -431,5 +431,42 @@ public class UserFacadeREST extends AbstractFacade<User> {
             return null;
         }
     }
-  
+    
+    // 
+    public User getUser(String username, Integer userId) {
+        if (username == null && userId == null) {
+            // get username of logged in user
+            username = security.getUserPrincipal().getName();
+        } 
+        // if current user is not in administrator role.
+        else if (!security.isUserInRole("administrator")) {
+            return null;
+        }
+        
+        Query q;
+        
+        if (userId != null && security.isUserInRole("administrator")) {
+            q = em.createNamedQuery("User.findByUserId");
+            q.setParameter("userId", userId);
+        }
+        else {
+            q = em.createNamedQuery("User.findByUsername");
+            q.setParameter("username", username);
+        }
+        
+        List<User> userList = new ArrayList<User>();
+        userList = q.getResultList();
+               
+        if (userList.size() == 1) {
+
+            // user
+            User u = userList.get(0);
+            
+            // get roles by user.
+            return u;
+        } else {
+            return null;
+        }
+    }
+    
 }

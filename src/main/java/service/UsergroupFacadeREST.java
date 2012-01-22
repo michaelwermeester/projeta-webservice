@@ -4,12 +4,21 @@
  */
 package service;
 
+import be.luckycode.projetawebservice.User;
 import be.luckycode.projetawebservice.Usergroup;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -18,6 +27,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -26,8 +39,11 @@ import javax.ws.rs.Produces;
 @Stateless
 @Path("usergroups")
 public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
+
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
+    @Context
+    SecurityContext security;
 
     public UsergroupFacadeREST() {
         super(Usergroup.class);
@@ -41,13 +57,13 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
         super.create(entity);
     }
 
-    @PUT
+    /*@PUT
     @Override
     @RolesAllowed({"administrator", "developer"})
     @Consumes("application/json")
     public void edit(Usergroup entity) {
         super.edit(entity);
-    }
+    }*/
 
     @DELETE
     @Path("{id}")
@@ -61,7 +77,7 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
     public Usergroup find(@PathParam("id") Integer id) {
         return super.find(id);
     }
-    
+
     // Returns all user groups.
     @GET
     @Override
@@ -89,5 +105,160 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
     protected EntityManager getEntityManager() {
         return em;
     }
+
+    // return a user's usergroups
+    // if no username is specified: return usergroups for current user.
+    // if username is specified: return the usergroups for the given user.
+    @GET
+    @Produces("application/json")
+    public String usergroupByUsername(@QueryParam("username") String username, @QueryParam("userId") Integer userId) {
+
+        //UserFacadeREST userFacade = new UserFacadeREST();
+
+        User u = getUser(username, userId);
+        
+        return getUsergroupByUser(u);
+    }
     
+    public User getUser(String username, Integer userId) {
+        if (username == null && userId == null) {
+            // get username of logged in user
+            username = security.getUserPrincipal().getName();
+        } 
+        // if current user is not in administrator role.
+        else if (!security.isUserInRole("administrator")) {
+            return null;
+        }
+        
+        Query q;
+        
+        if (userId != null && security.isUserInRole("administrator")) {
+            q = em.createNamedQuery("User.findByUserId");
+            q.setParameter("userId", userId);
+        }
+        else {
+            q = em.createNamedQuery("User.findByUsername");
+            q.setParameter("username", username);
+        }
+        
+        List<User> userList = new ArrayList<User>();
+        userList = q.getResultList();
+               
+        if (userList.size() == 1) {
+
+            // user
+            User u = userList.get(0);
+            
+            // get roles by user.
+            return u;
+        } else {
+            return null;
+        }
+    }
+
+    // get usergroups by user.
+    // generates a hashmap and returns it as a String.
+    private String getUsergroupByUser(User u) {
+        // get roles for user
+        Collection<Usergroup> usergroupList = u.getUsergroupCollection();
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map> usergroupMap = new ArrayList<Map>();
+        for (Usergroup ug : usergroupList) {
+
+            Map<String, Object> usergroupData = new HashMap<String, Object>();
+
+            usergroupData.put("usergroupId", ug.getUsergroupId().toString());
+            usergroupData.put("code", ug.getCode());
+            usergroupData.put("comment", ug.getComment());
+
+            usergroupMap.add(usergroupData);
+        }
+        String retVal = "";
+        HashMap<String, Object> retUserUsergroups = new HashMap<String, Object>();
+        retUserUsergroups.put("usergroup", usergroupMap);
+        try {
+            retVal = mapper.writeValueAsString(retUserUsergroups);
+        } catch (IOException ex) {
+            Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return retVal;
+    }
+
+    @PUT
+    @RolesAllowed("administrator")
+    @Consumes("application/json")
+    public void updateUsergroupsForUser(@QueryParam("userId") Integer userId, ArrayList<Usergroup> usergroups) {
+        //public String updateRolesForUser(User user) {
+        //super.edit(entity);
+
+        Query q;
+
+        if (userId != null && security.isUserInRole("administrator")) {
+            q = em.createNamedQuery("User.findByUserId");
+            q.setParameter("userId", userId);
+
+
+            List<User> userList = new ArrayList<User>();
+            userList = q.getResultList();
+
+            if (userList.size() == 1) {
+
+                // user
+                User u = userList.get(0);
+
+
+                Collection<Usergroup> userUsergroup = u.getUsergroupCollection();
+
+
+                for (Usergroup ug : userUsergroup) {
+
+                    if (ug.getUsergroupId() != null) {
+
+
+
+                        q = em.createNamedQuery("Usergroup.findByUsergroupId");
+                        q.setParameter("usergroupId", ug.getUsergroupId());
+
+                        List<Usergroup> tmpUsergroupList = new ArrayList<Usergroup>();
+                        tmpUsergroupList = q.getResultList();
+
+                        Usergroup usergroup = tmpUsergroupList.get(0);
+
+                        usergroup.getUserCollection().remove(u);
+
+                        em.merge(usergroup);
+                    }
+
+                }
+
+
+                for (Usergroup ug : usergroups) {
+
+                    if (ug.getUsergroupId() != null) {
+
+                        //if (roles.contains(r) == false) {
+                        //em.persist(r.getUsersCollection().add(u));
+
+                        q = em.createNamedQuery("Usergroup.findByUsergroupId");
+                        q.setParameter("usergroupId", ug.getUsergroupId());
+
+                        List<Usergroup> tmpUsergroupList = new ArrayList<Usergroup>();
+                        tmpUsergroupList = q.getResultList();
+
+                        if (tmpUsergroupList.size() > 0 && tmpUsergroupList.get(0).getUsergroupId() != null) {
+
+                            Usergroup usergroup = tmpUsergroupList.get(0);
+                            usergroup.getUserCollection().add(u);
+
+                            em.merge(usergroup);
+                        }
+                        //}
+                    }
+                }
+
+            } else {
+            }
+
+        }
+    }
 }
