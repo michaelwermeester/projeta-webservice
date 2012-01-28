@@ -186,7 +186,7 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
 
     @PUT
     @RolesAllowed("administrator")
-    @Path("update")
+    @Path("updateGroupsForUser")
     @Consumes("application/json")
     public void updateUsergroupsForUser(@QueryParam("userId") Integer userId, ArrayList<Usergroup> usergroups) {
         //public String updateRolesForUser(User user) {
@@ -256,6 +256,37 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
                         //}
                     }
                 }
+
+            } else {
+            }
+
+        }
+    }
+    
+    @PUT
+    @RolesAllowed("administrator")
+    @Path("updateUsersForGroup")
+    @Consumes("application/json")
+    public void updateUsersForGroup(@QueryParam("usergroupId") Integer usergroupId, ArrayList<User> users) {
+        //public String updateRolesForUser(User user) {
+        //super.edit(entity);
+
+        Query q;
+
+        if (usergroupId != null && security.isUserInRole("administrator")) {
+            q = em.createNamedQuery("Usergroup.findByUsergroupId");
+            q.setParameter("usergroupId", usergroupId);
+
+
+            List<Usergroup> usergroupList = new ArrayList<Usergroup>();
+            usergroupList = q.getResultList();
+
+            if (usergroupList.size() == 1) {
+
+                // user
+                Usergroup ug = usergroupList.get(0);
+                ug.setUserCollection(users);
+                em.merge(ug);
 
             } else {
             }
