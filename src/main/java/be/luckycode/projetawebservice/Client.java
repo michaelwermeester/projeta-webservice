@@ -78,9 +78,14 @@ public class Client implements Serializable {
         @JoinColumn(name = "contact_id", referencedColumnName = "contact_id")})
     @ManyToMany
     private Collection<Contact> contactCollection;
-    @JoinColumn(name = "primary_contact_id", referencedColumnName = "contact_id")
+    @JoinColumn(name = "primary_contact_id", referencedColumnName = "user_id")
     @ManyToOne
-    private Contact primaryContactId;
+    private User primaryContactId;
+    @JoinTable(name = "client_user", joinColumns = {
+        @JoinColumn(name = "client_id", referencedColumnName = "client_id")}, inverseJoinColumns = {
+        @JoinColumn(name = "user_id", referencedColumnName = "user_id")})
+    @ManyToMany
+    private Collection<User> userCollection;
 
     public Client() {
     }
@@ -168,11 +173,11 @@ public class Client implements Serializable {
         this.contactCollection = contactCollection;
     }
 
-    public Contact getPrimaryContactId() {
+    public User getPrimaryContactId() {
         return primaryContactId;
     }
 
-    public void setPrimaryContactId(Contact primaryContactId) {
+    public void setPrimaryContactId(User primaryContactId) {
         this.primaryContactId = primaryContactId;
     }
 
@@ -201,4 +206,12 @@ public class Client implements Serializable {
         return "be.luckycode.projetawebservice.Client[ clientId=" + clientId + " ]";
     }
     
+    @XmlTransient
+    public Collection<User> getUserCollection() {
+        return userCollection;
+    }
+
+    public void setUserCollection(Collection<User> userCollection) {
+        this.userCollection = userCollection;
+    }
 }

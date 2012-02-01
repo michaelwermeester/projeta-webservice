@@ -114,6 +114,10 @@ public class User implements Serializable {
     private Collection<Bug> bugCollection1;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userCreated")
     private Collection<Comment> commentCollection;
+    @ManyToMany(mappedBy = "userCollection")
+    private Collection<Client> clientCollection;
+    @OneToMany(mappedBy = "primaryContactId")
+    private Collection<Client> clientCollection1;
 
     public User() {
     }
@@ -353,6 +357,24 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return "be.luckycode.projetawebservice.User[ userId=" + userId + " ]";
+    }
+    
+    @XmlTransient
+    public Collection<Client> getClientCollection() {
+        return clientCollection;
+    }
+
+    public void setClientCollection(Collection<Client> clientCollection) {
+        this.clientCollection = clientCollection;
+    }
+    
+    @XmlTransient
+    public Collection<Client> getClientCollection1() {
+        return clientCollection1;
+    }
+
+    public void setClientCollection1(Collection<Client> clientCollection1) {
+        this.clientCollection1 = clientCollection1;
     }
     
 }

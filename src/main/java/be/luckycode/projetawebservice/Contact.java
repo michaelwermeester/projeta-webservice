@@ -75,8 +75,6 @@ public class Contact implements Serializable {
     private String jobTitle;
     @ManyToMany(mappedBy = "contactCollection")
     private Collection<Client> clientCollection;
-    @OneToMany(mappedBy = "primaryContactId")
-    private Collection<Client> clientCollection1;
     @JoinColumn(name = "language", referencedColumnName = "language_code")
     @ManyToOne
     private Language language;
@@ -165,15 +163,6 @@ public class Contact implements Serializable {
 
     public void setClientCollection(Collection<Client> clientCollection) {
         this.clientCollection = clientCollection;
-    }
-
-    @XmlTransient
-    public Collection<Client> getClientCollection1() {
-        return clientCollection1;
-    }
-
-    public void setClientCollection1(Collection<Client> clientCollection1) {
-        this.clientCollection1 = clientCollection1;
     }
 
     public Language getLanguage() {
