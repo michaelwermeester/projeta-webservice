@@ -5,7 +5,13 @@
 package service;
 
 import be.luckycode.projetawebservice.Client;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -17,6 +23,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -86,4 +93,52 @@ public class ClientFacadeREST extends AbstractFacade<Client> {
         return em;
     }
     
+    
+    @GET
+    @Path("names")
+    @Produces("application/json")
+    public String getClientNames() {
+        List<Client> clients = super.findAll();
+
+        String retVal = "";
+        
+        ObjectMapper mapper = new ObjectMapper();
+        
+        List<Map> clientList = new ArrayList<Map>();
+                
+        for (Client cli : clients) {
+            
+            Map<String, Object> clientData = generateClientJSON(cli);
+            
+            clientList.add(clientData);
+        }
+        
+        HashMap<String, Object> retClients = new HashMap<String, Object>();
+        retClients.put("clients", clientList);
+        
+        try {
+            retVal = mapper.writeValueAsString(retClients);
+        } catch (IOException ex) {
+            Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return retVal;
+    }
+    
+    private Map<String, Object> generateClientJSON(Client client) {
+        
+        Map<String, Object> clientData = new HashMap<String, Object>();
+        
+        clientData.put("clientId", client.getClientId().toString());
+        clientData.put("clientName", client.getClientName());
+        
+        /*if (client.getFirstName() != null)
+            clientData.put("firstName", client.getFirstName());
+        if (client.getLastName() != null)
+            clientData.put("lastName", client.getLastName());
+        if (client.getEmailAddress() != null)
+            clientData.put("emailAddress", client.getEmailAddress());*/
+        
+        return clientData;
+    }
 }
