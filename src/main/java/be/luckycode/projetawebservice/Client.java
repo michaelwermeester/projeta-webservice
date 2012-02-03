@@ -65,7 +65,7 @@ public class Client implements Serializable {
     @Size(max = 50)
     @Column(name = "fax_number")
     private String faxNumber;
-    @Size(max = 25)
+    @Size(max = 255)
     @Column(name = "address")
     private String address;
     @JoinTable(name = "project_client", joinColumns = {
