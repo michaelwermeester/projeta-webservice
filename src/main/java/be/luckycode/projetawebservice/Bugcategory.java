@@ -47,6 +47,9 @@ public class Bugcategory implements Serializable {
     private String categoryName;
     @OneToMany(mappedBy = "bugcategoryId")
     private Collection<Bug> bugCollection;
+    @Size(max = 500)
+    @Column(name = "comment")
+    private String comment;
 
     public Bugcategory() {
     }
@@ -108,6 +111,14 @@ public class Bugcategory implements Serializable {
     @Override
     public String toString() {
         return "be.luckycode.projetawebservice.Bugcategory[ bugcategoryId=" + bugcategoryId + " ]";
+    }
+    
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
     
 }

@@ -23,7 +23,7 @@ import javax.ws.rs.Produces;
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.bugcategory")
+@Path("bugcategories")
 public class BugcategoryFacadeREST extends AbstractFacade<Bugcategory> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
