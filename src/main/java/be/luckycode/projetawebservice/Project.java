@@ -116,6 +116,8 @@ public class Project implements Serializable {
     @JoinColumn(name = "user_created", referencedColumnName = "user_id")
     @ManyToOne
     private User userCreated;
+    @OneToMany(mappedBy = "projectId")
+    private Collection<Task> taskCollection;
 
     public Project() {
     }
@@ -328,6 +330,15 @@ public class Project implements Serializable {
 
     public void setProjectversionCollection(Collection<Projectversion> projectversionCollection) {
         this.projectversionCollection = projectversionCollection;
+    }
+    
+    @XmlTransient
+    public Collection<Task> getTaskCollection() {
+        return taskCollection;
+    }
+
+    public void setTaskCollection(Collection<Task> taskCollection) {
+        this.taskCollection = taskCollection;
     }
     
 }

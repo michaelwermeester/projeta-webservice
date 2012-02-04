@@ -98,6 +98,9 @@ public class Task implements Serializable {
     @NotNull
     @Column(name = "task_id")
     private Integer taskId;
+    @JoinColumn(name = "project_id", referencedColumnName = "project_id")
+    @ManyToOne
+    private Project projectId;
 
     public Task() {
     }
@@ -278,4 +281,11 @@ public class Task implements Serializable {
         this.taskDescription = taskDescription;
     }
     
+    public Project getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Project projectId) {
+        this.projectId = projectId;
+    }
 }
