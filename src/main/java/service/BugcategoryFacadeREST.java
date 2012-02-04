@@ -6,6 +6,7 @@ package service;
 
 import be.luckycode.projetawebservice.Bugcategory;
 import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -34,19 +35,21 @@ public class BugcategoryFacadeREST extends AbstractFacade<Bugcategory> {
 
     @POST
     @Override
-    @Consumes({"application/xml", "application/json"})
+    @Consumes("application/json")
     public void create(Bugcategory entity) {
         super.create(entity);
     }
 
     @PUT
     @Override
-    @Consumes({"application/xml", "application/json"})
+    @RolesAllowed("administrator")
+    @Consumes("application/json")
     public void edit(Bugcategory entity) {
         super.edit(entity);
     }
 
     @DELETE
+    @RolesAllowed("administrator")
     @Path("{id}")
     public void remove(@PathParam("id") Integer id) {
         super.remove(super.find(id));
@@ -61,7 +64,8 @@ public class BugcategoryFacadeREST extends AbstractFacade<Bugcategory> {
 
     @GET
     @Override
-    @Produces({"application/xml", "application/json"})
+    @Path("all")
+    @Produces("application/json")
     public List<Bugcategory> findAll() {
         return super.findAll();
     }
