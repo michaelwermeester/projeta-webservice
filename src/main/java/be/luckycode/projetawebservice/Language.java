@@ -46,8 +46,6 @@ public class Language implements Serializable {
     private String languageDescription;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "languageCode")
     private Collection<Dictionary> dictionaryCollection;
-    @OneToMany(mappedBy = "language")
-    private Collection<Contact> contactCollection;
 
     public Language() {
     }
@@ -84,15 +82,6 @@ public class Language implements Serializable {
 
     public void setDictionaryCollection(Collection<Dictionary> dictionaryCollection) {
         this.dictionaryCollection = dictionaryCollection;
-    }
-
-    @XmlTransient
-    public Collection<Contact> getContactCollection() {
-        return contactCollection;
-    }
-
-    public void setContactCollection(Collection<Contact> contactCollection) {
-        this.contactCollection = contactCollection;
     }
 
     @Override
