@@ -32,7 +32,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Status.findAll", query = "SELECT s FROM Status s"),
     @NamedQuery(name = "Status.findByStatusId", query = "SELECT s FROM Status s WHERE s.statusId = :statusId"),
-    @NamedQuery(name = "Status.findByStatusName", query = "SELECT s FROM Status s WHERE s.statusName = :statusName")})
+    @NamedQuery(name = "Status.findByStatusName", query = "SELECT s FROM Status s WHERE s.statusName = :statusName"),
+    @NamedQuery(name = "Status.findByType", query = "SELECT s FROM Status s WHERE s.type = :type")})
 public class Status implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -46,6 +47,10 @@ public class Status implements Serializable {
     @Size(min = 1, max = 100)
     @Column(name = "status_name")
     private String statusName;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "type")
+    private char type;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "statusId")
     private Collection<BugProgress> bugProgressCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "statusId")
@@ -131,6 +136,14 @@ public class Status implements Serializable {
     @Override
     public String toString() {
         return "be.luckycode.projetawebservice.Status[ statusId=" + statusId + " ]";
+    }
+    
+    public char getType() {
+        return type;
+    }
+
+    public void setType(char type) {
+        this.type = type;
     }
     
 }
