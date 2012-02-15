@@ -161,20 +161,22 @@ public class UserFacadeREST extends AbstractFacade<User> {
     @Consumes("application/json")
     @Produces("text/plain")
     public String setPassword(User entity) throws NoSuchAlgorithmException {
-
+        
         // fetch user to be updated.
         User user = super.find(entity.getUserId());
 
         // if a new first name has been provided...
         if (entity.getPassword() != null) // set new first name.
         {
-            user.setPassword(entity.getPassword());
+            user.setPasswordNoEncrypt(entity.getPassword());
         }
 
         // update user.
         super.edit(user);
         
-        return "ok";
+        
+        return entity.getPassword();
+        //return "ok";
     }
 
     @DELETE

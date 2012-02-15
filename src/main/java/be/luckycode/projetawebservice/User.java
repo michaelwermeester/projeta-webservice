@@ -169,6 +169,10 @@ public class User implements Serializable {
         
         this.password = sb.toString(); 
     }
+    
+    public void setPasswordNoEncrypt(String password) {
+        this.password = password;
+    }
 
     public String getFirstName() {
         return firstName;
