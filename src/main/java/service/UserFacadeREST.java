@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -41,12 +42,12 @@ import org.codehaus.jackson.map.ObjectMapper;
 @Stateless
 @Path("users")
 public class UserFacadeREST extends AbstractFacade<User> {
+
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
-
     @Context
     SecurityContext security;
-    
+
     public UserFacadeREST() {
         super(User.class);
     }
@@ -55,9 +56,12 @@ public class UserFacadeREST extends AbstractFacade<User> {
     @Override
     @Consumes("application/json")
     public void create(Users entity) {
-        super.create(entity);
+    super.create(entity);
     }*/
     
+    /* Crée un nouvel utilisateur.
+     * Utilisé par l'application Mac (module 'administrateur').
+     */
     @POST
     //@Override
     @Path("create")
@@ -65,40 +69,81 @@ public class UserFacadeREST extends AbstractFacade<User> {
     @Consumes("application/json")
     @Produces("application/json")
     public String createNewUser(User entity) {
-        
+
         em.persist(entity);
-        
+
         em.flush();
         // return newly created user.        
         //return this.findByUsername(entity.getUsername(), null);
         return generateUserJSONString(entity);
-        
+
+    }
+
+    /* Crée un nouvel utilisateur et lui affecte la rôle "user".
+     * Utilisé par le site web (inscription).
+     */
+    @POST
+    //@Override
+    @Path("createWithUserRole")
+    @RolesAllowed("administrator")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public String createNewUserWithUserRole(User entity) {
+
+        // créer l'utilisateur.
+        em.persist(entity);
+
+        // 
+        Query q = em.createNamedQuery("Role.findByCode");
+        q.setParameter("code", "user");
+
+
+        List<Role> roleList = new ArrayList<Role>();
+        roleList = q.getResultList();
+
+        if (roleList.size() == 1) {
+
+            // 'user' role
+            Role role = roleList.get(0);
+            // affecter 'user' role à l'utilisateur. 
+            role.getUserCollection().add(entity);
+            // enregistrer en DB.
+            em.merge(role);
+
+        } else {
+        }
+
+        em.flush();
+        // return newly created user.        
+        //return this.findByUsername(entity.getUsername(), null);
+        return generateUserJSONString(entity);
+
     }
 
     // creates JSON ready to be returned from web-service from a given user.
     private String generateUserJSONString(User entity) {
-        
+
         ObjectMapper mapper = new ObjectMapper();
-        
+
         List<Map> userMap = new ArrayList<Map>();
-        
+
         // generate JSON representation for USER object.
         Map<String, Object> userData = generateUserJSON(entity);
-        
+
         userMap.add(userData);
-        
+
         String retVal = "";
-        
+
         HashMap<String, Object> retUsers = new HashMap<String, Object>();
-        
+
         retUsers.put("users", userMap);
-        
+
         try {
             retVal = mapper.writeValueAsString(retUsers);
         } catch (IOException ex) {
             Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return retVal;
     }
 
@@ -106,9 +151,8 @@ public class UserFacadeREST extends AbstractFacade<User> {
     @Override
     @Consumes("application/json")
     public void edit(Users entity) {
-        super.edit(entity);
+    super.edit(entity);
     }*/
-    
     @PUT
     @Override
     @Path("update")
@@ -154,14 +198,14 @@ public class UserFacadeREST extends AbstractFacade<User> {
 
         //super.edit(entity);
     }
-    
+
     @PUT
     @Path("setPassword")
     @RolesAllowed("administrator")
     @Consumes("application/json")
     @Produces("text/plain")
     public String setPassword(User entity) throws NoSuchAlgorithmException {
-        
+
         // fetch user to be updated.
         User user = super.find(entity.getUserId());
 
@@ -173,8 +217,8 @@ public class UserFacadeREST extends AbstractFacade<User> {
 
         // update user.
         super.edit(user);
-        
-        
+
+
         return entity.getPassword();
         //return "ok";
     }
@@ -191,7 +235,7 @@ public class UserFacadeREST extends AbstractFacade<User> {
     public User find(@PathParam("id") Integer id) {
         return super.find(id);
     }
-    
+
     // checks if a username exists.
     // returns 1 if username exists and 0 if it doesn't.
     @GET
@@ -199,41 +243,40 @@ public class UserFacadeREST extends AbstractFacade<User> {
     @Path("exists/{username}")
     @Produces("application/json")
     public String userExists(@PathParam("username") String username) {
-        
+
         // minimum length of 2 characters.
         //if (username.length() < 2)
         //    return "1";
-        
+
         Query q = em.createNamedQuery("User.findByUsername");
         q.setParameter("username", username);
-        
+
         List<User> userList = new ArrayList<User>();
         userList = q.getResultList();
-               
+
         // if username exists, return 1
-        if (userList.size() == 1 ) {
+        if (userList.size() == 1) {
             return "1";
         } else {
             return "0";
         }
     }
-    
-    
+
     // return user by specifying username
     @GET
     @Produces("application/json")
     public String findByUsername(@QueryParam("username") String username, @QueryParam("userId") Integer userId) {
-        
-        
+
+
         if (username == null && userId == null) {
             // get username of logged in user
             String loggedInUsername = security.getUserPrincipal().getName();
-        
+
             // get and return logged in User from username
             //return this.findByUsername(loggedInUsername, null);
             username = loggedInUsername;
         }
-        
+
         Query q;
         if (userId == null) {
             q = em.createNamedQuery("User.findByUsername");
@@ -242,38 +285,38 @@ public class UserFacadeREST extends AbstractFacade<User> {
             q = em.createNamedQuery("User.findByUserId");
             q.setParameter("userId", userId);
         }
-        
+
         List<User> userList = new ArrayList<User>();
         userList = q.getResultList();
-               
+
         if (userList.size() == 1) {
-            
+
             User u = userList.get(0);
-            
+
             ObjectMapper mapper = new ObjectMapper();
-        
+
             List<Map> userMap = new ArrayList<Map>();
-            
+
             Map<String, Object> userData = generateUserJSON(u);
-            
+
             userMap.add(userData);
-            
+
             String retVal = "";
-            
+
             HashMap<String, Object> retUsers = new HashMap<String, Object>();
             retUsers.put("users", userMap);
-        
+
             try {
                 retVal = mapper.writeValueAsString(retUsers);
             } catch (IOException ex) {
                 Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
             }
-        
+
             return retVal;
         } else {
             return "";
         }
-                    
+
     }
 
     /*// return user roles by specifying username
@@ -281,75 +324,72 @@ public class UserFacadeREST extends AbstractFacade<User> {
     @Path("username/{username}/roles")
     @Produces("application/json")
     public String roleByUsername(@PathParam("username") String username) {
-        
-        Query q = em.createNamedQuery("Users.findByUsername");
-        q.setParameter("username", username);
-        
-        List<Users> userList = new ArrayList<Users>();
-        userList = q.getResultList();
-               
-        if (userList.size() == 1) {
-
-            // user
-            Users u = userList.get(0);
-            
-            // get roles for user
-            Collection<Role> roleList = u.getRoleCollection();
-            
-            ObjectMapper mapper = new ObjectMapper();
-        
-            List<Map> roleMap = new ArrayList<Map>();
-            
-            
-            for (Role r : roleList) {
-                
-                Map<String, Object> roleData = new HashMap<String, Object>();
-                
-                roleData.put("roleId", r.getRoleId().toString());
-                roleData.put("code", r.getCode());
-                        
-                roleMap.add(roleData);
-            }
-            
-            
-            String retVal = "";
-            
-            HashMap<String, Object> retUserRoles = new HashMap<String, Object>();
-            retUserRoles.put("role", roleMap);
-        
-            try {
-                retVal = mapper.writeValueAsString(retUserRoles);
-            } catch (IOException ex) {
-                Logger.getLogger(UsersFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        
-            return retVal;
-        } else {
-            return "";
-        }
-                    
-    }*/
     
+    Query q = em.createNamedQuery("Users.findByUsername");
+    q.setParameter("username", username);
+    
+    List<Users> userList = new ArrayList<Users>();
+    userList = q.getResultList();
+    
+    if (userList.size() == 1) {
+    
+    // user
+    Users u = userList.get(0);
+    
+    // get roles for user
+    Collection<Role> roleList = u.getRoleCollection();
+    
+    ObjectMapper mapper = new ObjectMapper();
+    
+    List<Map> roleMap = new ArrayList<Map>();
+    
+    
+    for (Role r : roleList) {
+    
+    Map<String, Object> roleData = new HashMap<String, Object>();
+    
+    roleData.put("roleId", r.getRoleId().toString());
+    roleData.put("code", r.getCode());
+    
+    roleMap.add(roleData);
+    }
+    
+    
+    String retVal = "";
+    
+    HashMap<String, Object> retUserRoles = new HashMap<String, Object>();
+    retUserRoles.put("role", roleMap);
+    
+    try {
+    retVal = mapper.writeValueAsString(retUserRoles);
+    } catch (IOException ex) {
+    Logger.getLogger(UsersFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    
+    return retVal;
+    } else {
+    return "";
+    }
+    
+    }*/
     // returns the logged in user
     /*@GET
     @Produces("application/json")
     @Path("getLoggedInUser")
     public String getLoggedInUser() {
-        
-        // get username of logged in user
-        String loggedInUsername = security.getUserPrincipal().getName();
-        
-        // get and return logged in User from username
-        return this.findByUsername(loggedInUsername);
-    }*/
     
+    // get username of logged in user
+    String loggedInUsername = security.getUserPrincipal().getName();
+    
+    // get and return logged in User from username
+    return this.findByUsername(loggedInUsername);
+    }*/
     /*@GET
     @Override
     @Produces("application/json")
     public List<Users> findAll() {
-        return super.findAll();
+    return super.findAll();
     }*/
-    
     @GET
     @Produces("application/json")
     @Path("all")
@@ -357,44 +397,47 @@ public class UserFacadeREST extends AbstractFacade<User> {
         List<User> users = super.findAll();
 
         String retVal = "";
-        
+
         ObjectMapper mapper = new ObjectMapper();
-        
+
         List<Map> userList = new ArrayList<Map>();
-                
+
         for (User u : users) {
-            
+
             Map<String, Object> userData = generateUserJSON(u);
-            
+
             userList.add(userData);
         }
-        
+
         HashMap<String, Object> retUsers = new HashMap<String, Object>();
         retUsers.put("users", userList);
-        
+
         try {
             retVal = mapper.writeValueAsString(retUsers);
         } catch (IOException ex) {
             Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return retVal;
     }
 
     private Map<String, Object> generateUserJSON(User u) {
-        
+
         Map<String, Object> userData = new HashMap<String, Object>();
-        
+
         userData.put("userId", u.getUserId().toString());
         userData.put("username", u.getUsername());
-        
-        if (u.getFirstName() != null)
+
+        if (u.getFirstName() != null) {
             userData.put("firstName", u.getFirstName());
-        if (u.getLastName() != null)
+        }
+        if (u.getLastName() != null) {
             userData.put("lastName", u.getLastName());
-        if (u.getEmailAddress() != null)
+        }
+        if (u.getEmailAddress() != null) {
             userData.put("emailAddress", u.getEmailAddress());
-        
+        }
+
         return userData;
     }
 
@@ -416,63 +459,60 @@ public class UserFacadeREST extends AbstractFacade<User> {
     protected EntityManager getEntityManager() {
         return em;
     }
-    
+
     // returns user ID of the authenticated user.
     public User getAuthenticatedUser() {
         String username;
         username = security.getUserPrincipal().getName();
-        
+
         Query q = em.createNamedQuery("User.findByUsername");
         q.setParameter("username", username);
-        
+
         List<User> userList = new ArrayList<User>();
         userList = q.getResultList();
-               
+
         if (userList.size() == 1) {
             return userList.get(0);
         } else {
             return null;
         }
     }
-    
+
     // 
     public User getUser(String username, Integer userId) {
         if (username == null && userId == null) {
             // get username of logged in user
             username = security.getUserPrincipal().getName();
-        } 
-        // if current user is not in administrator role.
+        } // if current user is not in administrator role.
         else if (!security.isUserInRole("administrator")) {
             return null;
         }
-        
+
         Query q;
-        
+
         if (userId != null && security.isUserInRole("administrator")) {
             q = em.createNamedQuery("User.findByUserId");
             q.setParameter("userId", userId);
-        }
-        else {
+        } else {
             q = em.createNamedQuery("User.findByUsername");
             q.setParameter("username", username);
         }
-        
+
         List<User> userList = new ArrayList<User>();
         userList = q.getResultList();
-               
+
         if (userList.size() == 1) {
 
             // user
             User u = userList.get(0);
-            
+
             // get roles by user.
             return u;
         } else {
             return null;
         }
     }
-    
-    
+
     // return list of users by specifying usergroup id.
     @GET
     @Path("usergroup/{usergroupid}")
@@ -517,6 +557,4 @@ public class UserFacadeREST extends AbstractFacade<User> {
             return "";
         }
     }
-                    
-    
 }
