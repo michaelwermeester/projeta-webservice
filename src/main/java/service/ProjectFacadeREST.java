@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -44,11 +45,26 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         super(Project.class);
     }
 
-    @POST
+    /*@POST
     @Override
     @Consumes("application/json")
     public void create(Project entity) {
         super.create(entity);
+    }*/
+    
+    @POST
+    @Path("create")
+    @RolesAllowed("administrator")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public String createNewProject(Project entity) {
+        
+        em.persist(entity);
+        
+        em.flush();
+        
+        // test -> return project id...
+        return entity.getProjectId().toString();
     }
 
     @PUT
@@ -124,16 +140,24 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                 Map<String, Object> projectData = new HashMap<String, Object>();
                 Map<String, Object> userStruct = new HashMap<String, Object>();
                 //Map<String, String> nameStruct = new HashMap<String, String>();
-                userStruct.put("userId", p.getUserCreated().getUserId().toString());
-                userStruct.put("username", p.getUserCreated().getUsername());
-                projectData.put("userCreated", userStruct);
-                projectData.put("dateCreated", CommonMethods.convertDate(p.getDateCreated()));
+                if (p.getUserCreated() != null) {
+                    
+                    userStruct.put("userId", p.getUserCreated().getUserId().toString());
+                    userStruct.put("username", p.getUserCreated().getUsername());
+                    projectData.put("userCreated", userStruct);
+                }
+                
+                if (p.getDateCreated() != null)
+                    projectData.put("dateCreated", CommonMethods.convertDate(p.getDateCreated()));
                 //projectData.put("dateCreated", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getDateCreated()));
-                projectData.put("flagPublic", p.getFlagPublic());
+                if (p.getFlagPublic() != null)
+                    projectData.put("flagPublic", p.getFlagPublic());
                 //projectData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getEndDate()));
-                projectData.put("endDate", CommonMethods.convertDate(p.getEndDate()));
+                if (p.getEndDate() != null)
+                    projectData.put("endDate", CommonMethods.convertDate(p.getEndDate()));
                 //projectData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getStartDate()));
-                projectData.put("startDate", CommonMethods.convertDate(p.getStartDate()));
+                if (p.getStartDate() != null) 
+                    projectData.put("startDate", CommonMethods.convertDate(p.getStartDate()));
                 projectData.put("projectDescription", p.getProjectDescription());
                 projectData.put("projectId", p.getProjectId().toString());
                 projectData.put("projectTitle", p.getProjectTitle());
@@ -147,9 +171,9 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                     projectData.put("canceled", p.getCanceled());
                 else
                     projectData.put("canceled", false);
-                //if (p.getStartDateReal() != null)
+                if (p.getStartDateReal() != null)
                     projectData.put("startDateReal", CommonMethods.convertDate(p.getStartDateReal()));
-                //if (p.getEndDateReal() != null)
+                if (p.getEndDateReal() != null)
                     projectData.put("endDateReal", CommonMethods.convertDate(p.getEndDateReal()));
 
                 // get child projects, if any

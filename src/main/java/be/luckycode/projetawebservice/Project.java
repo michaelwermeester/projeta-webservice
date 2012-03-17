@@ -7,23 +7,7 @@ package be.luckycode.projetawebservice;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -36,6 +20,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(name = "project")
 @XmlRootElement
+@SequenceGenerator(name = "sequenceProject", sequenceName = "project_project_id_seq", allocationSize = 1)
 @NamedQueries({
     @NamedQuery(name = "Project.findAll", query = "SELECT p FROM Project p"),
     @NamedQuery(name = "Project.findByProjectId", query = "SELECT p FROM Project p WHERE p.projectId = :projectId"),
@@ -96,10 +81,11 @@ public class Project implements Serializable {
     private Collection<Projectversion> projectversionCollection;
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @NotNull
-    @Column(name = "project_id")
+    @Column(name = "project_id", nullable = false, unique = true)
+    @GeneratedValue(generator = "sequenceProject")
     private Integer projectId;
     @Basic(optional = false)
     @NotNull
@@ -112,7 +98,7 @@ public class Project implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "flag_public")
-    private boolean flagPublic;
+    private Boolean flagPublic;
     @JoinColumn(name = "user_created", referencedColumnName = "user_id")
     @ManyToOne
     private User userCreated;
@@ -156,11 +142,11 @@ public class Project implements Serializable {
         this.projectDescription = projectDescription;
     }
 
-    public boolean getFlagPublic() {
+    public Boolean getFlagPublic() {
         return flagPublic;
     }
 
-    public void setFlagPublic(boolean flagPublic) {
+    public void setFlagPublic(Boolean flagPublic) {
         this.flagPublic = flagPublic;
     }
 
