@@ -179,7 +179,11 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                 // get child projects, if any
                 getChildProjects(p, userStruct, projectData);
 
-                projectList.add(projectData);
+                // retourner/inclure seulement s'il ne s'agit pas d'un projet supprimé.  
+                if (p.getDeleted() == null || p.getDeleted() == false) {
+                    
+                    projectList.add(projectData);
+                }
             }
         }
   
