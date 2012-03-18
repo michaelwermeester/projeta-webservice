@@ -79,6 +79,18 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     public void remove(@PathParam("id") Integer id) {
         super.remove(super.find(id));
     }
+    
+    @POST
+    @Path("delete/{id}")
+    public void deleteProject(@PathParam("id") Integer id) {
+        
+        Project project = super.find(id);
+        // marquer "Supprimé"
+        project.setDeleted(Boolean.TRUE);
+        
+        // enregistrer en DB.
+        super.edit(project);
+    }
 
     @GET
     @Path("{id}")
