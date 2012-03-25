@@ -557,4 +557,45 @@ public class UserFacadeREST extends AbstractFacade<User> {
             return "";
         }
     }
+    
+    @GET
+    @Produces("application/json")
+    @Path("developers")
+    public String getDevelopers() {
+        
+        Query q = em.createNamedQuery("Role.findByCode");
+        q.setParameter("code", "developer");
+
+
+        List<Role> roleList = new ArrayList<Role>(q.getResultList());
+        //roleList = q.getResultList();
+        
+        // obtenir les utilisateurs qui ont 'developer' comme rôle.
+        List<User> users = new ArrayList<User>(roleList.get(0).getUserCollection());
+        
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map> userList = new ArrayList<Map>();
+
+        for (User u : users) {
+
+            Map<String, Object> userData = generateUserJSON(u);
+
+            userList.add(userData);
+        }
+
+        HashMap<String, Object> retUsers = new HashMap<String, Object>();
+        retUsers.put("users", userList);
+
+        try {
+            retVal = mapper.writeValueAsString(retUsers);
+        } catch (IOException ex) {
+            Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retVal;
+    }
 }

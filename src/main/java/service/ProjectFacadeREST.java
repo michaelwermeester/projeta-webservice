@@ -64,7 +64,69 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         em.flush();
         
         // test -> return project id...
-        return entity.getProjectId().toString();
+        //return entity.getProjectId().toString();
+        //Project p = super.find(entity.getProjectId());
+        List<Project> prjList = new ArrayList<Project>();
+        prjList.add(entity);
+        
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map> projectList = new ArrayList<Map>();
+        
+        getProjects(prjList, projectList);
+        
+//        Map<String, Object> projectData = new HashMap<String, Object>();
+//                Map<String, Object> userStruct = new HashMap<String, Object>();
+//                //Map<String, String> nameStruct = new HashMap<String, String>();
+//                if (p.getUserCreated() != null) {
+//                    
+//                    userStruct.put("userId", p.getUserCreated().getUserId().toString());
+//                    userStruct.put("username", p.getUserCreated().getUsername());
+//                    projectData.put("userCreated", userStruct);
+//                }
+//                
+//                if (p.getDateCreated() != null)
+//                    projectData.put("dateCreated", CommonMethods.convertDate(p.getDateCreated()));
+//                //projectData.put("dateCreated", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getDateCreated()));
+//                if (p.getFlagPublic() != null)
+//                    projectData.put("flagPublic", p.getFlagPublic());
+//                //projectData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getEndDate()));
+//                if (p.getEndDate() != null)
+//                    projectData.put("endDate", CommonMethods.convertDate(p.getEndDate()));
+//                //projectData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getStartDate()));
+//                if (p.getStartDate() != null) 
+//                    projectData.put("startDate", CommonMethods.convertDate(p.getStartDate()));
+//                projectData.put("projectDescription", p.getProjectDescription());
+//                projectData.put("projectId", p.getProjectId().toString());
+//                projectData.put("projectTitle", p.getProjectTitle());
+//                
+//                // new/optional
+//                if (p.getCompleted() != null)
+//                    projectData.put("completed", p.getCompleted());
+//                else
+//                    projectData.put("completed", false);
+//                if (p.getCanceled() != null)
+//                    projectData.put("canceled", p.getCanceled());
+//                else
+//                    projectData.put("canceled", false);
+//                if (p.getStartDateReal() != null)
+//                    projectData.put("startDateReal", CommonMethods.convertDate(p.getStartDateReal()));
+//                if (p.getEndDateReal() != null)
+//                    projectData.put("endDateReal", CommonMethods.convertDate(p.getEndDateReal()));
+//                    
+//                projectList.add(projectData);
+        
+        String retVal = "";
+                
+        HashMap<String, Object> retProjects = new HashMap<String, Object>();
+        retProjects.put("project", projectList);
+        
+        try {
+            retVal = mapper.writeValueAsString(retProjects);
+        } catch (IOException ex) {
+            Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return retVal;
     }
 
     @PUT
