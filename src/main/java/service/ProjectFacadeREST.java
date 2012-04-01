@@ -469,4 +469,47 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         return em;
     }
     
+    @PUT
+    @Path("update")
+    @RolesAllowed("administrator")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public String updateProject(Project entity) {
+        
+        
+        // fetch user to be updated.
+        Project project = super.find(entity.getProjectId());
+        
+        if (project.getProjectTitle() != null)
+            project.setProjectTitle(entity.getProjectTitle());
+        if (project.getProjectDescription() != null)
+            project.setProjectDescription(entity.getProjectDescription());
+        
+        
+        super.edit(project);
+        
+
+        
+        // SAME CODE AS IN CREATE !!!
+        List<Project> prjList = new ArrayList<Project>();
+        prjList.add(super.find(project.getProjectId()));
+        
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map> projectList = new ArrayList<Map>();
+        
+        getProjects(prjList, projectList);
+        
+        String retVal = "";
+                
+        HashMap<String, Object> retProjects = new HashMap<String, Object>();
+        retProjects.put("project", projectList);
+        
+        try {
+            retVal = mapper.writeValueAsString(retProjects);
+        } catch (IOException ex) {
+            Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return retVal;
+    }
 }
