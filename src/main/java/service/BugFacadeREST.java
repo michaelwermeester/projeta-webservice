@@ -23,7 +23,7 @@ import javax.ws.rs.Produces;
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.bug")
+@Path("bugs")
 public class BugFacadeREST extends AbstractFacade<Bug> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
@@ -34,14 +34,14 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
 
     @POST
     @Override
-    @Consumes({"application/xml", "application/json"})
+    @Consumes("application/json")
     public void create(Bug entity) {
         super.create(entity);
     }
 
     @PUT
     @Override
-    @Consumes({"application/xml", "application/json"})
+    @Consumes("application/json")
     public void edit(Bug entity) {
         super.edit(entity);
     }
@@ -54,14 +54,14 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
 
     @GET
     @Path("{id}")
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public Bug find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public List<Bug> findAll() {
         return super.findAll();
     }
