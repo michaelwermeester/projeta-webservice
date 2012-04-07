@@ -129,12 +129,19 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                 taskData.put("startDate", CommonMethods.convertDate(t.getStartDate()));
                 //taskData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getEndDate()));
                 //taskData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getStartDate()));
-                taskData.put("taskDescription", t.getTaskDescription());
+                
+                if (t.getTaskDescription() != null)
+                    taskData.put("taskDescription", t.getTaskDescription());
                 taskData.put("taskId", t.getTaskId().toString());
                 taskData.put("taskTitle", t.getTaskTitle());
                 
                 taskData.put("completed", t.getCompleted());
-
+                
+                if (t.getPriority() != null)
+                    taskData.put("priority", t.getPriority().toString());
+                else
+                    taskData.put("priority", "1");
+                
                 // get child projects, if any
                 getChildTasks(t, userStruct, taskData);
 
