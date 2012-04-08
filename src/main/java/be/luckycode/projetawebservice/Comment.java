@@ -6,19 +6,7 @@ package be.luckycode.projetawebservice;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -30,10 +18,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "comment")
 @XmlRootElement
+@SequenceGenerator(name = "sequenceComment", sequenceName = "comment_comment_id_seq", allocationSize = 1)
 @NamedQueries({
     @NamedQuery(name = "Comment.findAll", query = "SELECT c FROM Comment c"),
     @NamedQuery(name = "Comment.findByCommentId", query = "SELECT c FROM Comment c WHERE c.commentId = :commentId"),
     @NamedQuery(name = "Comment.findByComment", query = "SELECT c FROM Comment c WHERE c.comment = :comment"),
+    //
+    @NamedQuery(name = "Comment.findByTaskId", query = "SELECT c FROM Comment c WHERE c.taskId.taskId = :taskId order by c.dateCreated ASC"),
+    
     @NamedQuery(name = "Comment.findByDateCreated", query = "SELECT c FROM Comment c WHERE c.dateCreated = :dateCreated")})
 public class Comment implements Serializable {
     @Basic(optional = false)
@@ -43,10 +35,11 @@ public class Comment implements Serializable {
     private Date dateCreated;
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @NotNull
-    @Column(name = "comment_id")
+    @Column(name = "comment_id", nullable = false, unique = true)
+    @GeneratedValue(generator = "sequenceComment")
     private Integer commentId;
     @Basic(optional = false)
     @NotNull

@@ -315,6 +315,8 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         super.edit(task);
 
 
+        // TODO : mark childtask as completed.
+        
 
         // SAME CODE AS IN CREATE !!!
         List<Task> tskList = new ArrayList<Task>();
