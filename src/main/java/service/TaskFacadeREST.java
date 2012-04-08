@@ -245,4 +245,53 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         // enregistrer en DB.
         super.edit(task);
     }
+    
+    @PUT
+    @Path("update")
+    @RolesAllowed("administrator")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public String updateTask(Task entity) {
+
+
+        // fetch user to be updated.
+        Task task = super.find(entity.getTaskId());
+
+        if (task.getTaskTitle() != null) {
+            task.setTaskTitle(entity.getTaskTitle());
+        }
+        if (task.getTaskDescription() != null) {
+            task.setTaskDescription(entity.getTaskDescription());
+        }
+        if (task.getCompleted() != null) {
+            task.setCompleted(entity.getCompleted());
+        }
+
+
+        super.edit(task);
+
+
+
+        // SAME CODE AS IN CREATE !!!
+        List<Task> tskList = new ArrayList<Task>();
+        tskList.add(super.find(task.getTaskId()));
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map> taskList = new ArrayList<Map>();
+
+        getTasks(tskList, taskList);
+
+        String retVal = "";
+
+        HashMap<String, Object> retTasks = new HashMap<String, Object>();
+        retTasks.put("project", taskList);
+
+        try {
+            retVal = mapper.writeValueAsString(retTasks);
+        } catch (IOException ex) {
+            Logger.getLogger(TaskFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retVal;
+    }
 }
