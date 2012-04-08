@@ -23,8 +23,10 @@ import javax.xml.bind.annotation.XmlTransient;
 @SequenceGenerator(name = "sequenceTask", sequenceName = "task_task_id_seq", allocationSize = 1)
 @NamedQueries({
     @NamedQuery(name = "Task.findAll", query = "SELECT t FROM Task t"),
-    // get root projects (projects which have no parent)
-    @NamedQuery(name = "Task.getParentTasks", query = "SELECT t FROM Task t WHERE t.parentTaskId IS NULL"),
+    // get root projects (projects which have no parent) && exclude personal tasks.
+    @NamedQuery(name = "Task.getParentTasks", query = "SELECT t FROM Task t WHERE t.parentTaskId IS NULL and t.isPersonal = false"),
+    // get root projects (projects which have no parent) which are personal
+    @NamedQuery(name = "Task.getPersonalParentTasks", query = "SELECT t FROM Task t WHERE t.parentTaskId IS NULL and t.isPersonal = true and t.userCreated.userId = ?1"),
     // get child projects
     @NamedQuery(name = "Task.getChildTasks", query = "SELECT t FROM Task t WHERE t.parentTaskId = ?1"),
     @NamedQuery(name = "Task.findByTaskId", query = "SELECT t FROM Task t WHERE t.taskId = :taskId")})

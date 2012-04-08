@@ -23,7 +23,7 @@ import javax.ws.rs.Produces;
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.comment")
+@Path("comments")
 public class CommentFacadeREST extends AbstractFacade<Comment> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
@@ -54,14 +54,14 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
 
     @GET
     @Path("{id}")
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public Comment find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public List<Comment> findAll() {
         return super.findAll();
     }

@@ -5,6 +5,7 @@
 package service;
 
 import be.luckycode.projetawebservice.Task;
+import be.luckycode.projetawebservice.User;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +28,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -39,6 +42,8 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
+    @Context
+    SecurityContext security;
 
     public TaskFacadeREST() {
         super(Task.class);
@@ -76,6 +81,45 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
      * List<Task> findAll() { return super.findAll();
     }
      */
+    
+    @GET
+    @Path("personal")
+    @Produces("application/json")
+    public String findPersonalTasks() {
+        
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map> taskList = new ArrayList<Map>();
+
+
+
+        // get root projects (projects which have no parent) and which are personal.
+        Query q = em.createNamedQuery("Task.getPersonalParentTasks");
+        q.setParameter(1, this.getAuthenticatedUser().getUserId());
+
+        List<Task> tList = new ArrayList<Task>();
+        tList = q.getResultList();
+
+
+        // get projects and its children
+        getTasks(tList, taskList);
+
+
+        HashMap<String, Object> retTasks = new HashMap<String, Object>();
+        retTasks.put("task", taskList);
+
+        try {
+            retVal = mapper.writeValueAsString(retTasks);
+        } catch (IOException ex) {
+            Logger.getLogger(TaskFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retVal;
+    }
+    
+    
     @GET
     @Produces("application/json")
     public String findAll4() {
@@ -293,5 +337,23 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         }
 
         return retVal;
+    }
+    
+    // returns user ID of the authenticated user.
+    public User getAuthenticatedUser() {
+        String username;
+        username = security.getUserPrincipal().getName();
+
+        Query q = em.createNamedQuery("User.findByUsername");
+        q.setParameter("username", username);
+
+        List<User> userList = new ArrayList<User>();
+        userList = q.getResultList();
+
+        if (userList.size() == 1) {
+            return userList.get(0);
+        } else {
+            return null;
+        }
     }
 }
