@@ -119,6 +119,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             for (Task t : taskList) {
                 Map<String, Object> taskData = new HashMap<String, Object>();
                 Map<String, Object> userStruct = new HashMap<String, Object>();
+                //Map<String, Object> userAssignedStruct = new HashMap<String, Object>();
                 //Map<String, String> nameStruct = new HashMap<String, String>();
                 
                 userStruct.put("userId", t.getUserCreated().getUserId().toString());
@@ -139,8 +140,15 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                 
                 if (t.getPriority() != null)
                     taskData.put("priority", t.getPriority().toString());
-                else
+                else // retourner 1 comme priorité par défaut.
                     taskData.put("priority", "1");
+                
+                if (t.getUserAssigned() != null) {
+                    //userAssignedStruct.put("userId", t.getUserCreated().getUserId().toString());
+                    //userAssignedStruct.put("username", t.getUserCreated().getUsername());
+                    //taskData.put("userAssigned", userAssignedStruct);
+                    taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
+                }
                 
                 // get child projects, if any
                 getChildTasks(t, userStruct, taskData);
