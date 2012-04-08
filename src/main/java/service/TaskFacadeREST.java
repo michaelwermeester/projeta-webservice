@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -35,6 +36,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 @Stateless
 @Path("tasks")
 public class TaskFacadeREST extends AbstractFacade<Task> {
+
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
 
@@ -69,117 +71,123 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         return super.find(id);
     }
 
-    /*@GET
-    @Override
-    @Produces({"application/xml", "application/json"})
-    public List<Task> findAll() {
-        return super.findAll();
-    }*/
-    
+    /*
+     * @GET @Override @Produces({"application/xml", "application/json"}) public
+     * List<Task> findAll() { return super.findAll();
+    }
+     */
     @GET
     @Produces("application/json")
     public String findAll4() {
-        
+
         String retVal = "";
-        
+
         ObjectMapper mapper = new ObjectMapper();
-        
+
         List<Map> taskList = new ArrayList<Map>();
-        
-        
-        
+
+
+
         // get root projects (projects which have no parent)
         Query q = em.createNamedQuery("Task.getParentTasks");
-        
+
         List<Task> tList = new ArrayList<Task>();
         tList = q.getResultList();
-        
-        
+
+
         // get projects and its children
         getTasks(tList, taskList);
-        
-        
+
+
         HashMap<String, Object> retTasks = new HashMap<String, Object>();
         retTasks.put("task", taskList);
-        
+
         try {
             retVal = mapper.writeValueAsString(retTasks);
         } catch (IOException ex) {
             Logger.getLogger(TaskFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return retVal;
-        
- 
+
+
     }
-    
+
     private void getTasks(List<Task> taskList, List<Map> taskMapList) {
         // if list is not empty
         if (taskList.isEmpty() == false) {
             for (Task t : taskList) {
-                Map<String, Object> taskData = new HashMap<String, Object>();
-                Map<String, Object> userStruct = new HashMap<String, Object>();
-                //Map<String, Object> userAssignedStruct = new HashMap<String, Object>();
-                //Map<String, String> nameStruct = new HashMap<String, String>();
-                
-                userStruct.put("userId", t.getUserCreated().getUserId().toString());
-                userStruct.put("username", t.getUserCreated().getUsername());
-                taskData.put("userCreated", userStruct);
-                
-                taskData.put("endDate", CommonMethods.convertDate(t.getEndDate()));
-                taskData.put("startDate", CommonMethods.convertDate(t.getStartDate()));
-                //taskData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getEndDate()));
-                //taskData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getStartDate()));
-                
-                if (t.getTaskDescription() != null)
-                    taskData.put("taskDescription", t.getTaskDescription());
-                taskData.put("taskId", t.getTaskId().toString());
-                taskData.put("taskTitle", t.getTaskTitle());
-                
-                taskData.put("completed", t.getCompleted());
-                
-                if (t.getPriority() != null)
-                    taskData.put("priority", t.getPriority().toString());
-                else // retourner 1 comme priorité par défaut.
-                    taskData.put("priority", "1");
-                
-                if (t.getUserAssigned() != null) {
-                    //userAssignedStruct.put("userId", t.getUserCreated().getUserId().toString());
-                    //userAssignedStruct.put("username", t.getUserCreated().getUsername());
-                    //taskData.put("userAssigned", userAssignedStruct);
-                    taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
-                }
-                
-                // get child projects, if any
-                getChildTasks(t, userStruct, taskData);
 
-                taskMapList.add(taskData);
+                // retourner/inclure seulement s'il ne s'agit pas d'une tâche supprimée.  
+                if (t.getDeleted() == null || t.getDeleted() == false) {
+
+                    Map<String, Object> taskData = new HashMap<String, Object>();
+                    Map<String, Object> userStruct = new HashMap<String, Object>();
+                    //Map<String, Object> userAssignedStruct = new HashMap<String, Object>();
+                    //Map<String, String> nameStruct = new HashMap<String, String>();
+
+                    userStruct.put("userId", t.getUserCreated().getUserId().toString());
+                    userStruct.put("username", t.getUserCreated().getUsername());
+                    taskData.put("userCreated", userStruct);
+
+                    taskData.put("endDate", CommonMethods.convertDate(t.getEndDate()));
+                    taskData.put("startDate", CommonMethods.convertDate(t.getStartDate()));
+                    //taskData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getEndDate()));
+                    //taskData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getStartDate()));
+
+                    if (t.getTaskDescription() != null) {
+                        taskData.put("taskDescription", t.getTaskDescription());
+                    }
+                    taskData.put("taskId", t.getTaskId().toString());
+                    taskData.put("taskTitle", t.getTaskTitle());
+
+                    taskData.put("completed", t.getCompleted());
+
+                    taskData.put("isPersonal", t.getIsPersonal());
+
+                    if (t.getPriority() != null) {
+                        taskData.put("priority", t.getPriority().toString());
+                    } else // retourner 1 comme priorité par défaut.
+                    {
+                        taskData.put("priority", "1");
+                    }
+
+                    if (t.getUserAssigned() != null) {
+                        //userAssignedStruct.put("userId", t.getUserCreated().getUserId().toString());
+                        //userAssignedStruct.put("username", t.getUserCreated().getUsername());
+                        //taskData.put("userAssigned", userAssignedStruct);
+                        taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
+                    }
+
+                    // get child projects, if any
+                    getChildTasks(t, userStruct, taskData);
+
+                    taskMapList.add(taskData);
+                }
             }
         }
     }
-    
+
     private void getChildTasks(Task t, Map<String, Object> userStruct, Map<String, Object> taskData) {
         List<Map> childTaskMapList = new ArrayList<Map>();
-        
+
         // get child projects
         Query qry_child_tasks = em.createNamedQuery("Task.getChildTasks");
         qry_child_tasks.setParameter(1, t);
-        
-    
+
+
         List<Task> childTaskList = new ArrayList<Task>();
         childTaskList = qry_child_tasks.getResultList();
-        
+
         // get child projects
         getTasks(childTaskList, childTaskMapList);
-        
+
         // 
         if (childTaskMapList.isEmpty() == false) {
-            
+
             taskData.put("childTask", childTaskMapList);
         }
     }
-    
-    
 
     @GET
     @Path("{from}/{to}")
@@ -199,5 +207,42 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     protected EntityManager getEntityManager() {
         return em;
     }
-    
+
+    @POST
+    @Path("create")
+    @RolesAllowed("administrator")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public String createNewTask(Task entity) {
+
+        em.persist(entity);
+
+        em.flush();
+
+        return "OK, created.";
+    }
+
+    @POST
+    @Path("delete/{id}")
+    public void deleteTaskById(@PathParam("id") Integer id) {
+
+        Task task = super.find(id);
+        // marquer "Supprimé"
+        task.setDeleted(Boolean.TRUE);
+
+        // enregistrer en DB.
+        super.edit(task);
+    }
+
+    @POST
+    @Path("delete")
+    public void deleteTask(Task entity) {
+
+        Task task = super.find(entity.getTaskId());
+        // marquer "Supprimé"
+        task.setDeleted(Boolean.TRUE);
+
+        // enregistrer en DB.
+        super.edit(task);
+    }
 }

@@ -7,21 +7,7 @@ package be.luckycode.projetawebservice;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -34,6 +20,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(name = "task")
 @XmlRootElement
+@SequenceGenerator(name = "sequenceTask", sequenceName = "task_task_id_seq", allocationSize = 1)
 @NamedQueries({
     @NamedQuery(name = "Task.findAll", query = "SELECT t FROM Task t"),
     // get root projects (projects which have no parent)
@@ -95,10 +82,11 @@ public class Task implements Serializable {
     private Collection<Comment> commentCollection;
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @NotNull
-    @Column(name = "task_id")
+    @Column(name = "task_id", nullable = false, unique = true)
+    @GeneratedValue(generator = "sequenceTask")
     private Integer taskId;
     @JoinColumn(name = "project_id", referencedColumnName = "project_id")
     @ManyToOne
