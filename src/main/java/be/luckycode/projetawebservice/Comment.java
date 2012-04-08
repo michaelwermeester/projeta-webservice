@@ -62,6 +62,9 @@ public class Comment implements Serializable {
     @JoinColumn(name = "bug_id", referencedColumnName = "bug_id")
     @ManyToOne
     private Bug bugId;
+    @JoinColumn(name = "project_id", referencedColumnName = "project_id")
+    @ManyToOne
+    private Project projectId;
 
     public Comment() {
     }
@@ -118,6 +121,14 @@ public class Comment implements Serializable {
 
     public Bug getBugId() {
         return bugId;
+    }
+    
+    public Project getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Project projectId) {
+        this.projectId = projectId;
     }
 
     public void setBugId(Bug bugId) {

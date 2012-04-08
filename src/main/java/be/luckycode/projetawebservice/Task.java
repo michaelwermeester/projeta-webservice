@@ -76,6 +76,8 @@ public class Task implements Serializable {
     private Boolean completed;
     @Column(name = "deleted")
     private Boolean deleted;
+    @OneToMany(mappedBy = "taskId")
+    private Collection<Progress> progressCollection;
     @JoinColumn(name = "user_assigned", referencedColumnName = "user_id")
     @ManyToOne
     private User userAssigned;
@@ -287,5 +289,14 @@ public class Task implements Serializable {
 
     public void setProjectId(Project projectId) {
         this.projectId = projectId;
+    }
+    
+    @XmlTransient
+    public Collection<Progress> getProgressCollection() {
+        return progressCollection;
+    }
+
+    public void setProgressCollection(Collection<Progress> progressCollection) {
+        this.progressCollection = progressCollection;
     }
 }

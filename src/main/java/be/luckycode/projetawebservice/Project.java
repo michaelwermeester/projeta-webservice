@@ -102,8 +102,13 @@ public class Project implements Serializable {
     @JoinColumn(name = "user_created", referencedColumnName = "user_id")
     @ManyToOne
     private User userCreated;
+    @JoinColumn(name = "user_assigned", referencedColumnName = "user_id")
+    @ManyToOne
+    private User userAssigned;
     @OneToMany(mappedBy = "projectId")
     private Collection<Task> taskCollection;
+    @OneToMany(mappedBy = "projectId")
+    private Collection<Progress> progressCollection;
 
     public Project() {
     }
@@ -318,6 +323,14 @@ public class Project implements Serializable {
         this.projectversionCollection = projectversionCollection;
     }
     
+    public User getUserAssigned() {
+        return userAssigned;
+    }
+
+    public void setUserAssigned(User userAssigned) {
+        this.userAssigned = userAssigned;
+    }
+    
     @XmlTransient
     public Collection<Task> getTaskCollection() {
         return taskCollection;
@@ -326,5 +339,15 @@ public class Project implements Serializable {
     public void setTaskCollection(Collection<Task> taskCollection) {
         this.taskCollection = taskCollection;
     }
+    
+    @XmlTransient
+    public Collection<Progress> getProgressCollection() {
+        return progressCollection;
+    }
+
+    public void setProgressCollection(Collection<Progress> progressCollection) {
+        this.progressCollection = progressCollection;
+    }
+
     
 }

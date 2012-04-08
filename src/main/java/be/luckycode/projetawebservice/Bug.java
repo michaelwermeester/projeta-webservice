@@ -96,6 +96,8 @@ public class Bug implements Serializable {
     @NotNull
     @Column(name = "bug_id")
     private Integer bugId;
+    @OneToMany(mappedBy = "bugId")
+    private Collection<Progress> progressCollection;
 
     public Bug() {
     }
@@ -267,6 +269,15 @@ public class Bug implements Serializable {
 
     public void setCommentCollection(Collection<Comment> commentCollection) {
         this.commentCollection = commentCollection;
+    }
+    
+    @XmlTransient
+    public Collection<Progress> getProgressCollection() {
+        return progressCollection;
+    }
+
+    public void setProgressCollection(Collection<Progress> progressCollection) {
+        this.progressCollection = progressCollection;
     }
 
 }
