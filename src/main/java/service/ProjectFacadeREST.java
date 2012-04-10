@@ -4,7 +4,10 @@
  */
 package service;
 
+//import be.luckycode.projetawebservice.DummyProject;
 import be.luckycode.projetawebservice.Project;
+import be.luckycode.projetawebservice.ProjectDummy;
+import be.luckycode.projetawebservice.ProjectSimpleWebSite;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -177,6 +180,58 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
      * findAll() { return super.findAll();
     }
      */
+    
+    @GET
+    @Path("test")
+    //public List<Project> findProjectsPOJO() {
+    //    return super.findAll();
+    //}
+    
+    public ProjectDummy findProjectsPOJO() {
+        
+        ProjectDummy projDummy = new ProjectDummy();
+        //projDummy.setListProject(super.findAll());
+        
+        List<Project> listProjTmp = super.findAll();
+        
+        List<ProjectSimpleWebSite> listProj = new ArrayList<ProjectSimpleWebSite>();
+        
+        for (Project p_tmp : listProjTmp) {
+            
+            ProjectSimpleWebSite p = new ProjectSimpleWebSite();
+            p.setProjectTitle(p_tmp.getProjectTitle());
+            p.setProjectId(p_tmp.getProjectId());
+            
+            listProj.add(p);
+        }
+        
+        projDummy.setListProject(listProj);
+        
+        return projDummy;
+    }
+    
+    /*@GET
+    @Path("test")
+    //public List<Project> findProjectsPOJO() {
+    @Produces("application/xml")
+    public DummyProject findProjectsPOJO() {
+        //return super.findAll();
+        //return super.findAll();
+        
+        DummyProject dc = new DummyProject();
+        dc.setListProjects(super.findAll());
+        
+        return dc;
+        
+        //Project p = new Project();
+        //p.setProjectCollection(new ArrayList(super.findAll()));
+        //int size = p.getProjectCollection().size();
+        //String s = Integer.toString(size);
+        //p.setProjectTitle(s);
+        
+        //return p;
+    }*/
+    
     // returns parent objects including its children
     @GET
     @Produces("application/json")
