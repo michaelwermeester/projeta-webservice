@@ -181,26 +181,30 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     }
      */
     
+    // FOR WEBSITE !!!
     @GET
     @Path("test")
-    //public List<Project> findProjectsPOJO() {
-    //    return super.findAll();
-    //}
-    
     public ProjectDummy findProjectsPOJO() {
         
         ProjectDummy projDummy = new ProjectDummy();
         //projDummy.setListProject(super.findAll());
         
-        List<Project> listProjTmp = super.findAll();
+        //List<Project> listProjTmp = super.findAll();
+        Query q = em.createNamedQuery("Project.getParentProjects");
+
+        List<Project> prjList = new ArrayList<Project>();
+        prjList = q.getResultList();
+        
         
         List<ProjectSimpleWebSite> listProj = new ArrayList<ProjectSimpleWebSite>();
         
-        for (Project p_tmp : listProjTmp) {
+        for (Project p_tmp : prjList) {
             
             ProjectSimpleWebSite p = new ProjectSimpleWebSite();
             p.setProjectTitle(p_tmp.getProjectTitle());
             p.setProjectId(p_tmp.getProjectId());
+
+            getChildProjectsWebSite(p);
             
             listProj.add(p);
         }
@@ -208,6 +212,32 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         projDummy.setListProject(listProj);
         
         return projDummy;
+    }
+    
+    // FOR WEBSITE !!!
+    private void getChildProjectsWebSite(ProjectSimpleWebSite p) {
+        // get child projects
+        Query qry_child_projects = em.createNamedQuery("Project.getChildProjects");
+        Project p_qry = new Project(p.getProjectId());
+        qry_child_projects.setParameter(1, p_qry);
+
+        List<Project> childPrjList = new ArrayList<Project>();
+        childPrjList = qry_child_projects.getResultList();
+        
+        List<ProjectSimpleWebSite> listSubProject = new ArrayList<ProjectSimpleWebSite>();
+        
+        for (Project p_tmp : childPrjList) {
+            
+            ProjectSimpleWebSite p_sub = new ProjectSimpleWebSite();
+            p_sub.setProjectTitle(p_tmp.getProjectTitle());
+            p_sub.setProjectId(p_tmp.getProjectId());
+            
+            getChildProjectsWebSite(p_sub);
+            
+            listSubProject.add(p_sub);
+        }
+        
+        p.setChildProject(listSubProject);
     }
     
     /*@GET
