@@ -5,6 +5,7 @@
 package service;
 
 import be.luckycode.projetawebservice.Comment;
+import be.luckycode.projetawebservice.CommentDummy;
 import be.luckycode.projetawebservice.Task;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,6 +63,26 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
         super.remove(super.find(id));
     }
 
+    
+    // FOR WEBSITE !!!
+    @GET
+    @Path("wstask/{id}")
+    public CommentDummy findCommentsByTaskIdWebsite(@PathParam("id") Integer id) {
+        
+        CommentDummy retCommentDummy = new CommentDummy();
+        
+        
+        Query q = em.createNamedQuery("Comment.findByTaskId");
+        q.setParameter("taskId", id);
+        
+        List<Comment> cList = new ArrayList<Comment>(q.getResultList());
+        
+        
+        retCommentDummy.setListComment(cList);
+        
+        return retCommentDummy;
+    }
+    
     @GET
     @Path("task/{id}")
     @Produces("application/json")
