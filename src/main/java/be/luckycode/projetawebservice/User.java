@@ -367,4 +367,17 @@ public class User implements Serializable {
         this.clientCollection1 = clientCollection1;
     }
     
+    public String getFullName() {
+        
+        String fullname = "";
+        
+        if (this.firstName != null && this.firstName.length() > 0)
+            fullname += this.firstName;
+        if (this.firstName != null && this.firstName.length() > 0 && this.lastName != null && this.lastName.length() > 0)
+            fullname += " ";
+        if (this.lastName != null && this.lastName.length() > 0)
+            fullname += this.lastName;
+        
+        return fullname;
+    }
 }
