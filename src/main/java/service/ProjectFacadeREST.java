@@ -183,7 +183,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     
     // FOR WEBSITE !!!
     @GET
-    //@Path("test")
+    @Path("wsprojects")
     public ProjectDummy findProjectsPOJO() {
         
         ProjectDummy projDummy = new ProjectDummy();
