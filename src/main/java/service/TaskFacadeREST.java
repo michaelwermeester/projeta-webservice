@@ -4,8 +4,7 @@
  */
 package service;
 
-import be.luckycode.projetawebservice.Task;
-import be.luckycode.projetawebservice.User;
+import be.luckycode.projetawebservice.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -358,4 +357,66 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             return null;
         }
     }
+    
+    
+    // FOR WEBSITE !!!
+    @GET
+    @Path("wsproject/{id}")
+    public ProjectDummy findTasksByProjectIdPOJO(@PathParam("id") Integer id) {
+        
+        ProjectDummy projDummy = new ProjectDummy();
+        //projDummy.setListProject(super.findAll());
+        
+        //List<Project> listProjTmp = super.findAll();
+        //Query q = em.createNamedQuery("Project.getParentProjects");
+
+        List<Task> taskList = new ArrayList<Task>();
+        Query q = em.createNamedQuery("Task.getParentTasksByProjectId");
+        q.setParameter("projectId", id);
+        
+        taskList = q.getResultList();
+        
+        List<ProjectSimpleWebSite> listProj = new ArrayList<ProjectSimpleWebSite>();
+        
+        for (Task t_tmp : taskList) {
+            
+            ProjectSimpleWebSite p = new ProjectSimpleWebSite();
+            p.setProjectTitle(t_tmp.getTaskTitle());
+            p.setProjectId(t_tmp.getTaskId());
+
+            //getChildProjectsWebSite(p);
+            
+            listProj.add(p);
+        }
+        
+        projDummy.setListProject(listProj);
+        
+        return projDummy;
+    }
+    
+    // FOR WEBSITE !!!
+    /*private void getChildProjectsWebSite(ProjectSimpleWebSite p) {
+        // get child projects
+        Query qry_child_projects = em.createNamedQuery("Project.getChildProjects");
+        Project p_qry = new Project(p.getProjectId());
+        qry_child_projects.setParameter(1, p_qry);
+
+        List<Project> childPrjList = new ArrayList<Project>();
+        childPrjList = qry_child_projects.getResultList();
+        
+        List<ProjectSimpleWebSite> listSubProject = new ArrayList<ProjectSimpleWebSite>();
+        
+        for (Project p_tmp : childPrjList) {
+            
+            ProjectSimpleWebSite p_sub = new ProjectSimpleWebSite();
+            p_sub.setProjectTitle(p_tmp.getProjectTitle());
+            p_sub.setProjectId(p_tmp.getProjectId());
+            
+            getChildProjectsWebSite(p_sub);
+            
+            listSubProject.add(p_sub);
+        }
+        
+        p.setChildProject(listSubProject);
+    }*/
 }
