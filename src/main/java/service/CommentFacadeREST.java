@@ -8,13 +8,10 @@ import be.luckycode.projetawebservice.Comment;
 import be.luckycode.projetawebservice.CommentDummy;
 import be.luckycode.projetawebservice.Task;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -176,4 +173,20 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
         return em;
     }
     
+    
+    @POST
+    @Path("create")
+    @RolesAllowed("administrator")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public String createNewComment(Comment entity) {
+
+        //entity.setDateCreated(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
+        
+        em.persist(entity);
+
+        em.flush();
+
+        return "OK, created.";
+    }
 }

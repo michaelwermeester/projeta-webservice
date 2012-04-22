@@ -29,8 +29,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Comment.findByDateCreated", query = "SELECT c FROM Comment c WHERE c.dateCreated = :dateCreated")})
 public class Comment implements Serializable {
     @Basic(optional = false)
-    @NotNull
-    @Column(name = "date_created")
+    //@NotNull
+    @Column(name = "date_created", insertable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreated;
     private static final long serialVersionUID = 1L;
