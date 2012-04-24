@@ -70,7 +70,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
     @GET
     @Path("{id}")
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public Task find(@PathParam("id") Integer id) {
         return super.find(id);
     }
@@ -384,7 +384,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             p.setProjectTitle(t_tmp.getTaskTitle());
             p.setProjectId(t_tmp.getTaskId());
 
-            //getChildProjectsWebSite(p);
+            getChildTasksWebSite(p);
             
             listProj.add(p);
         }
@@ -395,28 +395,28 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     }
     
     // FOR WEBSITE !!!
-    /*private void getChildProjectsWebSite(ProjectSimpleWebSite p) {
+    private void getChildTasksWebSite(ProjectSimpleWebSite p) {
         // get child projects
-        Query qry_child_projects = em.createNamedQuery("Project.getChildProjects");
-        Project p_qry = new Project(p.getProjectId());
-        qry_child_projects.setParameter(1, p_qry);
+        Query qry_child_tasks = em.createNamedQuery("Task.getChildTasks");
+        Task p_qry = new Task(p.getProjectId());
+        qry_child_tasks.setParameter(1, p_qry);
 
-        List<Project> childPrjList = new ArrayList<Project>();
-        childPrjList = qry_child_projects.getResultList();
+        List<Task> childTaskList = new ArrayList<Task>();
+        childTaskList = qry_child_tasks.getResultList();
         
         List<ProjectSimpleWebSite> listSubProject = new ArrayList<ProjectSimpleWebSite>();
         
-        for (Project p_tmp : childPrjList) {
+        for (Task t_tmp : childTaskList) {
             
             ProjectSimpleWebSite p_sub = new ProjectSimpleWebSite();
-            p_sub.setProjectTitle(p_tmp.getProjectTitle());
-            p_sub.setProjectId(p_tmp.getProjectId());
+            p_sub.setProjectTitle(t_tmp.getTaskTitle());
+            p_sub.setProjectId(t_tmp.getTaskId());
             
-            getChildProjectsWebSite(p_sub);
+            getChildTasksWebSite(p_sub);
             
             listSubProject.add(p_sub);
         }
         
         p.setChildProject(listSubProject);
-    }*/
+    }
 }
