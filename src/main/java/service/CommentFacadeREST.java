@@ -179,14 +179,16 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
     @RolesAllowed("administrator")
     @Consumes("application/json")
     @Produces("application/json")
-    public String createNewComment(Comment entity) {
+    public Comment createNewComment(Comment entity) {
 
         //entity.setDateCreated(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
         
         em.persist(entity);
 
-        em.flush();
+        return entity;
+        
+        //em.flush();
 
-        return "OK, created.";
+        //return "OK, created.";
     }
 }
