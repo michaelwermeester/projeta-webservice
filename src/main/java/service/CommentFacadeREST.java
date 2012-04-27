@@ -191,4 +191,23 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
 
         //return "OK, created.";
     }
+    
+    // FOR WEBSITE !!!
+    @GET
+    @Path("wsproject/{id}")
+    public CommentDummy findCommentsByProjectIdWebsite(@PathParam("id") Integer id) {
+        
+        CommentDummy retCommentDummy = new CommentDummy();
+        
+        
+        Query q = em.createNamedQuery("Comment.findByProjectId");
+        q.setParameter("projectId", id);
+        
+        List<Comment> cList = new ArrayList<Comment>(q.getResultList());
+        
+        
+        retCommentDummy.setListComment(cList);
+        
+        return retCommentDummy;
+    }
 }

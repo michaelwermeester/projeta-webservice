@@ -23,8 +23,10 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Comment.findAll", query = "SELECT c FROM Comment c"),
     @NamedQuery(name = "Comment.findByCommentId", query = "SELECT c FROM Comment c WHERE c.commentId = :commentId"),
     @NamedQuery(name = "Comment.findByComment", query = "SELECT c FROM Comment c WHERE c.comment = :comment"),
-    //
+    // retourner les commentaires liés à un tâche.
     @NamedQuery(name = "Comment.findByTaskId", query = "SELECT c FROM Comment c WHERE c.taskId.taskId = :taskId order by c.dateCreated ASC"),
+    // retourner les commentaires liés à un projet.
+    @NamedQuery(name = "Comment.findByProjectId", query = "SELECT c FROM Comment c WHERE c.projectId.projectId = :projectId order by c.dateCreated ASC"),
     
     @NamedQuery(name = "Comment.findByDateCreated", query = "SELECT c FROM Comment c WHERE c.dateCreated = :dateCreated")})
 public class Comment implements Serializable {
