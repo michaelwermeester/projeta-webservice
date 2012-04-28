@@ -7,6 +7,7 @@ package service;
 import be.luckycode.projetawebservice.Comment;
 import be.luckycode.projetawebservice.CommentDummy;
 import be.luckycode.projetawebservice.Task;
+import be.luckycode.projetawebservice.User;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -24,6 +25,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -35,6 +38,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 public class CommentFacadeREST extends AbstractFacade<Comment> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
+    @Context
+    SecurityContext security;
 
     public CommentFacadeREST() {
         super(Comment.class);
@@ -183,6 +188,13 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
 
         //entity.setDateCreated(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
         
+        // si pas de 'user création' défini, mettre l'utilisateur authentifié.
+        if (entity.getUserCreated() == null) {
+            //entity.setUserCreated(new User(this.getAuthenticatedUser().getUserId()));
+            entity.setUserCreated(this.getAuthenticatedUser());
+        }
+        
+        // sauvegarder en DB.
         em.persist(entity);
 
         return entity;
@@ -209,5 +221,23 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
         retCommentDummy.setListComment(cList);
         
         return retCommentDummy;
+    }
+    
+    // returns user ID of the authenticated user.
+    public User getAuthenticatedUser() {
+        String username;
+        username = security.getUserPrincipal().getName();
+
+        Query q = em.createNamedQuery("User.findByUsername");
+        q.setParameter("username", username);
+
+        List<User> userList = new ArrayList<User>();
+        userList = q.getResultList();
+
+        if (userList.size() == 1) {
+            return userList.get(0);
+        } else {
+            return null;
+        }
     }
 }
