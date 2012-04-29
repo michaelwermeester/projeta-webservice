@@ -4,8 +4,7 @@
  */
 package service;
 
-import be.luckycode.projetawebservice.Bug;
-import be.luckycode.projetawebservice.User;
+import be.luckycode.projetawebservice.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -127,4 +126,68 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
             return null;
         }
     }
+    
+    
+    // FOR WEBSITE !!!
+    @GET
+    @Path("wsproject/{id}")
+    public BugDummy findBugsByProjectIdPOJO(@PathParam("id") Integer id) {
+        
+        BugDummy bugDummy = new BugDummy();
+        //projDummy.setListProject(super.findAll());
+        
+        //List<Project> listProjTmp = super.findAll();
+        //Query q = em.createNamedQuery("Project.getParentProjects");
+
+        List<Bug> bugList = new ArrayList<Bug>();
+        Query q = em.createNamedQuery("Bug.getBugsByProjectId");
+        q.setParameter("projectId", id);
+        
+        bugList = q.getResultList();
+        
+        List<BugSimpleWebSite> listBugs = new ArrayList<BugSimpleWebSite>();
+        
+        for (Bug b_tmp : bugList) {
+            
+            BugSimpleWebSite p = new BugSimpleWebSite();
+            p.setBugTitle(b_tmp.getTitle());
+            p.setBugId(b_tmp.getBugId());
+            if (b_tmp.getBugcategoryId() != null)
+                p.setBugType(b_tmp.getBugcategoryId().getCategoryName());
+            
+            //getChildBugsWebSite(p);
+            
+            listBugs.add(p);
+        }
+        
+        bugDummy.setListBug(listBugs);
+        
+        return bugDummy;
+    }
+    
+    // FOR WEBSITE !!!
+    /*private void getChildBugsWebSite(ProjectSimpleWebSite p) {
+        // get child projects
+        Query qry_child_bugs = em.createNamedQuery("Bug.getChildBugs");
+        Bug p_qry = new Bug(p.getProjectId());
+        qry_child_bugs.setParameter(1, p_qry);
+
+        List<Bug> childBugList = new ArrayList<Bug>();
+        childBugList = qry_child_bugs.getResultList();
+        
+        List<ProjectSimpleWebSite> listSubProject = new ArrayList<ProjectSimpleWebSite>();
+        
+        for (Bug b_tmp : childBugList) {
+            
+            ProjectSimpleWebSite p_sub = new ProjectSimpleWebSite();
+            p_sub.setProjectTitle(b_tmp.getTitle());
+            p_sub.setProjectId(b_tmp.getBugId());
+            
+            getChildBugsWebSite(p_sub);
+            
+            listSubProject.add(p_sub);
+        }
+        
+        p.setChildProject(listSubProject);
+    }*/
 }
