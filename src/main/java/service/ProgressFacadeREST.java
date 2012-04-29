@@ -4,33 +4,42 @@
  */
 package service;
 
+import be.luckycode.projetawebservice.Comment;
 import be.luckycode.projetawebservice.Progress;
+import be.luckycode.projetawebservice.User;
+import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 
 /**
  *
  * @author michael
  */
 @Stateless
-@Path("be.luckycode.projetawebservice.progress")
+@Path("progress")
 public class ProgressFacadeREST extends AbstractFacade<Progress> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
+    @Context
+    SecurityContext security;
 
     public ProgressFacadeREST() {
         super(Progress.class);
     }
 
-    @POST
+    /*@POST
     @Override
     @Consumes({"application/xml", "application/json"})
     public void create(Progress entity) {
         super.create(entity);
-    }
+    }*/
 
     @PUT
     @Override
@@ -54,7 +63,7 @@ public class ProgressFacadeREST extends AbstractFacade<Progress> {
 
     @GET
     @Override
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json")
     public List<Progress> findAll() {
         return super.findAll();
     }
@@ -76,6 +85,49 @@ public class ProgressFacadeREST extends AbstractFacade<Progress> {
     @java.lang.Override
     protected EntityManager getEntityManager() {
         return em;
+    }
+    
+    @POST
+    @Path("create")
+    @RolesAllowed({"administrator", "developer"})
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Progress createNewProgress(Progress entity) {
+
+        //entity.setDateCreated(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
+        
+        // si pas de 'user création' défini, mettre l'utilisateur authentifié.
+        if (entity.getUserCreated() == null) {
+            //entity.setUserCreated(new User(this.getAuthenticatedUser().getUserId()));
+            entity.setUserCreated(this.getAuthenticatedUser());
+        }
+        
+        // sauvegarder en DB.
+        em.persist(entity);
+
+        return entity;
+        
+        //em.flush();
+
+        //return "OK, created.";
+    }
+    
+    // returns user ID of the authenticated user.
+    public User getAuthenticatedUser() {
+        String username;
+        username = security.getUserPrincipal().getName();
+
+        Query q = em.createNamedQuery("User.findByUsername");
+        q.setParameter("username", username);
+
+        List<User> userList = new ArrayList<User>();
+        userList = q.getResultList();
+
+        if (userList.size() == 1) {
+            return userList.get(0);
+        } else {
+            return null;
+        }
     }
     
 }

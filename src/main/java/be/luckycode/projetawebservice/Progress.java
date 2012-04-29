@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "progress")
 @XmlRootElement
+@SequenceGenerator(name = "sequenceProgress", sequenceName = "progress_progress_id_seq", allocationSize = 1)
 @NamedQueries({
     @NamedQuery(name = "Progress.findAll", query = "SELECT p FROM Progress p"),
     @NamedQuery(name = "Progress.findByIdProgress", query = "SELECT p FROM Progress p WHERE p.idProgress = :idProgress"),
@@ -27,14 +28,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Progress implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @NotNull
-    @Column(name = "id_progress")
+    //@NotNull
+    @Column(name = "id_progress", nullable = false, unique = true)
+    @GeneratedValue(generator = "sequenceProgress")
     private Integer idProgress;
     @Basic(optional = false)
-    @NotNull
-    @Column(name = "date_created")
+    //@NotNull
+    @Column(name = "date_created", insertable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreated;
     @Column(name = "percentage_complete")
