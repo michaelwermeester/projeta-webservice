@@ -7,23 +7,7 @@ package be.luckycode.projetawebservice;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -36,13 +20,14 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(name = "bug")
 @XmlRootElement
+@SequenceGenerator(name = "sequenceBug", sequenceName = "bug_bug_id_seq", allocationSize = 1)
 @NamedQueries({
     @NamedQuery(name = "Bug.findAll", query = "SELECT b FROM Bug b"),
     @NamedQuery(name = "Bug.findByBugId", query = "SELECT b FROM Bug b WHERE b.bugId = :bugId")})
 public class Bug implements Serializable {
     @Basic(optional = false)
-    @NotNull
-    @Column(name = "date_reported")
+    //@NotNull
+    @Column(name = "date_reported", insertable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateReported;
     @Column(name = "priority")
@@ -91,10 +76,11 @@ public class Bug implements Serializable {
     private Collection<Comment> commentCollection;
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @NotNull
-    @Column(name = "bug_id")
+    @Column(name = "bug_id", nullable = false, unique = true)
+    @GeneratedValue(generator = "sequenceBug")
     private Integer bugId;
     @OneToMany(mappedBy = "bugId")
     private Collection<Progress> progressCollection;
