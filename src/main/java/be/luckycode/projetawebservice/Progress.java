@@ -24,6 +24,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Progress.findByIdProgress", query = "SELECT p FROM Progress p WHERE p.idProgress = :idProgress"),
     @NamedQuery(name = "Progress.findByDateCreated", query = "SELECT p FROM Progress p WHERE p.dateCreated = :dateCreated"),
     @NamedQuery(name = "Progress.findByPercentageComplete", query = "SELECT p FROM Progress p WHERE p.percentageComplete = :percentageComplete"),
+    // 
+    @NamedQuery(name = "Progress.findByTaskId", query = "SELECT p FROM Progress p WHERE p.taskId.taskId = :taskId order by p.dateCreated ASC"),
+    
     @NamedQuery(name = "Progress.findByProgressComment", query = "SELECT p FROM Progress p WHERE p.progressComment = :progressComment")})
 public class Progress implements Serializable {
     private static final long serialVersionUID = 1L;

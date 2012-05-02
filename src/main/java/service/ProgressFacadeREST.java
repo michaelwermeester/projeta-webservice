@@ -6,6 +6,7 @@ package service;
 
 import be.luckycode.projetawebservice.Comment;
 import be.luckycode.projetawebservice.Progress;
+import be.luckycode.projetawebservice.ProgressDummy;
 import be.luckycode.projetawebservice.User;
 import java.util.ArrayList;
 import java.util.List;
@@ -128,6 +129,26 @@ public class ProgressFacadeREST extends AbstractFacade<Progress> {
         } else {
             return null;
         }
+    }
+    
+    
+    // FOR WEBSITE !!!
+    @GET
+    @Path("wstask/{id}")
+    public ProgressDummy findProgressByTaskIdWebsite(@PathParam("id") Integer id) {
+        
+        ProgressDummy retProgressDummy = new ProgressDummy();
+        
+        
+        Query q = em.createNamedQuery("Progress.findByTaskId");
+        q.setParameter("taskId", id);
+        
+        List<Progress> cList = new ArrayList<Progress>(q.getResultList());
+        
+        
+        retProgressDummy.setListProgress(cList);
+        
+        return retProgressDummy;
     }
     
 }
