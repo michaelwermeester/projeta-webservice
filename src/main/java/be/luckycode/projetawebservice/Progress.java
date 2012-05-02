@@ -24,8 +24,10 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Progress.findByIdProgress", query = "SELECT p FROM Progress p WHERE p.idProgress = :idProgress"),
     @NamedQuery(name = "Progress.findByDateCreated", query = "SELECT p FROM Progress p WHERE p.dateCreated = :dateCreated"),
     @NamedQuery(name = "Progress.findByPercentageComplete", query = "SELECT p FROM Progress p WHERE p.percentageComplete = :percentageComplete"),
-    // 
+    // findByTaskId
     @NamedQuery(name = "Progress.findByTaskId", query = "SELECT p FROM Progress p WHERE p.taskId.taskId = :taskId order by p.dateCreated ASC"),
+    // findByProjectId
+    @NamedQuery(name = "Progress.findByProjectId", query = "SELECT p FROM Progress p WHERE p.projectId.projectId = :projectId order by p.dateCreated ASC"),
     
     @NamedQuery(name = "Progress.findByProgressComment", query = "SELECT p FROM Progress p WHERE p.progressComment = :progressComment")})
 public class Progress implements Serializable {

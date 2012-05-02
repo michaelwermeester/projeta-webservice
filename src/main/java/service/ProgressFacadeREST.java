@@ -151,4 +151,22 @@ public class ProgressFacadeREST extends AbstractFacade<Progress> {
         return retProgressDummy;
     }
     
+    // FOR WEBSITE !!!
+    @GET
+    @Path("wsproject/{id}")
+    public ProgressDummy findProgressByProjectIdWebsite(@PathParam("id") Integer id) {
+        
+        ProgressDummy retProgressDummy = new ProgressDummy();
+        
+        
+        Query q = em.createNamedQuery("Progress.findByProjectId");
+        q.setParameter("projectId", id);
+        
+        List<Progress> cList = new ArrayList<Progress>(q.getResultList());
+        
+        
+        retProgressDummy.setListProgress(cList);
+        
+        return retProgressDummy;
+    }
 }
