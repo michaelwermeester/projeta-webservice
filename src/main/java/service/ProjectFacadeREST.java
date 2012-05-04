@@ -5,6 +5,7 @@
 package service;
 
 //import be.luckycode.projetawebservice.DummyProject;
+import be.luckycode.projetawebservice.Progress;
 import be.luckycode.projetawebservice.Project;
 import be.luckycode.projetawebservice.ProjectDummy;
 import be.luckycode.projetawebservice.ProjectSimpleWebSite;
@@ -203,6 +204,9 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             ProjectSimpleWebSite p = new ProjectSimpleWebSite();
             p.setProjectTitle(p_tmp.getProjectTitle());
             p.setProjectId(p_tmp.getProjectId());
+            
+            // statut
+            p.setProjectStatus(getStatusForProjectId(p_tmp.getProjectId()));
 
             getChildProjectsWebSite(p);
             
@@ -232,12 +236,35 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             p_sub.setProjectTitle(p_tmp.getProjectTitle());
             p_sub.setProjectId(p_tmp.getProjectId());
             
+            // statut.
+            p_sub.setProjectStatus(getStatusForProjectId(p_tmp.getProjectId()));
+            
             getChildProjectsWebSite(p_sub);
             
             listSubProject.add(p_sub);
         }
         
         p.setChildProject(listSubProject);
+    }
+    
+    // retourne le statut actuel du projet.
+    private String getStatusForProjectId(Integer projectId) {
+        
+        // liste des 'Progress' pour le projet.
+        Query qryStatus = em.createNamedQuery("Progress.findByProjectId");
+        qryStatus.setParameter("projectId", projectId);
+        // obtenir le plus récent.
+        qryStatus.setMaxResults(1); // top 1 result
+        // lire en liste.
+        List<Progress> listProgress = new ArrayList<Progress>();
+        listProgress = qryStatus.getResultList();
+        
+        // retourner le statut, s'il y'en a un.
+        if (listProgress.size() > 0) {
+            return listProgress.get(0).getStatusId().getStatusName();
+        } else {
+            return "-";
+        }
     }
     
     /*@GET
