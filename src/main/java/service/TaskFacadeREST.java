@@ -384,6 +384,9 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             p.setProjectTitle(t_tmp.getTaskTitle());
             p.setProjectId(t_tmp.getTaskId());
 
+            // statut.
+            p.setProjectStatus(getStatusForProjectId(t_tmp.getTaskId()));
+            
             getChildTasksWebSite(p);
             
             listProj.add(p);
@@ -412,11 +415,34 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             p_sub.setProjectTitle(t_tmp.getTaskTitle());
             p_sub.setProjectId(t_tmp.getTaskId());
             
+            // statut.
+            p_sub.setProjectStatus(getStatusForProjectId(t_tmp.getTaskId()));
+            
             getChildTasksWebSite(p_sub);
             
             listSubProject.add(p_sub);
         }
         
         p.setChildProject(listSubProject);
+    }
+    
+    // retourne le statut actuel du projet.
+    private String getStatusForProjectId(Integer projectId) {
+        
+        // liste des 'Progress' pour le projet.
+        Query qryStatus = em.createNamedQuery("Progress.findByTaskId");
+        qryStatus.setParameter("taskId", projectId);
+        // obtenir le plus récent.
+        qryStatus.setMaxResults(1); // top 1 result
+        // lire en liste.
+        List<Progress> listProgress = new ArrayList<Progress>();
+        listProgress = qryStatus.getResultList();
+        
+        // retourner le statut, s'il y'en a un.
+        if (listProgress.size() > 0) {
+            return listProgress.get(0).getStatusId().getStatusName();
+        } else {
+            return "-";
+        }
     }
 }
