@@ -5,10 +5,7 @@
 package service;
 
 //import be.luckycode.projetawebservice.DummyProject;
-import be.luckycode.projetawebservice.Progress;
-import be.luckycode.projetawebservice.Project;
-import be.luckycode.projetawebservice.ProjectDummy;
-import be.luckycode.projetawebservice.ProjectSimpleWebSite;
+import be.luckycode.projetawebservice.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -267,6 +264,46 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         }
     }
     
+    // retourne le statut actuel du projet.
+    private Short getPercentageCompleteForProjectId(Integer projectId) {
+        
+        // liste des 'Progress' pour le projet.
+        Query qryPercentage = em.createNamedQuery("Progress.findByProjectId");
+        qryPercentage.setParameter("projectId", projectId);
+        // obtenir le plus récent.
+        qryPercentage.setMaxResults(1); // top 1 result
+        // lire en liste.
+        List<Progress> listProgress = new ArrayList<Progress>();
+        listProgress = qryPercentage.getResultList();
+        
+        // retourner le statut, s'il y'en a un.
+        if (listProgress.size() > 0) {
+            return listProgress.get(0).getPercentageComplete();
+        } else {
+            return 0;
+        }
+    }
+    
+    // retourne le statut actuel du projet.
+    private Progress getProgressForProjectId(Integer projectId) {
+        
+        // liste des 'Progress' pour le projet.
+        Query qryPercentage = em.createNamedQuery("Progress.findByProjectId");
+        qryPercentage.setParameter("projectId", projectId);
+        // obtenir le plus récent.
+        qryPercentage.setMaxResults(1); // top 1 result
+        // lire en liste.
+        List<Progress> listProgress = new ArrayList<Progress>();
+        listProgress = qryPercentage.getResultList();
+        
+        // retourner le statut, s'il y'en a un.
+        if (listProgress.size() > 0) {
+            return listProgress.get(0);
+        } else {
+            return null;
+        }
+    }
+    
     /*@GET
     @Path("test")
     //public List<Project> findProjectsPOJO() {
@@ -381,6 +418,22 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                         projectData.put("endDateReal", CommonMethods.convertDate(p.getEndDateReal()));
                     }
 
+                    Progress progress = getProgressForProjectId(p.getProjectId());
+                    
+                    if (progress != null) {
+                        // état.
+                        if (progress.getStatusId() != null && progress.getStatusId().getStatusName() != null) 
+                            projectData.put("projectStatus", progress.getStatusId().getStatusName());
+                        // pourcentage.
+                        projectData.put("projectPercentage", progress.getPercentageComplete().toString());
+                    }
+                    
+                    // état du projet.
+                    //projectData.put("projectStatus", getStatusForProjectId(p.getProjectId()));
+                    
+                    // pourcentage.
+                    //projectData.put("projectPercentage", getPercentageCompleteForProjectId(p.getProjectId()));
+                    
                     // get child projects, if any
                     getChildProjects(p, userStruct, projectData);
 
