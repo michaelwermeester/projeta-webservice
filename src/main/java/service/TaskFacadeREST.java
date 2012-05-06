@@ -201,6 +201,18 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                         //taskData.put("userAssigned", userAssignedStruct);
                         taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
                     }
+                    
+                    // état et pourcentage.
+                    Progress progress = getProgressForTaskId(t.getTaskId());
+                    
+                    if (progress != null) {
+                        // état.
+                        if (progress.getStatusId() != null && progress.getStatusId().getStatusName() != null) 
+                            taskData.put("taskStatus", progress.getStatusId().getStatusName());
+                        // pourcentage.
+                        taskData.put("taskPercentage", progress.getPercentageComplete().toString());
+                    }
+                    
 
                     // get child projects, if any
                     getChildTasks(t, userStruct, taskData);
@@ -443,6 +455,26 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             return listProgress.get(0).getStatusId().getStatusName();
         } else {
             return "-";
+        }
+    }
+    
+    // retourne le statut actuel de la tâche.
+    private Progress getProgressForTaskId(Integer taskId) {
+        
+        // liste des 'Progress' pour le projet.
+        Query qryPercentage = em.createNamedQuery("Progress.findByTaskId");
+        qryPercentage.setParameter("taskId", taskId);
+        // obtenir le plus récent.
+        qryPercentage.setMaxResults(1); // top 1 result
+        // lire en liste.
+        List<Progress> listProgress = new ArrayList<Progress>();
+        listProgress = qryPercentage.getResultList();
+        
+        // retourner le statut, s'il y'en a un.
+        if (listProgress.size() > 0) {
+            return listProgress.get(0);
+        } else {
+            return null;
         }
     }
 }

@@ -418,6 +418,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                         projectData.put("endDateReal", CommonMethods.convertDate(p.getEndDateReal()));
                     }
 
+                    // état et pourcentage.
                     Progress progress = getProgressForProjectId(p.getProjectId());
                     
                     if (progress != null) {
