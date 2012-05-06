@@ -30,6 +30,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -42,6 +44,8 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
+    @Context
+    SecurityContext security;
 
     public ProjectFacadeREST() {
         super(Project.class);
@@ -58,7 +62,13 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     @Consumes("application/json")
     @Produces("application/json")
     public String createNewProject(Project entity) {
-
+        
+        //List<Progress> progressList = new ArrayList<Progress>();
+        //progressList.add(progress);
+        
+        //entity.setProgressCollection(progressList);
+        
+        // créer en base de donnés.
         em.persist(entity);
 
         em.flush();
@@ -125,8 +135,23 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         } catch (IOException ex) {
             Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        // initialiser les valeurs par défaut pour l'état, pourcentage, etc.
+        initDefaultProgressForNewProject(entity);
 
         return retVal;
+    }
+
+    // Créer état, pourcentage d'avancement etc. par défaut.
+    private void initDefaultProgressForNewProject(Project entity) {
+        Progress progress = new Progress();
+        progress.setPercentageComplete((short)0);
+        progress.setProgressComment("Projet créé.");
+        progress.setStatusId(new Status(1));
+        progress.setUserCreated(getAuthenticatedUser());
+        progress.setProjectId(entity);
+        
+        em.persist(progress);
     }
 
     @PUT
@@ -694,5 +719,23 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         }
 
         return retVal;
+    }
+    
+    // returns user ID of the authenticated user.
+    public User getAuthenticatedUser() {
+        String username;
+        username = security.getUserPrincipal().getName();
+
+        Query q = em.createNamedQuery("User.findByUsername");
+        q.setParameter("username", username);
+
+        List<User> userList = new ArrayList<User>();
+        userList = q.getResultList();
+
+        if (userList.size() == 1) {
+            return userList.get(0);
+        } else {
+            return null;
+        }
     }
 }
