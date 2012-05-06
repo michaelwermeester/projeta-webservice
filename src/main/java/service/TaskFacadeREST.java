@@ -277,8 +277,30 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         initDefaultProgressForNewTask(entity);
         
         em.flush();
+        
+        
 
-        return "OK, created.";
+        // SAME CODE AS IN CREATE !!!
+        List<Task> tskList = new ArrayList<Task>();
+        tskList.add(super.find(entity.getTaskId()));
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map> taskList = new ArrayList<Map>();
+
+        getTasks(tskList, taskList);
+
+        String retVal = "";
+
+        HashMap<String, Object> retTasks = new HashMap<String, Object>();
+        retTasks.put("task", taskList);
+
+        try {
+            retVal = mapper.writeValueAsString(retTasks);
+        } catch (IOException ex) {
+            Logger.getLogger(TaskFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retVal;
     }
 
     @POST
@@ -345,7 +367,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         String retVal = "";
 
         HashMap<String, Object> retTasks = new HashMap<String, Object>();
-        retTasks.put("project", taskList);
+        retTasks.put("task", taskList);
 
         try {
             retVal = mapper.writeValueAsString(retTasks);
