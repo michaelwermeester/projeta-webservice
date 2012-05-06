@@ -270,8 +270,12 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     @Produces("application/json")
     public String createNewTask(Task entity) {
 
+        // Créer la nouvelle tâche dans la base de données.
         em.persist(entity);
 
+        // Créer état, pourcentage d'avancement etc. par défaut.
+        initDefaultProgressForNewTask(entity);
+        
         em.flush();
 
         return "OK, created.";
@@ -476,5 +480,17 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         } else {
             return null;
         }
+    }
+    
+    // Créer état, pourcentage d'avancement etc. par défaut.
+    private void initDefaultProgressForNewTask(Task entity) {
+        Progress progress = new Progress();
+        progress.setPercentageComplete((short)0);
+        progress.setProgressComment("Tâche créé.");
+        progress.setStatusId(new Status(9));
+        progress.setUserCreated(getAuthenticatedUser());
+        progress.setTaskId(entity);
+        
+        em.persist(progress);
     }
 }

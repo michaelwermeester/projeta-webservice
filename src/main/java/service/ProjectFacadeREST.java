@@ -63,13 +63,11 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     @Produces("application/json")
     public String createNewProject(Project entity) {
         
-        //List<Progress> progressList = new ArrayList<Progress>();
-        //progressList.add(progress);
-        
-        //entity.setProgressCollection(progressList);
-        
-        // créer en base de donnés.
+        // créer le projet en base de donnés.
         em.persist(entity);
+        
+        // initialiser les valeurs par défaut pour l'état, pourcentage, etc.
+        initDefaultProgressForNewProject(entity);
 
         em.flush();
 
@@ -135,9 +133,6 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         } catch (IOException ex) {
             Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        // initialiser les valeurs par défaut pour l'état, pourcentage, etc.
-        initDefaultProgressForNewProject(entity);
 
         return retVal;
     }
