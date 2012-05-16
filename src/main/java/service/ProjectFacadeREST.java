@@ -222,6 +222,10 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             ProjectSimpleWebSite p = new ProjectSimpleWebSite();
             p.setProjectTitle(p_tmp.getProjectTitle());
             p.setProjectId(p_tmp.getProjectId());
+            if (p_tmp.getStartDate() != null)
+                p.setStartDate(p_tmp.getStartDate());
+            if (p_tmp.getEndDate() != null)
+                p.setEndDate(p_tmp.getEndDate());
             
             // statut
             p.setProjectStatus(getStatusForProjectId(p_tmp.getProjectId()));
@@ -253,6 +257,10 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             ProjectSimpleWebSite p_sub = new ProjectSimpleWebSite();
             p_sub.setProjectTitle(p_tmp.getProjectTitle());
             p_sub.setProjectId(p_tmp.getProjectId());
+            if (p_tmp.getStartDate() != null)
+                p_sub.setStartDate(p_tmp.getStartDate());
+            if (p_tmp.getEndDate() != null)
+                p_sub.setEndDate(p_tmp.getEndDate());
             
             // statut.
             p_sub.setProjectStatus(getStatusForProjectId(p_tmp.getProjectId()));
