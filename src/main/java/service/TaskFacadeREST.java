@@ -338,14 +338,20 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         // fetch user to be updated.
         Task task = super.find(entity.getTaskId());
 
-        if (task.getTaskTitle() != null) {
+        if (entity.getTaskTitle() != null) {
             task.setTaskTitle(entity.getTaskTitle());
         }
-        if (task.getTaskDescription() != null) {
+        if (entity.getTaskDescription() != null) {
             task.setTaskDescription(entity.getTaskDescription());
         }
-        if (task.getCompleted() != null) {
+        if (entity.getCompleted() != null) {
             task.setCompleted(entity.getCompleted());
+        }
+        if (entity.getStartDate() != null) {
+            task.setStartDate(entity.getStartDate());
+        }
+        if (entity.getEndDate() != null) {
+            task.setEndDate(entity.getEndDate());
         }
 
 
