@@ -7,6 +7,7 @@ package service;
 //import be.luckycode.projetawebservice.DummyProject;
 import be.luckycode.projetawebservice.*;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -677,6 +678,8 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     @Produces("application/json")
     public String updateProject(Project entity) {
 
+        //Date d = new Date();
+        //return d.toString();
 
         // fetch user to be updated.
         Project project = super.find(entity.getProjectId());
@@ -687,7 +690,12 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         if (project.getProjectDescription() != null) {
             project.setProjectDescription(entity.getProjectDescription());
         }
-
+        if (entity.getStartDate() != null) {
+            project.setStartDate(entity.getStartDate());
+        }
+        if (entity.getEndDate() != null) {
+            project.setEndDate(entity.getEndDate());
+        }
 
         super.edit(project);
 
