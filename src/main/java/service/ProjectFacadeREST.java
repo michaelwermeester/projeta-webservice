@@ -684,10 +684,10 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         // fetch user to be updated.
         Project project = super.find(entity.getProjectId());
 
-        if (project.getProjectTitle() != null) {
+        if (entity.getProjectTitle() != null) {
             project.setProjectTitle(entity.getProjectTitle());
         }
-        if (project.getProjectDescription() != null) {
+        if (entity.getProjectDescription() != null) {
             project.setProjectDescription(entity.getProjectDescription());
         }
         if (entity.getStartDate() != null) {
