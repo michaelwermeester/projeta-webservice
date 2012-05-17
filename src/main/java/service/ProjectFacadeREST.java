@@ -358,7 +358,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     // returns parent objects including its children
     @GET
     @Produces("application/json")
-    public String findAll4() {
+    public String findAllProjects() {
 
         String retVal = "";
 
@@ -408,6 +408,17 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                         userStruct.put("userId", p.getUserCreated().getUserId().toString());
                         userStruct.put("username", p.getUserCreated().getUsername());
                         projectData.put("userCreated", userStruct);
+                    }
+                    
+                    if (p.getUserAssigned() != null) {
+
+                        userStruct.put("userId", p.getUserAssigned().getUserId().toString());
+                        userStruct.put("username", p.getUserAssigned().getUsername());
+                        if (p.getUserAssigned().getFirstName() != null)
+                            userStruct.put("firstName", p.getUserAssigned().getFirstName());
+                        if (p.getUserAssigned().getLastName() != null)
+                            userStruct.put("lastName", p.getUserAssigned().getLastName());
+                        projectData.put("userAssigned", userStruct);
                     }
 
                     if (p.getDateCreated() != null) {
