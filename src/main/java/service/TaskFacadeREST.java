@@ -484,7 +484,11 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         
         // retourner le statut, s'il y'en a un.
         if (listProgress.size() > 0) {
-            return listProgress.get(0).getStatusId().getStatusName();
+            String status = "";
+            if (listProgress.get(0).getPercentageComplete() != null)
+                status += listProgress.get(0).getPercentageComplete().toString() + "% - ";
+            
+            return status + listProgress.get(0).getStatusId().getStatusName();
         } else {
             return "-";
         }
