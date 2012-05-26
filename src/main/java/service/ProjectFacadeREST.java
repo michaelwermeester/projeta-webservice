@@ -230,7 +230,46 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             // statut
             p.setProjectStatus(getStatusForProjectId(p_tmp.getProjectId()));
 
-            getChildProjectsWebSite(p);
+            getChildProjectsWebSite(p, "Project.getChildProjects");
+            
+            listProj.add(p);
+        }
+        
+        projDummy.setListProject(listProj);
+        
+        return projDummy;
+    }
+    
+    @GET
+    @Path("wsprojectspublic")
+    public ProjectDummy findPublicProjectsPOJO() {
+        
+        ProjectDummy projDummy = new ProjectDummy();
+        //projDummy.setListProject(super.findAll());
+        
+        //List<Project> listProjTmp = super.findAll();
+        Query q = em.createNamedQuery("Project.getParentPublicProjects");
+
+        List<Project> prjList = new ArrayList<Project>();
+        prjList = q.getResultList();
+        
+        
+        List<ProjectSimpleWebSite> listProj = new ArrayList<ProjectSimpleWebSite>();
+        
+        for (Project p_tmp : prjList) {
+            
+            ProjectSimpleWebSite p = new ProjectSimpleWebSite();
+            p.setProjectTitle(p_tmp.getProjectTitle());
+            p.setProjectId(p_tmp.getProjectId());
+            if (p_tmp.getStartDate() != null)
+                p.setStartDate(p_tmp.getStartDate());
+            if (p_tmp.getEndDate() != null)
+                p.setEndDate(p_tmp.getEndDate());
+            
+            // statut
+            p.setProjectStatus(getStatusForProjectId(p_tmp.getProjectId()));
+
+            getChildProjectsWebSite(p, "Project.getChildPublicProjects");
             
             listProj.add(p);
         }
@@ -241,9 +280,9 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     }
     
     // FOR WEBSITE !!!
-    private void getChildProjectsWebSite(ProjectSimpleWebSite p) {
+    private void getChildProjectsWebSite(ProjectSimpleWebSite p, String namedQuery) {
         // get child projects
-        Query qry_child_projects = em.createNamedQuery("Project.getChildProjects");
+        Query qry_child_projects = em.createNamedQuery(namedQuery);
         Project p_qry = new Project(p.getProjectId());
         qry_child_projects.setParameter(1, p_qry);
 
@@ -265,7 +304,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             // statut.
             p_sub.setProjectStatus(getStatusForProjectId(p_tmp.getProjectId()));
             
-            getChildProjectsWebSite(p_sub);
+            getChildProjectsWebSite(p_sub, namedQuery);
             
             listSubProject.add(p_sub);
         }
