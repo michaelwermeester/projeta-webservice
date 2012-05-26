@@ -81,7 +81,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         ObjectMapper mapper = new ObjectMapper();
         List<Map> projectList = new ArrayList<Map>();
 
-        getProjects(prjList, projectList);
+        getProjects(prjList, projectList, "Project.getChildProjects");
 
 //        Map<String, Object> projectData = new HashMap<String, Object>();
 //                Map<String, Object> userStruct = new HashMap<String, Object>();
@@ -381,7 +381,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
 
         // get projects and its children
-        getProjects(prjList, projectList);
+        getProjects(prjList, projectList, "Project.getChildProjects");
 
 
         HashMap<String, Object> retProjects = new HashMap<String, Object>();
@@ -398,7 +398,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
     }
 
-    private void getProjects(List<Project> prjList, List<Map> projectList) {
+    private void getProjects(List<Project> prjList, List<Map> projectList, String namedQuery) {
         // if list is not empty
         if (prjList.isEmpty() == false) {
             for (Project p : prjList) {
@@ -480,7 +480,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                     //projectData.put("projectPercentage", getPercentageCompleteForProjectId(p.getProjectId()));
                     
                     // get child projects, if any
-                    getChildProjects(p, userStruct, projectData);
+                    getChildProjects(p, userStruct, projectData, namedQuery);
 
                     // retourner/inclure seulement s'il ne s'agit pas d'un projet supprimé.  
                     //if (p.getDeleted() == null || p.getDeleted() == false) {
@@ -492,11 +492,38 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
     }
 
-    private void getChildProjects(Project p, Map<String, Object> userStruct, Map<String, Object> projectData) {
+//    private void getChildProjects(Project p, Map<String, Object> userStruct, Map<String, Object> projectData) {
+//        
+//        
+//        getChildProjects(p, userStruct, projectData, "Project.getChildProjects");
+//        
+//        /*List<Map> childProjectList = new ArrayList<Map>();
+//
+//        // get child projects
+//        Query qry_child_projects = em.createNamedQuery("Project.getChildProjects");
+//        qry_child_projects.setParameter(1, p);
+//
+//
+//        List<Project> childPrjList = new ArrayList<Project>();
+//        childPrjList = qry_child_projects.getResultList();
+//
+//        // get child projects
+//        getProjects(childPrjList, childProjectList);
+//
+//        // 
+//        if (childProjectList.isEmpty() == false) {
+//
+//            projectData.put("childProject", childProjectList);
+//        }*/
+//    }
+    
+    // méthode getChildProjects principale. Utiliser celle-ci
+    private void getChildProjects(Project p, Map<String, Object> userStruct, Map<String, Object> projectData, String namedQuery) {
+        
         List<Map> childProjectList = new ArrayList<Map>();
 
         // get child projects
-        Query qry_child_projects = em.createNamedQuery("Project.getChildProjects");
+        Query qry_child_projects = em.createNamedQuery(namedQuery);
         qry_child_projects.setParameter(1, p);
 
 
@@ -535,7 +562,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
          */
 
         // get child projects
-        getProjects(childPrjList, childProjectList);
+        getProjects(childPrjList, childProjectList, namedQuery);
 
         // 
         if (childProjectList.isEmpty() == false) {
@@ -731,7 +758,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         ObjectMapper mapper = new ObjectMapper();
         List<Map> projectList = new ArrayList<Map>();
 
-        getProjects(prjList, projectList);
+        getProjects(prjList, projectList, "Project.getChildProjects");
 
         String retVal = "";
 
@@ -763,5 +790,45 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         } else {
             return null;
         }
+    }
+    
+    // returns parent objects including its children
+    @GET
+    @Path("public")
+    @Produces("application/json")
+    public String findAllPublicProjects() {
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map> projectList = new ArrayList<Map>();
+
+
+
+        // get root projects (projects which have no parent)
+        //Query q = em.createQuery("SELECT p FROM Project p WHERE p.parentProjectId IS NULL");
+        Query q = em.createNamedQuery("Project.getParentPublicProjects");
+
+        List<Project> prjList = new ArrayList<Project>();
+        prjList = q.getResultList();
+
+
+        // get projects and its children
+        getProjects(prjList, projectList,"Project.getChildPublicProjects");
+
+
+        HashMap<String, Object> retProjects = new HashMap<String, Object>();
+        retProjects.put("project", projectList);
+
+        try {
+            retVal = mapper.writeValueAsString(retProjects);
+        } catch (IOException ex) {
+            Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retVal;
+
+
     }
 }
