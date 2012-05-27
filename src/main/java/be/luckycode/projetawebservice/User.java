@@ -380,4 +380,18 @@ public class User implements Serializable {
         
         return fullname;
     }
+    
+    public String getFullNameUsername() {
+
+        String fullNameUsername = "";
+
+            if (getFullName() != null) {
+                fullNameUsername += getFullName() + " ";
+            }
+            if (getUsername() != null) {
+                fullNameUsername += "(" + getUsername() + ")";
+            }
+
+        return fullNameUsername;
+    }
 }
