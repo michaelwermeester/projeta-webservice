@@ -509,7 +509,8 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                         if (progress.getStatusId() != null && progress.getStatusId().getStatusName() != null) 
                             projectData.put("projectStatus", progress.getStatusId().getStatusName());
                         // pourcentage.
-                        projectData.put("projectPercentage", progress.getPercentageComplete().toString());
+                        if (progress.getPercentageComplete() != null) 
+                            projectData.put("projectPercentage", progress.getPercentageComplete().toString());
                     }
                     
                     // état du projet.
