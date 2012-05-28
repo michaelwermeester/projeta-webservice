@@ -121,7 +121,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     
     @GET
     @Produces("application/json")
-    public String findAll4() {
+    public String findAllTasks() {
 
         String retVal = "";
 
@@ -211,6 +211,12 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                             taskData.put("taskStatus", progress.getStatusId().getStatusName());
                         // pourcentage.
                         taskData.put("taskPercentage", progress.getPercentageComplete().toString());
+                    }
+                    
+                    // nom du projet.
+                    if (t.getProjectId() != null) {
+                        if (t.getProjectId().getProjectTitle() != null)
+                            taskData.put("projectTitle", t.getProjectId().getProjectTitle());
                     }
                     
 
