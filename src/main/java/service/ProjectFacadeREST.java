@@ -835,6 +835,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     // returns parent objects including its children
     @GET
     @Path("public")
+    @RolesAllowed({"user", "administrator", "developer"})
     @Produces("application/json")
     public String findAllPublicProjects() {
 

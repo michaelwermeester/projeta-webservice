@@ -69,6 +69,15 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
     @Override
     @Produces("application/json")
     public List<Bug> findAll() {
+        
+        /*List<Bug> bugList = super.findAll();
+        
+        for (Bug b : bugList) {
+            
+        }
+        
+        return bugList;*/
+        
         return super.findAll();
     }
 
