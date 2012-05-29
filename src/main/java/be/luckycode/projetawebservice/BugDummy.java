@@ -19,7 +19,6 @@ public class BugDummy {
     /**
      * @return the listProject
      */
-    //public List<Project> getListProject() {
     public List<BugSimpleWebSite> getListBug() {
         return listBug;
     }
@@ -27,7 +26,6 @@ public class BugDummy {
     /**
      * @param listProject the listProject to set
      */
-    //public void setListProject(List<Project> listProject) {
     public void setListBug(List<BugSimpleWebSite> listBug) {
         this.listBug = listBug;
     }

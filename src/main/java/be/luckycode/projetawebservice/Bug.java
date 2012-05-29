@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlTransient;
     
     // get root tasks by project ID & exclude personal tasks.
     @NamedQuery(name = "Bug.getBugsByProjectId", query = "SELECT b FROM Bug b WHERE b.projectId.projectId = :projectId and (b.deleted = false or b.deleted is null)"),
-     
+    
     @NamedQuery(name = "Bug.findByBugId", query = "SELECT b FROM Bug b WHERE b.bugId = :bugId")})
 public class Bug implements Serializable {
     @Basic(optional = false)
@@ -80,7 +80,6 @@ public class Bug implements Serializable {
     private Collection<Comment> commentCollection;
     private static final long serialVersionUID = 1L;
     @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @NotNull
     @Column(name = "bug_id", nullable = false, unique = true)
