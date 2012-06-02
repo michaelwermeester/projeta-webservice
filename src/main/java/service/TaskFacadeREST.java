@@ -433,6 +433,10 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             ProjectSimpleWebSite p = new ProjectSimpleWebSite();
             p.setProjectTitle(t_tmp.getTaskTitle());
             p.setProjectId(t_tmp.getTaskId());
+            if (t_tmp.getStartDate() != null)
+                p.setStartDate(t_tmp.getStartDate());
+            if (t_tmp.getEndDate() != null)
+                p.setEndDate(t_tmp.getEndDate());
 
             // statut.
             p.setProjectStatus(getStatusForTaskId(t_tmp.getTaskId()));
@@ -464,6 +468,10 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             ProjectSimpleWebSite p_sub = new ProjectSimpleWebSite();
             p_sub.setProjectTitle(t_tmp.getTaskTitle());
             p_sub.setProjectId(t_tmp.getTaskId());
+            if (t_tmp.getStartDate() != null)
+                p_sub.setStartDate(t_tmp.getStartDate());
+            if (t_tmp.getEndDate() != null)
+                p_sub.setEndDate(t_tmp.getEndDate());
             
             // statut.
             p_sub.setProjectStatus(getStatusForTaskId(t_tmp.getTaskId()));

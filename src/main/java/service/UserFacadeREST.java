@@ -93,13 +93,12 @@ public class UserFacadeREST extends AbstractFacade<User> {
         // créer l'utilisateur.
         em.persist(entity);
 
-        // 
+        // Construire le query pour obtenir le rôle ID pour la rôle "user".
         Query q = em.createNamedQuery("Role.findByCode");
         q.setParameter("code", "user");
 
-
-        List<Role> roleList = new ArrayList<Role>();
-        roleList = q.getResultList();
+        // Créer une liste à partir des résultats.
+        List<Role> roleList = q.getResultList();
 
         if (roleList.size() == 1) {
 
@@ -109,15 +108,11 @@ public class UserFacadeREST extends AbstractFacade<User> {
             role.getUserCollection().add(entity);
             // enregistrer en DB.
             em.merge(role);
-
-        } else {
-        }
+        } 
 
         em.flush();
         // return newly created user.        
-        //return this.findByUsername(entity.getUsername(), null);
         return generateUserJSONString(entity);
-
     }
 
     // creates JSON ready to be returned from web-service from a given user.
