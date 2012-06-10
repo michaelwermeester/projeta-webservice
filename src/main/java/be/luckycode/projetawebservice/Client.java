@@ -68,10 +68,11 @@ public class Client implements Serializable {
     @Size(max = 255)
     @Column(name = "address")
     private String address;
-    @JoinTable(name = "project_client", joinColumns = {
-        @JoinColumn(name = "client_id", referencedColumnName = "client_id")}, inverseJoinColumns = {
-        @JoinColumn(name = "project_id", referencedColumnName = "project_id")})
-    @ManyToMany
+//    @JoinTable(name = "project_client", joinColumns = {
+//        @JoinColumn(name = "client_id", referencedColumnName = "client_id")}, inverseJoinColumns = {
+//        @JoinColumn(name = "project_id", referencedColumnName = "project_id")})
+//    @ManyToMany
+    @ManyToMany(mappedBy = "clientCollection")
     private Collection<Project> projectCollection;
     @JoinColumn(name = "primary_contact_id", referencedColumnName = "user_id")
     @ManyToOne

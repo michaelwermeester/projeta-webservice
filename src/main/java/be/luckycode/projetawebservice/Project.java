@@ -70,7 +70,11 @@ public class Project implements Serializable {
         @JoinColumn(name = "user_id", referencedColumnName = "user_id")})
     @ManyToMany
     private Collection<User> userCollection;
-    @ManyToMany(mappedBy = "projectCollection")
+    //@ManyToMany(mappedBy = "projectCollection")
+    @JoinTable(name = "project_client", joinColumns = {
+        @JoinColumn(name = "project_id", referencedColumnName = "project_id")}, inverseJoinColumns = {
+        @JoinColumn(name = "client_id", referencedColumnName = "client_id")})
+    @ManyToMany
     private Collection<Client> clientCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "projectId")
     private Collection<ProjectProgress> projectProgressCollection;

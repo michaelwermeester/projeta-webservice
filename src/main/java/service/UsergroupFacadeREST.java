@@ -307,6 +307,7 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
     @GET
     @Path("project/{projectid}")
     @Produces("application/json")
+    @RolesAllowed("administrator")
     public List<Usergroup> findByProject(@PathParam("projectid") Integer projectid) {
 
         String retVal = "";

@@ -5,16 +5,17 @@
 package service;
 
 import be.luckycode.projetawebservice.Client;
+import be.luckycode.projetawebservice.Project;
+import be.luckycode.projetawebservice.User;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -140,5 +141,52 @@ public class ClientFacadeREST extends AbstractFacade<Client> {
             clientData.put("emailAddress", client.getEmailAddress());*/
         
         return clientData;
+    }
+    
+    
+    // return list of users assigned to a project.
+    @GET
+    @Path("project/{projectid}")
+    @RolesAllowed("administrator")
+    @Produces("application/json")
+    public String findByProject(@PathParam("projectid") Integer projectid) {
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        Query q;
+        q = em.createNamedQuery("Project.findByProjectId");
+        q.setParameter("projectId", projectid);
+
+        List<Project> projectList = new ArrayList<Project>();
+        projectList = q.getResultList();
+
+        if (projectList.size() == 1) {
+
+            Collection<Client> clients = projectList.get(0).getClientCollection();
+
+            List<Map> clientList = new ArrayList<Map>();
+
+            for (Client c : clients) {
+
+                Map<String, Object> clientData = generateClientJSON(c);
+
+                clientList.add(clientData);
+            }
+
+            HashMap<String, Object> retUsers = new HashMap<String, Object>();
+            retUsers.put("clients", clientList);
+
+            try {
+                retVal = mapper.writeValueAsString(retUsers);
+            } catch (IOException ex) {
+                Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            return retVal;
+        } else {
+            return "";
+        }
     }
 }

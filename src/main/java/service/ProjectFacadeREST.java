@@ -938,4 +938,40 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             
         }
     }
+    
+    @PUT
+    @RolesAllowed("administrator")
+    @Path("updateClientsVisibleForProject")
+    @Consumes("application/json")
+    public void updateClientsVisibleForProject(@QueryParam("projectId") Integer projectId, ArrayList<Client> clients) {
+
+        Query q;
+
+        if (projectId != null && security.isUserInRole("administrator")) {
+            q = em.createNamedQuery("Project.findByProjectId");
+            q.setParameter("projectId", projectId);
+
+
+            List<Project> projectList = new ArrayList<Project>();
+            projectList = q.getResultList();
+
+            if (projectList.size() == 1) {
+
+                // user
+                Project project = projectList.get(0);          
+                 
+                if (clients.get(0).getClientId() == null) {
+                    ArrayList<Client> clientList = new ArrayList<Client>();
+                    project.setClientCollection(clientList);
+                } else {
+                    project.setClientCollection(clients);
+                }
+                em.merge(project); 
+
+            } else {
+                
+            }
+            
+        }
+    }
 }
