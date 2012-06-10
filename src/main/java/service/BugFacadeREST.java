@@ -5,8 +5,14 @@
 package service;
 
 import be.luckycode.projetawebservice.*;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -21,6 +27,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -44,6 +51,46 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
     public void create(Bug entity) {
         super.create(entity);
     }*/
+    
+//    @POST
+//    @Path("create")
+//    @RolesAllowed("administrator")
+//    @Consumes("application/json")
+//    @Produces("application/json")
+//    public String createNewBug(Bug entity) {
+//
+//        // Créer la nouvelle tâche dans la base de données.
+//        em.persist(entity);
+//
+//        // Créer état, pourcentage d'avancement etc. par défaut.
+//        initDefaultProgressForNewBug(entity);
+//        
+//        em.flush();
+//        
+//        
+//
+//        // SAME CODE AS IN CREATE !!!
+//        List<Bug> bugList = new ArrayList<Bug>();
+//        bugList.add(super.find(entity.getBugId()));
+//
+//        ObjectMapper mapper = new ObjectMapper();
+//        List<Map> bugListMap = new ArrayList<Map>();
+//
+//        getBugs(bugList, bugListMap);
+//
+//        String retVal = "";
+//
+//        HashMap<String, Object> retBugs = new HashMap<String, Object>();
+//        retBugs.put("bug", bugListMap);
+//
+//        try {
+//            retVal = mapper.writeValueAsString(retBugs);
+//        } catch (IOException ex) {
+//            Logger.getLogger(TaskFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//        return retVal;
+//    }
 
     @PUT
     @Override
@@ -114,6 +161,9 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         
         // sauvegarder en DB.
         em.persist(entity);
+        
+        // Créer état, pourcentage d'avancement etc. par défaut.
+        initDefaultProgressForNewBug(entity);
         
         return entity;
     }
@@ -199,4 +249,89 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         
         p.setChildProject(listSubProject);
     }*/
+    
+    // Créer état, pourcentage d'avancement etc. par défaut.
+    private void initDefaultProgressForNewBug(Bug entity) {
+        Progress progress = new Progress();
+        progress.setPercentageComplete((short)0);
+        progress.setProgressComment("Rapport de bogue créé.");
+        progress.setStatusId(new Status(13));
+        progress.setUserCreated(getAuthenticatedUser());
+        progress.setBugId(entity);
+        
+        em.persist(progress);
+    }
+    
+//    private void getBugs(List<Task> taskList, List<Map> taskMapList) {
+//        // if list is not empty
+//        if (taskList.isEmpty() == false) {
+//            for (Task t : taskList) {
+//
+//                // retourner/inclure seulement s'il ne s'agit pas d'une tâche supprimée.  
+//                if (t.getDeleted() == null || t.getDeleted() == false) {
+//
+//                    Map<String, Object> taskData = new HashMap<String, Object>();
+//                    Map<String, Object> userStruct = new HashMap<String, Object>();
+//                    Map<String, Object> userAssignedStruct = new HashMap<String, Object>();
+//                    //Map<String, String> nameStruct = new HashMap<String, String>();
+//
+//                    userStruct.put("userId", t.getUserCreated().getUserId().toString());
+//                    userStruct.put("username", t.getUserCreated().getUsername());
+//                    taskData.put("userCreated", userStruct);
+//
+//                    taskData.put("endDate", CommonMethods.convertDate(t.getEndDate()));
+//                    taskData.put("startDate", CommonMethods.convertDate(t.getStartDate()));
+//                    //taskData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getEndDate()));
+//                    //taskData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getStartDate()));
+//
+//                    if (t.getTaskDescription() != null) {
+//                        taskData.put("taskDescription", t.getTaskDescription());
+//                    }
+//                    taskData.put("taskId", t.getTaskId().toString());
+//                    taskData.put("taskTitle", t.getTaskTitle());
+//
+//                    taskData.put("completed", t.getCompleted());
+//
+//                    taskData.put("isPersonal", t.getIsPersonal());
+//
+//                    if (t.getPriority() != null) {
+//                        taskData.put("priority", t.getPriority().toString());
+//                    } else // retourner 1 comme priorité par défaut.
+//                    {
+//                        taskData.put("priority", "1");
+//                    }
+//
+//                    if (t.getUserAssigned() != null) {
+//                        userAssignedStruct.put("userId", t.getUserAssigned().getUserId().toString());
+//                        userAssignedStruct.put("username", t.getUserAssigned().getUsername());
+//                        taskData.put("userAssigned", userAssignedStruct);
+//                        //taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
+//                    }
+//                    
+//                    // état et pourcentage.
+//                    Progress progress = getProgressForTaskId(t.getTaskId());
+//                    
+//                    if (progress != null) {
+//                        // état.
+//                        if (progress.getStatusId() != null && progress.getStatusId().getStatusName() != null) 
+//                            taskData.put("taskStatus", progress.getStatusId().getStatusName());
+//                        // pourcentage.
+//                        taskData.put("taskPercentage", progress.getPercentageComplete().toString());
+//                    }
+//                    
+//                    // nom du projet.
+//                    if (t.getProjectId() != null) {
+//                        if (t.getProjectId().getProjectTitle() != null)
+//                            taskData.put("projectTitle", t.getProjectId().getProjectTitle());
+//                    }
+//                    
+//
+//                    // get child projects, if any
+//                    getChildTasks(t, userStruct, taskData);
+//
+//                    taskMapList.add(taskData);
+//                }
+//            }
+//        }
+//    }
 }
