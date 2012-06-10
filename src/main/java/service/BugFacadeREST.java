@@ -93,10 +93,23 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
 //    }
 
     @PUT
-    @Override
+    //@Override
+    @Path("update")
     @Consumes("application/json")
-    public void edit(Bug entity) {
-        super.edit(entity);
+    @Produces("application/json")
+    public void updateBug(Bug entity) {
+        
+        // fetch user to be updated.
+        Bug bug = super.find(entity.getBugId());
+
+        if (entity.getTitle() != null) {
+            bug.setTitle(entity.getTitle());
+        }
+        if (entity.getDetails() != null) {
+            bug.setDetails(entity.getDetails());
+        }
+        
+        super.edit(bug);
     }
 
     @DELETE
