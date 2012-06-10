@@ -23,14 +23,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -871,5 +864,42 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         return retVal;
 
 
+    }
+    
+    
+    @PUT
+    @RolesAllowed("administrator")
+    @Path("updateUsersVisibleForProject")
+    @Consumes("application/json")
+    public void updateUsersVisibleForProject(@QueryParam("projectId") Integer projectId, ArrayList<User> users) {
+
+        Query q;
+
+        if (projectId != null && security.isUserInRole("administrator")) {
+            q = em.createNamedQuery("Project.findByProjectId");
+            q.setParameter("projectId", projectId);
+
+
+            List<Project> projectList = new ArrayList<Project>();
+            projectList = q.getResultList();
+
+            if (projectList.size() == 1) {
+
+                // user
+                Project project = projectList.get(0);          
+                 
+                if (users.get(0).getUserId() == null) {
+                    ArrayList<User> list = new ArrayList<User>();
+                    project.setUserCollection(list);
+                } else {
+                    project.setUserCollection(users);
+                }
+                em.merge(project); 
+
+            } else {
+                
+            }
+            
+        }
     }
 }

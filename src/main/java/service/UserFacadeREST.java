@@ -4,6 +4,7 @@
  */
 package service;
 
+import be.luckycode.projetawebservice.Project;
 import be.luckycode.projetawebservice.Role;
 import be.luckycode.projetawebservice.User;
 import be.luckycode.projetawebservice.Usergroup;
@@ -592,5 +593,50 @@ public class UserFacadeREST extends AbstractFacade<User> {
         }
 
         return retVal;
+    }
+    
+    // return list of users assigned to a project.
+    @GET
+    @Path("project/{projectid}")
+    @Produces("application/json")
+    public String findByProject(@PathParam("projectid") Integer projectid) {
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        Query q;
+        q = em.createNamedQuery("Project.findByProjectId");
+        q.setParameter("projectId", projectid);
+
+        List<Project> projectList = new ArrayList<Project>();
+        projectList = q.getResultList();
+
+        if (projectList.size() == 1) {
+
+            Collection<User> users = projectList.get(0).getUserCollection();
+
+            List<Map> userList = new ArrayList<Map>();
+
+            for (User u : users) {
+
+                Map<String, Object> userData = generateUserJSON(u);
+
+                userList.add(userData);
+            }
+
+            HashMap<String, Object> retUsers = new HashMap<String, Object>();
+            retUsers.put("users", userList);
+
+            try {
+                retVal = mapper.writeValueAsString(retUsers);
+            } catch (IOException ex) {
+                Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            return retVal;
+        } else {
+            return "";
+        }
     }
 }

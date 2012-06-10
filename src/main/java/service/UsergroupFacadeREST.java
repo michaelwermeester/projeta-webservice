@@ -287,7 +287,6 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
                 Usergroup ug = usergroupList.get(0);
                 ug.setUserCollection(users);
                 em.merge(ug);
-
             } else {
             }
 
