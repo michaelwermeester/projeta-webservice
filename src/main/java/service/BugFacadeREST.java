@@ -125,20 +125,61 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         return super.find(id);
     }
 
+//    @GET
+//    @Override
+//    @Path("test")
+//    @Produces("application/json")
+//    public List<Bug> findAll() {
+//        
+//        /*List<Bug> bugList = super.findAll();
+//        
+//        for (Bug b : bugList) {
+//            
+//        }
+//        
+//        return bugList;*/
+//        
+//        return super.findAll();
+//    }
+    
+    // returns parent objects including its children
     @GET
-    @Override
+    //@Path("testnew")
     @Produces("application/json")
-    public List<Bug> findAll() {
-        
-        /*List<Bug> bugList = super.findAll();
-        
-        for (Bug b : bugList) {
-            
+    public String findAllBugs() {
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map> bugListMap = new ArrayList<Map>();
+
+
+
+        // get root projects (projects which have no parent)
+        //Query q = em.createQuery("SELECT p FROM Project p WHERE p.parentProjectId IS NULL");
+        Query q = em.createNamedQuery("Bug.findAll");
+
+        List<Bug> bugList = new ArrayList<Bug>();
+        bugList = q.getResultList();
+
+
+        // get projects and its children
+        getBugs(bugList, bugListMap);
+
+
+        HashMap<String, Object> retProjects = new HashMap<String, Object>();
+        retProjects.put("bug", bugListMap);
+
+        try {
+            retVal = mapper.writeValueAsString(retProjects);
+        } catch (IOException ex) {
+            Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        return bugList;*/
-        
-        return super.findAll();
+
+        return retVal;
+
+
     }
 
     @GET
@@ -275,76 +316,110 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         em.persist(progress);
     }
     
-//    private void getBugs(List<Task> taskList, List<Map> taskMapList) {
-//        // if list is not empty
-//        if (taskList.isEmpty() == false) {
-//            for (Task t : taskList) {
-//
-//                // retourner/inclure seulement s'il ne s'agit pas d'une tâche supprimée.  
-//                if (t.getDeleted() == null || t.getDeleted() == false) {
-//
-//                    Map<String, Object> taskData = new HashMap<String, Object>();
-//                    Map<String, Object> userStruct = new HashMap<String, Object>();
-//                    Map<String, Object> userAssignedStruct = new HashMap<String, Object>();
-//                    //Map<String, String> nameStruct = new HashMap<String, String>();
-//
-//                    userStruct.put("userId", t.getUserCreated().getUserId().toString());
-//                    userStruct.put("username", t.getUserCreated().getUsername());
-//                    taskData.put("userCreated", userStruct);
-//
-//                    taskData.put("endDate", CommonMethods.convertDate(t.getEndDate()));
-//                    taskData.put("startDate", CommonMethods.convertDate(t.getStartDate()));
-//                    //taskData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getEndDate()));
-//                    //taskData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getStartDate()));
-//
-//                    if (t.getTaskDescription() != null) {
-//                        taskData.put("taskDescription", t.getTaskDescription());
-//                    }
-//                    taskData.put("taskId", t.getTaskId().toString());
-//                    taskData.put("taskTitle", t.getTaskTitle());
-//
-//                    taskData.put("completed", t.getCompleted());
-//
-//                    taskData.put("isPersonal", t.getIsPersonal());
-//
-//                    if (t.getPriority() != null) {
-//                        taskData.put("priority", t.getPriority().toString());
-//                    } else // retourner 1 comme priorité par défaut.
-//                    {
-//                        taskData.put("priority", "1");
-//                    }
-//
-//                    if (t.getUserAssigned() != null) {
-//                        userAssignedStruct.put("userId", t.getUserAssigned().getUserId().toString());
-//                        userAssignedStruct.put("username", t.getUserAssigned().getUsername());
-//                        taskData.put("userAssigned", userAssignedStruct);
-//                        //taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
-//                    }
-//                    
-//                    // état et pourcentage.
-//                    Progress progress = getProgressForTaskId(t.getTaskId());
-//                    
-//                    if (progress != null) {
-//                        // état.
-//                        if (progress.getStatusId() != null && progress.getStatusId().getStatusName() != null) 
-//                            taskData.put("taskStatus", progress.getStatusId().getStatusName());
-//                        // pourcentage.
-//                        taskData.put("taskPercentage", progress.getPercentageComplete().toString());
-//                    }
-//                    
-//                    // nom du projet.
-//                    if (t.getProjectId() != null) {
-//                        if (t.getProjectId().getProjectTitle() != null)
-//                            taskData.put("projectTitle", t.getProjectId().getProjectTitle());
-//                    }
-//                    
-//
-//                    // get child projects, if any
-//                    getChildTasks(t, userStruct, taskData);
-//
-//                    taskMapList.add(taskData);
-//                }
-//            }
-//        }
-//    }
+    private void getBugs(List<Bug> bugList, List<Map> bugMapList) {
+        // if list is not empty
+        if (bugList.isEmpty() == false) {
+            for (Bug b : bugList) {
+
+                // retourner/inclure seulement s'il ne s'agit pas d'une tâche supprimée.  
+                if (b.getDeleted() == null || b.getDeleted() == false) {
+
+                    Map<String, Object> bugData = new HashMap<String, Object>();
+                    Map<String, Object> userStruct = new HashMap<String, Object>();
+                    Map<String, Object> userAssignedStruct = new HashMap<String, Object>();
+                    //Map<String, String> nameStruct = new HashMap<String, String>();
+
+                    userStruct.put("userId", b.getUserReported().getUserId().toString());
+                    userStruct.put("username", b.getUserReported().getUsername());
+                    bugData.put("userReported", userStruct);
+
+                    bugData.put("dateReported", CommonMethods.convertDate(b.getDateReported()));
+                    //bugData.put("startDate", CommonMethods.convertDate(t.getStartDate()));
+                    //taskData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getEndDate()));
+                    //taskData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getStartDate()));
+
+                    if (b.getDetails() != null) {
+                        bugData.put("details", b.getDetails());
+                    }
+                    bugData.put("bugId", b.getBugId().toString());
+                    bugData.put("title", b.getTitle());
+
+                    if (b.getFixed() != null) {
+                        bugData.put("fixed", b.getFixed());
+                    } else {
+                        bugData.put("fixed", false);
+                    }
+                    
+                    if (b.getCanceled() != null) {
+                        bugData.put("canceled", b.getCanceled());
+                    } else {
+                        bugData.put("canceled", false);
+                    }
+                    
+                    if (b.getDeleted() != null) {
+                        bugData.put("deleted", b.getDeleted());
+                    } else {
+                        bugData.put("deleted", false);
+                    }
+
+                    if (b.getPriority() != null) {
+                        bugData.put("priority", b.getPriority().toString());
+                    } else // retourner 1 comme priorité par défaut.
+                    {
+                        bugData.put("priority", "1");
+                    }
+
+                    if (b.getUserAssigned() != null) {
+                        userAssignedStruct.put("userId", b.getUserAssigned().getUserId().toString());
+                        userAssignedStruct.put("username", b.getUserAssigned().getUsername());
+                        bugData.put("userAssigned", userAssignedStruct);
+                        //taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
+                    }
+                    
+                    // état et pourcentage.
+                    Progress progress = getProgressForBugId(b.getBugId());
+                    
+                    if (progress != null) {
+                        // état.
+                        if (progress.getStatusId() != null && progress.getStatusId().getStatusName() != null) 
+                            bugData.put("bugStatus", progress.getStatusId().getStatusName());
+                        // pourcentage.
+                        bugData.put("bugPercentage", progress.getPercentageComplete().toString());
+                    }
+                    
+                    // nom du projet.
+                    if (b.getProjectId() != null) {
+                        if (b.getProjectId().getProjectTitle() != null)
+                            bugData.put("projectTitle", b.getProjectId().getProjectTitle());
+                    }
+                    
+
+                    // get child projects, if any
+                    //getChildTasks(t, userStruct, bugData);
+
+                    bugMapList.add(bugData);
+                }
+            }
+        }
+    }
+    
+    // retourne le statut actuel de la tâche.
+    private Progress getProgressForBugId(Integer bugId) {
+        
+        // liste des 'Progress' pour le projet.
+        Query qryPercentage = em.createNamedQuery("Progress.findByBugId");
+        qryPercentage.setParameter("bugId", bugId);
+        // obtenir le plus récent.
+        qryPercentage.setMaxResults(1); // top 1 result
+        // lire en liste.
+        List<Progress> listProgress = new ArrayList<Progress>();
+        listProgress = qryPercentage.getResultList();
+        
+        // retourner le statut, s'il y'en a un.
+        if (listProgress.size() > 0) {
+            return listProgress.get(0);
+        } else {
+            return null;
+        }
+    }
 }
