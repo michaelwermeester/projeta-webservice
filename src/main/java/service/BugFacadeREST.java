@@ -327,6 +327,7 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
                     Map<String, Object> bugData = new HashMap<String, Object>();
                     Map<String, Object> userStruct = new HashMap<String, Object>();
                     Map<String, Object> userAssignedStruct = new HashMap<String, Object>();
+                    Map<String, Object> bugCategoryStruct = new HashMap<String, Object>();
                     //Map<String, String> nameStruct = new HashMap<String, String>();
 
                     userStruct.put("userId", b.getUserReported().getUserId().toString());
@@ -391,6 +392,13 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
                     if (b.getProjectId() != null) {
                         if (b.getProjectId().getProjectTitle() != null)
                             bugData.put("projectTitle", b.getProjectId().getProjectTitle());
+                    }
+                    
+                    if (b.getBugcategoryId() != null) {
+                        bugCategoryStruct.put("bugcategoryId", b.getBugcategoryId().getBugcategoryId().toString());
+                        bugCategoryStruct.put("categoryName", b.getBugcategoryId().getCategoryName());
+                        bugData.put("bugCategory", bugCategoryStruct);
+                        //taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
                     }
                     
 
