@@ -166,7 +166,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
                     Map<String, Object> taskData = new HashMap<String, Object>();
                     Map<String, Object> userStruct = new HashMap<String, Object>();
-                    //Map<String, Object> userAssignedStruct = new HashMap<String, Object>();
+                    Map<String, Object> userAssignedStruct = new HashMap<String, Object>();
                     //Map<String, String> nameStruct = new HashMap<String, String>();
 
                     userStruct.put("userId", t.getUserCreated().getUserId().toString());
@@ -196,10 +196,10 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                     }
 
                     if (t.getUserAssigned() != null) {
-                        //userAssignedStruct.put("userId", t.getUserCreated().getUserId().toString());
-                        //userAssignedStruct.put("username", t.getUserCreated().getUsername());
-                        //taskData.put("userAssigned", userAssignedStruct);
-                        taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
+                        userAssignedStruct.put("userId", t.getUserAssigned().getUserId().toString());
+                        userAssignedStruct.put("username", t.getUserAssigned().getUsername());
+                        taskData.put("userAssigned", userAssignedStruct);
+                        //taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
                     }
                     
                     // état et pourcentage.
