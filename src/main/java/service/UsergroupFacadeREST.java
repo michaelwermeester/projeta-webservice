@@ -4,6 +4,7 @@
  */
 package service;
 
+import be.luckycode.projetawebservice.Project;
 import be.luckycode.projetawebservice.User;
 import be.luckycode.projetawebservice.Usergroup;
 import java.io.IOException;
@@ -283,13 +284,59 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
 
             if (usergroupList.size() == 1) {
 
-                // user
                 Usergroup ug = usergroupList.get(0);
-                ug.setUserCollection(users);
+                
+                if (users.get(0).getUserId() == null) {
+                    ArrayList<User> list = new ArrayList<User>();
+                    ug.setUserCollection(list);
+                } else {
+                    ug.setUserCollection(users);
+                }
+                // user
+                
+                //ug.setUserCollection(users);
                 em.merge(ug);
             } else {
             }
 
         }
+    }
+    
+    
+    // return list of usergroups assigned to a project.
+    @GET
+    @Path("project/{projectid}")
+    @Produces("application/json")
+    public List<Usergroup> findByProject(@PathParam("projectid") Integer projectid) {
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        Query q;
+        q = em.createNamedQuery("Project.findByProjectId");
+        q.setParameter("projectId", projectid);
+
+        List<Project> projectList = new ArrayList<Project>();
+        projectList = q.getResultList();
+
+        List<Usergroup> usergroupList = new ArrayList<Usergroup>();
+        
+        if (projectList.size() == 1) {
+
+            Collection<Usergroup> usergroups = projectList.get(0).getUsergroupCollection();
+
+            
+            
+            
+            for (Usergroup ug : usergroups) {
+                usergroupList.add(ug);
+            }
+            
+        } else {
+            //return "";
+        }
+        
+        return usergroupList;
     }
 }

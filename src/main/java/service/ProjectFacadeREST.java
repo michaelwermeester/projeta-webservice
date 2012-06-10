@@ -902,4 +902,40 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             
         }
     }
+    
+    @PUT
+    @RolesAllowed("administrator")
+    @Path("updateUsergroupsVisibleForProject")
+    @Consumes("application/json")
+    public void updateUsergroupsVisibleForProject(@QueryParam("projectId") Integer projectId, ArrayList<Usergroup> usergroups) {
+
+        Query q;
+
+        if (projectId != null && security.isUserInRole("administrator")) {
+            q = em.createNamedQuery("Project.findByProjectId");
+            q.setParameter("projectId", projectId);
+
+
+            List<Project> projectList = new ArrayList<Project>();
+            projectList = q.getResultList();
+
+            if (projectList.size() == 1) {
+
+                // user
+                Project project = projectList.get(0);          
+                 
+                if (usergroups.get(0).getUsergroupId() == null) {
+                    ArrayList<Usergroup> list = new ArrayList<Usergroup>();
+                    project.setUsergroupCollection(list);
+                } else {
+                    project.setUsergroupCollection(usergroups);
+                }
+                em.merge(project); 
+
+            } else {
+                
+            }
+            
+        }
+    }
 }
