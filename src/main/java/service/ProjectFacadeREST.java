@@ -513,7 +513,8 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                     //projectData.put("projectPercentage", getPercentageCompleteForProjectId(p.getProjectId()));
                     
                     // get child projects, if any
-                    getChildProjects(p, userStruct, projectData, namedQuery);
+                    if (namedQuery.length() > 0)
+                        getChildProjects(p, userStruct, projectData, namedQuery);
 
                     // retourner/inclure seulement s'il ne s'agit pas d'un projet supprimé.  
                     //if (p.getDeleted() == null || p.getDeleted() == false) {
@@ -973,5 +974,48 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             }
             
         }
+    }
+    
+    // retourne les projets assignés à un utilisateur. 
+    @GET
+    @RolesAllowed({"administrator", "developer"})
+    @Path("assigned")
+    @Produces("application/json")
+    public String findAllAssignedProjects() {
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map> projectList = new ArrayList<Map>();
+
+
+
+        // get root projects (projects which have no parent)
+        //Query q = em.createQuery("SELECT p FROM Project p WHERE p.parentProjectId IS NULL");
+        Query q = em.createNamedQuery("Project.getAssignedProjects");
+        q.setParameter("userAssignedId", getAuthenticatedUser().getUserId());
+
+        List<Project> prjList = new ArrayList<Project>();
+        prjList = q.getResultList();
+
+
+        // get projects and its children
+        //getProjects(prjList, projectList, "Project.getChildProjects");
+        getProjects(prjList, projectList, "");
+
+
+        HashMap<String, Object> retProjects = new HashMap<String, Object>();
+        retProjects.put("project", projectList);
+
+        try {
+            retVal = mapper.writeValueAsString(retProjects);
+        } catch (IOException ex) {
+            Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retVal;
+
+
     }
 }
