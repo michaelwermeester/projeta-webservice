@@ -20,7 +20,6 @@ public class CommonMethods {
         if (date != null)
             return new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(date);
         else
-            //return new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(new Date(0L));
             return null;
     }
     

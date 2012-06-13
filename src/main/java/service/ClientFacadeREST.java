@@ -133,18 +133,11 @@ public class ClientFacadeREST extends AbstractFacade<Client> {
         clientData.put("clientId", client.getClientId().toString());
         clientData.put("clientName", client.getClientName());
         
-        /*if (client.getFirstName() != null)
-            clientData.put("firstName", client.getFirstName());
-        if (client.getLastName() != null)
-            clientData.put("lastName", client.getLastName());
-        if (client.getEmailAddress() != null)
-            clientData.put("emailAddress", client.getEmailAddress());*/
-        
         return clientData;
     }
     
     
-    // return list of users assigned to a project.
+    // return list of clients assigned to a project.
     @GET
     @Path("project/{projectid}")
     @RolesAllowed("administrator")

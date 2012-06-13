@@ -52,32 +52,10 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
         super(Role.class);
     }
 
-    /*@POST
-    @Override
-    @Consumes({"application/xml", "application/json"})
-    public void create(Role entity) {
-        super.create(entity);
-    }
-
-    @PUT
-    @Override
-    @Consumes({"application/xml", "application/json"})
-    public void edit(Role entity) {
-        super.edit(entity);
-    }
-
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") Integer id) {
-        super.remove(super.find(id));
-    }*/
-
     @PUT
     @RolesAllowed("administrator")
     @Consumes("application/json")
     public void updateRolesForUser(@QueryParam("userId") Integer userId, ArrayList<Role> roles) {
-    //public String updateRolesForUser(User user) {
-        //super.edit(entity);
         
         Query q;
         
@@ -94,36 +72,10 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
                 // user
                 User u = userList.get(0);
                 
-                
-                //if (!roles.isEmpty()) {
-                    
-                    
-                    
-                    //if (roles.get(0).getRoleId() != null) {
-                        //em.persist(u);
-                        //em.getTransaction().begin();
-                        //em.flush();
-                        
-                        /*for (Role r : roles) {
-                            em.flush();
-                            em.merge(r);
-                        }*/
-                        
-                        //u.getRoleCollection().add(roles.get(0));
-                        
-                        
-                        //em.getTransaction().commit();
-                        
-          
-                        //em.refresh(u);
-                
-                        //em.setFlushMode(FlushModeType.COMMIT);
-                
                         Collection<Role> userRoles = u.getRoleCollection();
                         
                         
                         for (Role r : userRoles) {
-                        //em.remove(r.getUsersCollection().remove(u));
                             if (r.getRoleId() != null) {
                                 
                                 
@@ -136,45 +88,17 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
                                 
                                 Role role = tmpRoleList.get(0);
                                 
-                                //Collection ur = role.getUsersCollection();
-                                //ur.remove(u);
                                 role.getUserCollection().remove(u);
-                                //u.setRoleCollection(null);
                                 
-                                
-                                //em().remove(em().merge(entity));
-                                
-                                
-                                //r.getUsersCollection().remove(u);
-                        //em.remove(r);
-                                //em.flush();
-                                //em.merge(role);
-                                //em.merge(u);
-                                //em.remove(r);
-                                //em.persist(r);
                                 em.merge(role);
-                                //em.flush();
                             }
                             
                         }
-                        
-                        //em.flush();
-                        //u.setRoleCollection(null);
-                        //em.persist(u);
-                        
-                        //em.flush();
-                        
-                        //u.setRoleCollection(null);
-                        //em.merge(u);
-                        //em.flush();
                         
                         
                         for (Role r : roles) {
                             
                             if (r.getRoleId() != null) {
-                            
-                            //if (roles.contains(r) == false) {
-                                //em.persist(r.getUsersCollection().add(u));
                                 
                                 q = em.createNamedQuery("Role.findByRoleId");
                                 q.setParameter("roleId", r.getRoleId());
@@ -188,33 +112,10 @@ public class RoleFacadeREST extends AbstractFacade<Role> {
                                     role.getUserCollection().add(u);
                                 
                                     em.merge(role);
-                                    //em.flush();
-                                    
-                                    
                                 }
-                            //}
                             }
                         }
-
-                        //em.close();
-                        
-                        //em.flush();
-                        
-                        //u.setRoleCollection(roles);
-                        //em.merge(u);
                     }
-                    else {
-                        //em.persist(u);
-                        
-                        /*u.setRoleCollection(null);
-                        em.merge(u);
-                        */
-                    }
-                    
-                    
-                    
-                //}
-            //}
         }
     }
     

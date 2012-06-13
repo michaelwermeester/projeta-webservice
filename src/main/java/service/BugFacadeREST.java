@@ -45,55 +45,7 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         super(Bug.class);
     }
 
-    /*@POST
-    @Override
-    @Consumes("application/json")
-    public void create(Bug entity) {
-        super.create(entity);
-    }*/
-    
-//    @POST
-//    @Path("create")
-//    @RolesAllowed("administrator")
-//    @Consumes("application/json")
-//    @Produces("application/json")
-//    public String createNewBug(Bug entity) {
-//
-//        // Créer la nouvelle tâche dans la base de données.
-//        em.persist(entity);
-//
-//        // Créer état, pourcentage d'avancement etc. par défaut.
-//        initDefaultProgressForNewBug(entity);
-//        
-//        em.flush();
-//        
-//        
-//
-//        // SAME CODE AS IN CREATE !!!
-//        List<Bug> bugList = new ArrayList<Bug>();
-//        bugList.add(super.find(entity.getBugId()));
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//        List<Map> bugListMap = new ArrayList<Map>();
-//
-//        getBugs(bugList, bugListMap);
-//
-//        String retVal = "";
-//
-//        HashMap<String, Object> retBugs = new HashMap<String, Object>();
-//        retBugs.put("bug", bugListMap);
-//
-//        try {
-//            retVal = mapper.writeValueAsString(retBugs);
-//        } catch (IOException ex) {
-//            Logger.getLogger(TaskFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//
-//        return retVal;
-//    }
-
     @PUT
-    //@Override
     @Path("update")
     @Consumes("application/json")
     @Produces("application/json")
@@ -124,27 +76,9 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
     public Bug find(@PathParam("id") Integer id) {
         return super.find(id);
     }
-
-//    @GET
-//    @Override
-//    @Path("test")
-//    @Produces("application/json")
-//    public List<Bug> findAll() {
-//        
-//        /*List<Bug> bugList = super.findAll();
-//        
-//        for (Bug b : bugList) {
-//            
-//        }
-//        
-//        return bugList;*/
-//        
-//        return super.findAll();
-//    }
     
     // returns parent objects including its children
     @GET
-    //@Path("testnew")
     @Produces("application/json")
     public String findAllBugs() {
 
@@ -154,17 +88,14 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
 
         List<Map> bugListMap = new ArrayList<Map>();
 
-
-
-        // get root projects (projects which have no parent)
-        //Query q = em.createQuery("SELECT p FROM Project p WHERE p.parentProjectId IS NULL");
+        // get all bugs from database.
         Query q = em.createNamedQuery("Bug.findAll");
 
         List<Bug> bugList = new ArrayList<Bug>();
         bugList = q.getResultList();
 
 
-        // get projects and its children
+        // get bugs
         getBugs(bugList, bugListMap);
 
 
@@ -178,8 +109,6 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         }
 
         return retVal;
-
-
     }
 
     @GET
@@ -209,7 +138,6 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         
         // si pas de 'user création' défini, mettre l'utilisateur authentifié.
         if (entity.getUserReported() == null) {
-            //entity.setUserCreated(new User(this.getAuthenticatedUser().getUserId()));
             entity.setUserReported(this.getAuthenticatedUser());
         }
         
@@ -241,16 +169,12 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
     }
     
     
-    // FOR WEBSITE !!!
+    // utilisé par le site web. 
     @GET
     @Path("wsproject/{id}")
     public BugDummy findBugsByProjectIdPOJO(@PathParam("id") Integer id) {
         
         BugDummy bugDummy = new BugDummy();
-        //projDummy.setListProject(super.findAll());
-        
-        //List<Project> listProjTmp = super.findAll();
-        //Query q = em.createNamedQuery("Project.getParentProjects");
 
         List<Bug> bugList = new ArrayList<Bug>();
         Query q = em.createNamedQuery("Bug.getBugsByProjectId");
@@ -278,32 +202,6 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         return bugDummy;
     }
     
-    // FOR WEBSITE !!!
-    /*private void getChildBugsWebSite(ProjectSimpleWebSite p) {
-        // get child projects
-        Query qry_child_bugs = em.createNamedQuery("Bug.getChildBugs");
-        Bug p_qry = new Bug(p.getProjectId());
-        qry_child_bugs.setParameter(1, p_qry);
-
-        List<Bug> childBugList = new ArrayList<Bug>();
-        childBugList = qry_child_bugs.getResultList();
-        
-        List<ProjectSimpleWebSite> listSubProject = new ArrayList<ProjectSimpleWebSite>();
-        
-        for (Bug b_tmp : childBugList) {
-            
-            ProjectSimpleWebSite p_sub = new ProjectSimpleWebSite();
-            p_sub.setProjectTitle(b_tmp.getTitle());
-            p_sub.setProjectId(b_tmp.getBugId());
-            
-            getChildBugsWebSite(p_sub);
-            
-            listSubProject.add(p_sub);
-        }
-        
-        p.setChildProject(listSubProject);
-    }*/
-    
     // Créer état, pourcentage d'avancement etc. par défaut.
     private void initDefaultProgressForNewBug(Bug entity) {
         Progress progress = new Progress();
@@ -328,17 +226,13 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
                     Map<String, Object> userStruct = new HashMap<String, Object>();
                     Map<String, Object> userAssignedStruct = new HashMap<String, Object>();
                     Map<String, Object> bugCategoryStruct = new HashMap<String, Object>();
-                    //Map<String, String> nameStruct = new HashMap<String, String>();
-
+        
                     userStruct.put("userId", b.getUserReported().getUserId().toString());
                     userStruct.put("username", b.getUserReported().getUsername());
                     bugData.put("userReported", userStruct);
 
                     bugData.put("dateReported", CommonMethods.convertDate(b.getDateReported()));
-                    //bugData.put("startDate", CommonMethods.convertDate(t.getStartDate()));
-                    //taskData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getEndDate()));
-                    //taskData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getStartDate()));
-
+      
                     if (b.getDetails() != null) {
                         bugData.put("details", b.getDetails());
                     }
@@ -374,7 +268,6 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
                         userAssignedStruct.put("userId", b.getUserAssigned().getUserId().toString());
                         userAssignedStruct.put("username", b.getUserAssigned().getUsername());
                         bugData.put("userAssigned", userAssignedStruct);
-                        //taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
                     }
                     
                     // état et pourcentage.
@@ -398,12 +291,7 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
                         bugCategoryStruct.put("bugcategoryId", b.getBugcategoryId().getBugcategoryId().toString());
                         bugCategoryStruct.put("categoryName", b.getBugcategoryId().getCategoryName());
                         bugData.put("bugCategory", bugCategoryStruct);
-                        //taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
                     }
-                    
-
-                    // get child projects, if any
-                    //getChildTasks(t, userStruct, bugData);
 
                     bugMapList.add(bugData);
                 }
@@ -411,10 +299,10 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         }
     }
     
-    // retourne le statut actuel de la tâche.
+    // retourne le statut actuel de bogue.
     private Progress getProgressForBugId(Integer bugId) {
         
-        // liste des 'Progress' pour le projet.
+        // liste des 'Progress' pour le bogue.
         Query qryPercentage = em.createNamedQuery("Progress.findByBugId");
         qryPercentage.setParameter("bugId", bugId);
         // obtenir le plus récent.

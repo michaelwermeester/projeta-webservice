@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.XmlTransient;
 @SequenceGenerator(name = "sequenceBug", sequenceName = "bug_bug_id_seq", allocationSize = 1)
 @NamedQueries({
     @NamedQuery(name = "Bug.findAll", query = "SELECT b FROM Bug b"),
-    
     // get root tasks by project ID & exclude personal tasks.
     @NamedQuery(name = "Bug.getBugsByProjectId", query = "SELECT b FROM Bug b WHERE b.projectId.projectId = :projectId and (b.deleted = false or b.deleted is null)"),
     

@@ -58,14 +58,6 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
         super.create(entity);
     }
 
-    /*@PUT
-    @Override
-    @RolesAllowed({"administrator", "developer"})
-    @Consumes("application/json")
-    public void edit(Usergroup entity) {
-        super.edit(entity);
-    }*/
-
     @DELETE
     @Path("{id}")
     public void remove(@PathParam("id") Integer id) {
@@ -117,39 +109,37 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
         //UserFacadeREST userFacade = new UserFacadeREST();
 
         User u = getUser(username, userId);
-        
+
         return getUsergroupByUser(u);
     }
-    
+
     public User getUser(String username, Integer userId) {
         if (username == null && userId == null) {
             // get username of logged in user
             username = security.getUserPrincipal().getName();
-        } 
-        // if current user is not in administrator role.
+        } // if current user is not in administrator role.
         else if (!security.isUserInRole("administrator")) {
             return null;
         }
-        
+
         Query q;
-        
+
         if (userId != null && security.isUserInRole("administrator")) {
             q = em.createNamedQuery("User.findByUserId");
             q.setParameter("userId", userId);
-        }
-        else {
+        } else {
             q = em.createNamedQuery("User.findByUsername");
             q.setParameter("username", username);
         }
-        
+
         List<User> userList = new ArrayList<User>();
         userList = q.getResultList();
-               
+
         if (userList.size() == 1) {
 
             // user
             User u = userList.get(0);
-            
+
             // get roles by user.
             return u;
         } else {
@@ -190,8 +180,6 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
     @Path("updateGroupsForUser")
     @Consumes("application/json")
     public void updateUsergroupsForUser(@QueryParam("userId") Integer userId, ArrayList<Usergroup> usergroups) {
-        //public String updateRolesForUser(User user) {
-        //super.edit(entity);
 
         Query q;
 
@@ -238,9 +226,6 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
 
                     if (ug.getUsergroupId() != null) {
 
-                        //if (roles.contains(r) == false) {
-                        //em.persist(r.getUsersCollection().add(u));
-
                         q = em.createNamedQuery("Usergroup.findByUsergroupId");
                         q.setParameter("usergroupId", ug.getUsergroupId());
 
@@ -254,7 +239,6 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
 
                             em.merge(usergroup);
                         }
-                        //}
                     }
                 }
 
@@ -263,14 +247,12 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
 
         }
     }
-    
+
     @PUT
     @RolesAllowed("administrator")
     @Path("updateUsersForGroup")
     @Consumes("application/json")
     public void updateUsersForGroup(@QueryParam("usergroupId") Integer usergroupId, ArrayList<User> users) {
-        //public String updateRolesForUser(User user) {
-        //super.edit(entity);
 
         Query q;
 
@@ -285,24 +267,21 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
             if (usergroupList.size() == 1) {
 
                 Usergroup ug = usergroupList.get(0);
-                
+
                 if (users.get(0).getUserId() == null) {
                     ArrayList<User> list = new ArrayList<User>();
                     ug.setUserCollection(list);
                 } else {
                     ug.setUserCollection(users);
                 }
-                // user
-                
-                //ug.setUserCollection(users);
+
                 em.merge(ug);
             } else {
             }
 
         }
     }
-    
-    
+
     // return list of usergroups assigned to a project.
     @GET
     @Path("project/{projectid}")
@@ -322,22 +301,17 @@ public class UsergroupFacadeREST extends AbstractFacade<Usergroup> {
         projectList = q.getResultList();
 
         List<Usergroup> usergroupList = new ArrayList<Usergroup>();
-        
+
         if (projectList.size() == 1) {
 
             Collection<Usergroup> usergroups = projectList.get(0).getUsergroupCollection();
 
-            
-            
-            
             for (Usergroup ug : usergroups) {
                 usergroupList.add(ug);
             }
-            
-        } else {
-            //return "";
+
         }
-        
+
         return usergroupList;
     }
 }

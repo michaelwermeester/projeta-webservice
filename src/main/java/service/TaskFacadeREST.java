@@ -92,9 +92,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
         List<Map> taskList = new ArrayList<Map>();
 
-
-
-        // get root projects (projects which have no parent) and which are personal.
+        // get root tasks (tasks which have no parent) and which are personal.
         Query q = em.createNamedQuery("Task.getPersonalParentTasks");
         q.setParameter(1, this.getAuthenticatedUser().getUserId());
 
@@ -131,7 +129,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
 
 
-        // get root projects (projects which have no parent)
+        // get root tasks (tasks which have no parent)
         Query q = em.createNamedQuery("Task.getParentTasks");
 
         List<Task> tList = new ArrayList<Task>();
@@ -167,7 +165,6 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                     Map<String, Object> taskData = new HashMap<String, Object>();
                     Map<String, Object> userStruct = new HashMap<String, Object>();
                     Map<String, Object> userAssignedStruct = new HashMap<String, Object>();
-                    //Map<String, String> nameStruct = new HashMap<String, String>();
 
                     userStruct.put("userId", t.getUserCreated().getUserId().toString());
                     userStruct.put("username", t.getUserCreated().getUsername());
@@ -175,9 +172,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
                     taskData.put("endDate", CommonMethods.convertDate(t.getEndDate()));
                     taskData.put("startDate", CommonMethods.convertDate(t.getStartDate()));
-                    //taskData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getEndDate()));
-                    //taskData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(t.getStartDate()));
-
+  
                     if (t.getTaskDescription() != null) {
                         taskData.put("taskDescription", t.getTaskDescription());
                     }
@@ -199,7 +194,6 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                         userAssignedStruct.put("userId", t.getUserAssigned().getUserId().toString());
                         userAssignedStruct.put("username", t.getUserAssigned().getUsername());
                         taskData.put("userAssigned", userAssignedStruct);
-                        //taskData.put("userAssigned", t.getUserAssigned().getUserId().toString());
                     }
                     
                     // état et pourcentage.
@@ -286,7 +280,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         
         
 
-        // SAME CODE AS IN CREATE !!!
+        // Retourne la tâche créé. 
         List<Task> tskList = new ArrayList<Task>();
         tskList.add(super.find(entity.getTaskId()));
 
@@ -362,12 +356,9 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
 
         super.edit(task);
-
-
-        // TODO : mark childtask as completed.
         
 
-        // SAME CODE AS IN CREATE !!!
+        // retourne la tâche qui vient d'être mis-à-jour. 
         List<Task> tskList = new ArrayList<Task>();
         tskList.add(super.find(task.getTaskId()));
 
@@ -415,10 +406,6 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     public ProjectDummy findTasksByProjectIdPOJO(@PathParam("id") Integer id) {
         
         ProjectDummy projDummy = new ProjectDummy();
-        //projDummy.setListProject(super.findAll());
-        
-        //List<Project> listProjTmp = super.findAll();
-        //Query q = em.createNamedQuery("Project.getParentProjects");
 
         List<Task> taskList = new ArrayList<Task>();
         Query q = em.createNamedQuery("Task.getParentTasksByProjectId");
@@ -451,7 +438,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         return projDummy;
     }
     
-    // FOR WEBSITE !!!
+    // utilisé par le site web. Retourne les tâches enfants d'un projet spécifié. 
     private void getChildTasksWebSite(ProjectSimpleWebSite p) {
         // get child projects
         Query qry_child_tasks = em.createNamedQuery("Task.getChildTasks");

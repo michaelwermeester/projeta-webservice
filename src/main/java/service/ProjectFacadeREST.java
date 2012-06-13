@@ -45,29 +45,22 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         super(Project.class);
     }
 
-    /*
-     * @POST @Override @Consumes("application/json") public void create(Project
-     * entity) { super.create(entity);
-    }
-     */
     @POST
     @Path("create")
     @RolesAllowed("administrator")
     @Consumes("application/json")
     @Produces("application/json")
     public String createNewProject(Project entity) {
-        
+
         // créer le projet en base de donnés.
         em.persist(entity);
-        
+
         // initialiser les valeurs par défaut pour l'état, pourcentage, etc.
         initDefaultProgressForNewProject(entity);
 
         em.flush();
 
-        // test -> return project id...
-        //return entity.getProjectId().toString();
-        //Project p = super.find(entity.getProjectId());
+
         List<Project> prjList = new ArrayList<Project>();
         prjList.add(entity);
 
@@ -76,46 +69,6 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         getProjects(prjList, projectList, "Project.getChildProjects");
 
-//        Map<String, Object> projectData = new HashMap<String, Object>();
-//                Map<String, Object> userStruct = new HashMap<String, Object>();
-//                //Map<String, String> nameStruct = new HashMap<String, String>();
-//                if (p.getUserCreated() != null) {
-//                    
-//                    userStruct.put("userId", p.getUserCreated().getUserId().toString());
-//                    userStruct.put("username", p.getUserCreated().getUsername());
-//                    projectData.put("userCreated", userStruct);
-//                }
-//                
-//                if (p.getDateCreated() != null)
-//                    projectData.put("dateCreated", CommonMethods.convertDate(p.getDateCreated()));
-//                //projectData.put("dateCreated", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getDateCreated()));
-//                if (p.getFlagPublic() != null)
-//                    projectData.put("flagPublic", p.getFlagPublic());
-//                //projectData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getEndDate()));
-//                if (p.getEndDate() != null)
-//                    projectData.put("endDate", CommonMethods.convertDate(p.getEndDate()));
-//                //projectData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getStartDate()));
-//                if (p.getStartDate() != null) 
-//                    projectData.put("startDate", CommonMethods.convertDate(p.getStartDate()));
-//                projectData.put("projectDescription", p.getProjectDescription());
-//                projectData.put("projectId", p.getProjectId().toString());
-//                projectData.put("projectTitle", p.getProjectTitle());
-//                
-//                // new/optional
-//                if (p.getCompleted() != null)
-//                    projectData.put("completed", p.getCompleted());
-//                else
-//                    projectData.put("completed", false);
-//                if (p.getCanceled() != null)
-//                    projectData.put("canceled", p.getCanceled());
-//                else
-//                    projectData.put("canceled", false);
-//                if (p.getStartDateReal() != null)
-//                    projectData.put("startDateReal", CommonMethods.convertDate(p.getStartDateReal()));
-//                if (p.getEndDateReal() != null)
-//                    projectData.put("endDateReal", CommonMethods.convertDate(p.getEndDateReal()));
-//                    
-//                projectList.add(projectData);
 
         String retVal = "";
 
@@ -134,12 +87,12 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     // Créer état, pourcentage d'avancement etc. par défaut.
     private void initDefaultProgressForNewProject(Project entity) {
         Progress progress = new Progress();
-        progress.setPercentageComplete((short)0);
+        progress.setPercentageComplete((short) 0);
         progress.setProgressComment("Projet créé.");
         progress.setStatusId(new Status(1));
         progress.setUserCreated(getAuthenticatedUser());
         progress.setProjectId(entity);
-        
+
         em.persist(progress);
     }
 
@@ -187,92 +140,87 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         return super.find(id);
     }
 
-    /*
-     * @GET @Override @Produces("application/json") public List<Project>
-     * findAll() { return super.findAll();
-    }
-     */
-    
-    // FOR WEBSITE !!!
+    // Utilisé par le site web. Retourne tous les projets. 
     @GET
     @Path("wsprojects")
     public ProjectDummy findProjectsPOJO() {
-        
+
         ProjectDummy projDummy = new ProjectDummy();
-        //projDummy.setListProject(super.findAll());
-        
-        //List<Project> listProjTmp = super.findAll();
+
         Query q = em.createNamedQuery("Project.getParentProjects");
 
         List<Project> prjList = new ArrayList<Project>();
         prjList = q.getResultList();
-        
-        
+
+
         List<ProjectSimpleWebSite> listProj = new ArrayList<ProjectSimpleWebSite>();
-        
+
         for (Project p_tmp : prjList) {
-            
+
             ProjectSimpleWebSite p = new ProjectSimpleWebSite();
             p.setProjectTitle(p_tmp.getProjectTitle());
             p.setProjectId(p_tmp.getProjectId());
-            if (p_tmp.getStartDate() != null)
+            if (p_tmp.getStartDate() != null) {
                 p.setStartDate(p_tmp.getStartDate());
-            if (p_tmp.getEndDate() != null)
+            }
+            if (p_tmp.getEndDate() != null) {
                 p.setEndDate(p_tmp.getEndDate());
-            
+            }
+
             // statut
             p.setProjectStatus(getStatusForProjectId(p_tmp.getProjectId()));
 
             getChildProjectsWebSite(p, "Project.getChildProjects");
-            
+
             listProj.add(p);
         }
-        
+
         projDummy.setListProject(listProj);
-        
+
         return projDummy;
     }
-    
+
+    // Utilisé par le site web. Retourne tous les publics projets. 
     @GET
     @Path("wsprojectspublic")
     public ProjectDummy findPublicProjectsPOJO() {
-        
+
         ProjectDummy projDummy = new ProjectDummy();
-        //projDummy.setListProject(super.findAll());
-        
-        //List<Project> listProjTmp = super.findAll();
+
         Query q = em.createNamedQuery("Project.getParentPublicProjects");
 
         List<Project> prjList = new ArrayList<Project>();
         prjList = q.getResultList();
-        
-        
+
+
         List<ProjectSimpleWebSite> listProj = new ArrayList<ProjectSimpleWebSite>();
-        
+
         for (Project p_tmp : prjList) {
-            
+
             ProjectSimpleWebSite p = new ProjectSimpleWebSite();
             p.setProjectTitle(p_tmp.getProjectTitle());
             p.setProjectId(p_tmp.getProjectId());
-            if (p_tmp.getStartDate() != null)
+            if (p_tmp.getStartDate() != null) {
                 p.setStartDate(p_tmp.getStartDate());
-            if (p_tmp.getEndDate() != null)
+            }
+            if (p_tmp.getEndDate() != null) {
                 p.setEndDate(p_tmp.getEndDate());
-            
+            }
+
             // statut
             p.setProjectStatus(getStatusForProjectId(p_tmp.getProjectId()));
 
             getChildProjectsWebSite(p, "Project.getChildPublicProjects");
-            
+
             listProj.add(p);
         }
-        
+
         projDummy.setListProject(listProj);
-        
+
         return projDummy;
     }
-    
-    // FOR WEBSITE !!!
+
+    // Utilisé par le site web. Retourne les projets enfants. 
     private void getChildProjectsWebSite(ProjectSimpleWebSite p, String namedQuery) {
         // get child projects
         Query qry_child_projects = em.createNamedQuery(namedQuery);
@@ -281,33 +229,35 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         List<Project> childPrjList = new ArrayList<Project>();
         childPrjList = qry_child_projects.getResultList();
-        
+
         List<ProjectSimpleWebSite> listSubProject = new ArrayList<ProjectSimpleWebSite>();
-        
+
         for (Project p_tmp : childPrjList) {
-            
+
             ProjectSimpleWebSite p_sub = new ProjectSimpleWebSite();
             p_sub.setProjectTitle(p_tmp.getProjectTitle());
             p_sub.setProjectId(p_tmp.getProjectId());
-            if (p_tmp.getStartDate() != null)
+            if (p_tmp.getStartDate() != null) {
                 p_sub.setStartDate(p_tmp.getStartDate());
-            if (p_tmp.getEndDate() != null)
+            }
+            if (p_tmp.getEndDate() != null) {
                 p_sub.setEndDate(p_tmp.getEndDate());
-            
+            }
+
             // statut.
             p_sub.setProjectStatus(getStatusForProjectId(p_tmp.getProjectId()));
-            
+
             getChildProjectsWebSite(p_sub, namedQuery);
-            
+
             listSubProject.add(p_sub);
         }
-        
+
         p.setChildProject(listSubProject);
     }
-    
+
     // retourne le statut actuel du projet.
     private String getStatusForProjectId(Integer projectId) {
-        
+
         // liste des 'Progress' pour le projet.
         Query qryStatus = em.createNamedQuery("Progress.findByProjectId");
         qryStatus.setParameter("projectId", projectId);
@@ -316,22 +266,23 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         // lire en liste.
         List<Progress> listProgress = new ArrayList<Progress>();
         listProgress = qryStatus.getResultList();
-        
+
         // retourner le statut, s'il y'en a un.
         if (listProgress.size() > 0) {
             String status = "";
-            if (listProgress.get(0).getPercentageComplete() != null)
+            if (listProgress.get(0).getPercentageComplete() != null) {
                 status += listProgress.get(0).getPercentageComplete().toString() + "% - ";
-            
+            }
+
             return status + listProgress.get(0).getStatusId().getStatusName();
         } else {
             return "-";
         }
     }
-    
+
     // retourne le statut actuel du projet.
     private Short getPercentageCompleteForProjectId(Integer projectId) {
-        
+
         // liste des 'Progress' pour le projet.
         Query qryPercentage = em.createNamedQuery("Progress.findByProjectId");
         qryPercentage.setParameter("projectId", projectId);
@@ -340,7 +291,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         // lire en liste.
         List<Progress> listProgress = new ArrayList<Progress>();
         listProgress = qryPercentage.getResultList();
-        
+
         // retourner le statut, s'il y'en a un.
         if (listProgress.size() > 0) {
             return listProgress.get(0).getPercentageComplete();
@@ -348,10 +299,10 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             return 0;
         }
     }
-    
+
     // retourne le statut actuel du projet.
     private Progress getProgressForProjectId(Integer projectId) {
-        
+
         // liste des 'Progress' pour le projet.
         Query qryPercentage = em.createNamedQuery("Progress.findByProjectId");
         qryPercentage.setParameter("projectId", projectId);
@@ -360,7 +311,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         // lire en liste.
         List<Progress> listProgress = new ArrayList<Progress>();
         listProgress = qryPercentage.getResultList();
-        
+
         // retourner le statut, s'il y'en a un.
         if (listProgress.size() > 0) {
             return listProgress.get(0);
@@ -368,29 +319,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             return null;
         }
     }
-    
-    /*@GET
-    @Path("test")
-    //public List<Project> findProjectsPOJO() {
-    @Produces("application/xml")
-    public DummyProject findProjectsPOJO() {
-        //return super.findAll();
-        //return super.findAll();
-        
-        DummyProject dc = new DummyProject();
-        dc.setListProjects(super.findAll());
-        
-        return dc;
-        
-        //Project p = new Project();
-        //p.setProjectCollection(new ArrayList(super.findAll()));
-        //int size = p.getProjectCollection().size();
-        //String s = Integer.toString(size);
-        //p.setProjectTitle(s);
-        
-        //return p;
-    }*/
-    
+
     // returns parent objects including its children
     @GET
     @Produces("application/json")
@@ -402,15 +331,11 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         List<Map> projectList = new ArrayList<Map>();
 
-
-
-        // get root projects (projects which have no parent)
-        //Query q = em.createQuery("SELECT p FROM Project p WHERE p.parentProjectId IS NULL");
+        // get projets parents de la base de données. 
         Query q = em.createNamedQuery("Project.getParentProjects");
 
         List<Project> prjList = new ArrayList<Project>();
         prjList = q.getResultList();
-
 
         // get projects and its children
         getProjects(prjList, projectList, "Project.getChildProjects");
@@ -438,37 +363,39 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                 if (p.getDeleted() == null || p.getDeleted() == false) {
                     Map<String, Object> projectData = new HashMap<String, Object>();
                     Map<String, Object> userStruct = new HashMap<String, Object>();
-                    //Map<String, String> nameStruct = new HashMap<String, String>();
+
                     if (p.getUserCreated() != null) {
 
                         userStruct.put("userId", p.getUserCreated().getUserId().toString());
                         userStruct.put("username", p.getUserCreated().getUsername());
                         projectData.put("userCreated", userStruct);
                     }
-                    
+
                     if (p.getUserAssigned() != null) {
 
                         userStruct.put("userId", p.getUserAssigned().getUserId().toString());
                         userStruct.put("username", p.getUserAssigned().getUsername());
-                        if (p.getUserAssigned().getFirstName() != null)
+                        if (p.getUserAssigned().getFirstName() != null) {
                             userStruct.put("firstName", p.getUserAssigned().getFirstName());
-                        if (p.getUserAssigned().getLastName() != null)
+                        }
+                        if (p.getUserAssigned().getLastName() != null) {
                             userStruct.put("lastName", p.getUserAssigned().getLastName());
+                        }
                         projectData.put("userAssigned", userStruct);
                     }
 
                     if (p.getDateCreated() != null) {
                         projectData.put("dateCreated", CommonMethods.convertDate(p.getDateCreated()));
                     }
-                    //projectData.put("dateCreated", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getDateCreated()));
+
                     if (p.getFlagPublic() != null) {
                         projectData.put("flagPublic", p.getFlagPublic());
                     }
-                    //projectData.put("endDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getEndDate()));
+
                     if (p.getEndDate() != null) {
                         projectData.put("endDate", CommonMethods.convertDate(p.getEndDate()));
                     }
-                    //projectData.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getStartDate()));
+
                     if (p.getStartDate() != null) {
                         projectData.put("startDate", CommonMethods.convertDate(p.getStartDate()));
                     }
@@ -496,28 +423,22 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
                     // état et pourcentage.
                     Progress progress = getProgressForProjectId(p.getProjectId());
-                    
+
                     if (progress != null) {
                         // état.
-                        if (progress.getStatusId() != null && progress.getStatusId().getStatusName() != null) 
+                        if (progress.getStatusId() != null && progress.getStatusId().getStatusName() != null) {
                             projectData.put("projectStatus", progress.getStatusId().getStatusName());
+                        }
                         // pourcentage.
-                        if (progress.getPercentageComplete() != null) 
+                        if (progress.getPercentageComplete() != null) {
                             projectData.put("projectPercentage", progress.getPercentageComplete().toString());
+                        }
                     }
-                    
-                    // état du projet.
-                    //projectData.put("projectStatus", getStatusForProjectId(p.getProjectId()));
-                    
-                    // pourcentage.
-                    //projectData.put("projectPercentage", getPercentageCompleteForProjectId(p.getProjectId()));
-                    
-                    // get child projects, if any
-                    if (namedQuery.length() > 0)
-                        getChildProjects(p, userStruct, projectData, namedQuery);
 
-                    // retourner/inclure seulement s'il ne s'agit pas d'un projet supprimé.  
-                    //if (p.getDeleted() == null || p.getDeleted() == false) {
+                    // get child projects, if any
+                    if (namedQuery.length() > 0) {
+                        getChildProjects(p, userStruct, projectData, namedQuery);
+                    }
 
                     projectList.add(projectData);
                 }
@@ -526,34 +447,9 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
     }
 
-//    private void getChildProjects(Project p, Map<String, Object> userStruct, Map<String, Object> projectData) {
-//        
-//        
-//        getChildProjects(p, userStruct, projectData, "Project.getChildProjects");
-//        
-//        /*List<Map> childProjectList = new ArrayList<Map>();
-//
-//        // get child projects
-//        Query qry_child_projects = em.createNamedQuery("Project.getChildProjects");
-//        qry_child_projects.setParameter(1, p);
-//
-//
-//        List<Project> childPrjList = new ArrayList<Project>();
-//        childPrjList = qry_child_projects.getResultList();
-//
-//        // get child projects
-//        getProjects(childPrjList, childProjectList);
-//
-//        // 
-//        if (childProjectList.isEmpty() == false) {
-//
-//            projectData.put("childProject", childProjectList);
-//        }*/
-//    }
-    
     // méthode getChildProjects principale. Utiliser celle-ci
     private void getChildProjects(Project p, Map<String, Object> userStruct, Map<String, Object> projectData, String namedQuery) {
-        
+
         List<Map> childProjectList = new ArrayList<Map>();
 
         // get child projects
@@ -563,37 +459,6 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         List<Project> childPrjList = new ArrayList<Project>();
         childPrjList = qry_child_projects.getResultList();
-
-        // if list is not empty
-        /*
-         * if (childPrjList.isEmpty() == false) { for (Project childProject :
-         * childPrjList) { Map<String, Object> childProjectData = new
-         * HashMap<String, Object>(); Map<String, Object> childUserStruct = new
-         * HashMap<String, Object>(); //Map<String, String> nameStruct = new
-         * HashMap<String, String>(); childUserStruct.put("userId",
-         * childProject.getUserCreated().getUserId().toString());
-         * childUserStruct.put("username",
-         * childProject.getUserCreated().getUsername());
-         * childProjectData.put("userCreated", userStruct);
-         * childProjectData.put("dateCreated", new
-         * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(childProject.getDateCreated()));
-         * childProjectData.put("flagPublic", childProject.getFlagPublic());
-         * childProjectData.put("endDate", new
-         * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(childProject.getEndDate()));
-         * childProjectData.put("startDate", new
-         * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(childProject.getStartDate()));
-         * childProjectData.put("projectDescription",
-         * childProject.getProjectDescription());
-         * childProjectData.put("projectId",
-         * childProject.getProjectId().toString());
-         * childProjectData.put("projectTitle", childProject.getProjectTitle());
-         *
-         * // get child projects getChildProjects(childProject, childUserStruct,
-         * childProjectData);
-         *
-         * childProjectList.add(childProjectData); }
-        }
-         */
 
         // get child projects
         getProjects(childPrjList, childProjectList, namedQuery);
@@ -605,137 +470,6 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         }
     }
 
-    // returns parent objects including its children
-    /*
-     * @GET @Produces("application/json") public String findAll3() {
-     *
-     * String retVal = "";
-     *
-     * ObjectMapper mapper = new ObjectMapper();
-     *
-     * List<Map> projectList = new ArrayList<Map>();
-     *
-     *
-     *
-     * // get root projects (projects which have no parent) //Query q =
-     * em.createQuery("SELECT p FROM Project p WHERE p.parentProjectId IS
-     * NULL"); Query q = em.createNamedQuery("Project.getParentProjects");
-     *
-     * List<Project> prjList = new ArrayList<Project>(); prjList =
-     * q.getResultList();
-     *
-     *
-     *
-     *
-     * for (Project p : prjList) { Map<String, Object> projectData = new
-     * HashMap<String, Object>(); Map<String, Object> userStruct = new
-     * HashMap<String, Object>(); //Map<String, String> nameStruct = new
-     * HashMap<String, String>(); userStruct.put("userId",
-     * p.getUserCreated().getUserId().toString()); userStruct.put("username",
-     * p.getUserCreated().getUsername()); projectData.put("userCreated",
-     * userStruct); projectData.put("dateCreated", new
-     * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getDateCreated()));
-     * projectData.put("flagPublic", p.getFlagPublic());
-     * projectData.put("endDate", new
-     * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getEndDate()));
-     * projectData.put("startDate", new
-     * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getStartDate()));
-     * projectData.put("projectDescription", p.getProjectDescription());
-     * projectData.put("projectId", p.getProjectId().toString());
-     * projectData.put("projectTitle", p.getProjectTitle());
-     *
-     * List<Map> childProjectList = new ArrayList<Map>();
-     *
-     * // get child projects Query qry_child_projects =
-     * em.createNamedQuery("Project.getChildProjects");
-     * qry_child_projects.setParameter(1, p);
-     *
-     *
-     * List<Project> childPrjList = new ArrayList<Project>(); childPrjList =
-     * qry_child_projects.getResultList();
-     *
-     * for (Project childProject : childPrjList) { Map<String, Object>
-     * childProjectData = new HashMap<String, Object>(); Map<String, Object>
-     * childUserStruct = new HashMap<String, Object>(); //Map<String, String>
-     * nameStruct = new HashMap<String, String>(); childUserStruct.put("userId",
-     * childProject.getUserCreated().getUserId().toString());
-     * childUserStruct.put("username",
-     * childProject.getUserCreated().getUsername());
-     * childProjectData.put("userCreated", userStruct);
-     * childProjectData.put("dateCreated", new
-     * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(childProject.getDateCreated()));
-     * childProjectData.put("flagPublic", childProject.getFlagPublic());
-     * childProjectData.put("endDate", new
-     * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(childProject.getEndDate()));
-     * childProjectData.put("startDate", new
-     * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(childProject.getStartDate()));
-     * childProjectData.put("projectDescription",
-     * childProject.getProjectDescription()); childProjectData.put("projectId",
-     * childProject.getProjectId().toString());
-     * childProjectData.put("projectTitle", childProject.getProjectTitle());
-     *
-     * childProjectList.add(childProjectData); }
-     *
-     * if (childProjectList.isEmpty() == false) {
-     * projectData.put("childProject", childProjectList); }
-     *
-     * projectList.add(projectData); }
-     *
-     * HashMap<String, Object> retProjects = new HashMap<String, Object>();
-     * retProjects.put("project", projectList);
-     *
-     * try { retVal = mapper.writeValueAsString(retProjects); } catch
-     * (IOException ex) {
-     * Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE,
-     * null, ex); }
-     *
-     * return retVal;
-     *
-     *
-     * }
-     */
-    // returns all projects (ignores if the project is a child or parent)
-    /*
-     * @GET @Produces("application/json") public String findAll2() {
-     * List<Project> projects = super.findAll();
-     *
-     * String retVal = "";
-     *
-     * ObjectMapper mapper = new ObjectMapper();
-     *
-     * List<Map> projectList = new ArrayList<Map>();
-     *
-     * for (Project p : projects) { Map<String, Object> projectData = new
-     * HashMap<String, Object>(); Map<String, Object> userStruct = new
-     * HashMap<String, Object>(); //Map<String, String> nameStruct = new
-     * HashMap<String, String>(); userStruct.put("userId",
-     * p.getUserCreated().getUserId().toString()); userStruct.put("username",
-     * p.getUserCreated().getUsername()); projectData.put("userCreated",
-     * userStruct); projectData.put("dateCreated", new
-     * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getDateCreated()));
-     * projectData.put("flagPublic", p.getFlagPublic());
-     * projectData.put("endDate", new
-     * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getEndDate()));
-     * projectData.put("startDate", new
-     * SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(p.getStartDate()));
-     * projectData.put("projectDescription", p.getProjectDescription());
-     * projectData.put("projectId", p.getProjectId().toString());
-     * projectData.put("projectTitle", p.getProjectTitle());
-     *
-     * projectList.add(projectData); }
-     *
-     * HashMap<String, Object> retProjects = new HashMap<String, Object>();
-     * retProjects.put("project", projectList);
-     *
-     * try { retVal = mapper.writeValueAsString(retProjects); } catch
-     * (IOException ex) {
-     * Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE,
-     * null, ex); }
-     *
-     * return retVal;
-     *
-     * }
-     */
     @GET
     @Path("{from}/{to}")
     @Produces("application/json")
@@ -762,9 +496,6 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     @Produces("application/json")
     public String updateProject(Project entity) {
 
-        //Date d = new Date();
-        //return d.toString();
-
         // fetch user to be updated.
         Project project = super.find(entity.getProjectId());
 
@@ -785,7 +516,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
 
 
-        // SAME CODE AS IN CREATE !!!
+        // retourne le projet qui a été mis à jour. 
         List<Project> prjList = new ArrayList<Project>();
         prjList.add(super.find(project.getProjectId()));
 
@@ -807,7 +538,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         return retVal;
     }
-    
+
     // returns user ID of the authenticated user.
     public User getAuthenticatedUser() {
         String username;
@@ -825,7 +556,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             return null;
         }
     }
-    
+
     // returns parent objects including its children
     @GET
     @Path("public")
@@ -839,18 +570,14 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         List<Map> projectList = new ArrayList<Map>();
 
-
-
-        // get root projects (projects which have no parent)
-        //Query q = em.createQuery("SELECT p FROM Project p WHERE p.parentProjectId IS NULL");
+        // get root public projects (projects which have no parent)
         Query q = em.createNamedQuery("Project.getParentPublicProjects");
 
         List<Project> prjList = new ArrayList<Project>();
         prjList = q.getResultList();
 
-
         // get projects and its children
-        getProjects(prjList, projectList,"Project.getChildPublicProjects");
+        getProjects(prjList, projectList, "Project.getChildPublicProjects");
 
 
         HashMap<String, Object> retProjects = new HashMap<String, Object>();
@@ -866,8 +593,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
 
     }
-    
-    
+
     @PUT
     @RolesAllowed("administrator")
     @Path("updateUsersVisibleForProject")
@@ -887,23 +613,22 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             if (projectList.size() == 1) {
 
                 // user
-                Project project = projectList.get(0);          
-                 
+                Project project = projectList.get(0);
+
                 if (users.get(0).getUserId() == null) {
                     ArrayList<User> list = new ArrayList<User>();
                     project.setUserCollection(list);
                 } else {
                     project.setUserCollection(users);
                 }
-                em.merge(project); 
+                em.merge(project);
 
             } else {
-                
             }
-            
+
         }
     }
-    
+
     @PUT
     @RolesAllowed("administrator")
     @Path("updateUsergroupsVisibleForProject")
@@ -923,23 +648,22 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             if (projectList.size() == 1) {
 
                 // user
-                Project project = projectList.get(0);          
-                 
+                Project project = projectList.get(0);
+
                 if (usergroups.get(0).getUsergroupId() == null) {
                     ArrayList<Usergroup> list = new ArrayList<Usergroup>();
                     project.setUsergroupCollection(list);
                 } else {
                     project.setUsergroupCollection(usergroups);
                 }
-                em.merge(project); 
+                em.merge(project);
 
             } else {
-                
             }
-            
+
         }
     }
-    
+
     @PUT
     @RolesAllowed("administrator")
     @Path("updateClientsVisibleForProject")
@@ -959,23 +683,22 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             if (projectList.size() == 1) {
 
                 // user
-                Project project = projectList.get(0);          
-                 
+                Project project = projectList.get(0);
+
                 if (clients.get(0).getClientId() == null) {
                     ArrayList<Client> clientList = new ArrayList<Client>();
                     project.setClientCollection(clientList);
                 } else {
                     project.setClientCollection(clients);
                 }
-                em.merge(project); 
+                em.merge(project);
 
             } else {
-                
             }
-            
+
         }
     }
-    
+
     // retourne les projets assignés à un utilisateur. 
     @GET
     @RolesAllowed({"administrator", "developer"})
@@ -989,19 +712,14 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         List<Map> projectList = new ArrayList<Map>();
 
-
-
-        // get root projects (projects which have no parent)
-        //Query q = em.createQuery("SELECT p FROM Project p WHERE p.parentProjectId IS NULL");
+        // get projets attribués à l'utilisateur. 
         Query q = em.createNamedQuery("Project.getAssignedProjects");
         q.setParameter("userAssignedId", getAuthenticatedUser().getUserId());
 
         List<Project> prjList = new ArrayList<Project>();
         prjList = q.getResultList();
 
-
-        // get projects and its children
-        //getProjects(prjList, projectList, "Project.getChildProjects");
+        // get projects. Pas des sous-projets. 
         getProjects(prjList, projectList, "");
 
 
@@ -1015,7 +733,5 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         }
 
         return retVal;
-
-
     }
 }

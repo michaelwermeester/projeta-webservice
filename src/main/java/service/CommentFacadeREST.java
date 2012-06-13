@@ -66,7 +66,7 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
     }
 
     
-    // FOR WEBSITE !!!
+    // utilisé par le site web. Retourne les commentaires pour une tâche spécifié. 
     @GET
     @Path("wstask/{id}")
     public CommentDummy findCommentsByTaskIdWebsite(@PathParam("id") Integer id) {
@@ -185,8 +185,6 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
     @Consumes("application/json")
     @Produces("application/json")
     public Comment createNewComment(Comment entity) {
-
-        //entity.setDateCreated(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
         
         // si pas de 'user création' défini, mettre l'utilisateur authentifié.
         if (entity.getUserCreated() == null) {
@@ -198,13 +196,9 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
         em.persist(entity);
 
         return entity;
-        
-        //em.flush();
-
-        //return "OK, created.";
     }
     
-    // FOR WEBSITE !!!
+    // utilisé par le site web. Retourne les commentaire pour un projet spécifié. 
     @GET
     @Path("wsproject/{id}")
     public CommentDummy findCommentsByProjectIdWebsite(@PathParam("id") Integer id) {

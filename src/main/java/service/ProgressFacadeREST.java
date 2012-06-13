@@ -35,13 +35,6 @@ public class ProgressFacadeREST extends AbstractFacade<Progress> {
         super(Progress.class);
     }
 
-    /*@POST
-    @Override
-    @Consumes({"application/xml", "application/json"})
-    public void create(Progress entity) {
-        super.create(entity);
-    }*/
-
     @PUT
     @Override
     @Consumes({"application/xml", "application/json"})
@@ -99,7 +92,6 @@ public class ProgressFacadeREST extends AbstractFacade<Progress> {
         
         // si pas de 'user création' défini, mettre l'utilisateur authentifié.
         if (entity.getUserCreated() == null) {
-            //entity.setUserCreated(new User(this.getAuthenticatedUser().getUserId()));
             entity.setUserCreated(this.getAuthenticatedUser());
         }
         
@@ -107,10 +99,6 @@ public class ProgressFacadeREST extends AbstractFacade<Progress> {
         em.persist(entity);
 
         return entity;
-        
-        //em.flush();
-
-        //return "OK, created.";
     }
     
     // returns user ID of the authenticated user.
@@ -132,7 +120,7 @@ public class ProgressFacadeREST extends AbstractFacade<Progress> {
     }
     
     
-    // FOR WEBSITE !!!
+    // Utilisé par le site web. Retourne les états d'avanvancement pour une tâche spécifié. 
     @GET
     @Path("wstask/{id}")
     public ProgressDummy findProgressByTaskIdWebsite(@PathParam("id") Integer id) {
@@ -151,7 +139,7 @@ public class ProgressFacadeREST extends AbstractFacade<Progress> {
         return retProgressDummy;
     }
     
-    // FOR WEBSITE !!!
+    // Utilisé par le site web. Retourne les états d'avanvancement pour un projet spécifié. 
     @GET
     @Path("wsproject/{id}")
     public ProgressDummy findProgressByProjectIdWebsite(@PathParam("id") Integer id) {

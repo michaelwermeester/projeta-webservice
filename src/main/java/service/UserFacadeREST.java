@@ -52,19 +52,11 @@ public class UserFacadeREST extends AbstractFacade<User> {
     public UserFacadeREST() {
         super(User.class);
     }
-
-    /*@POST
-    @Override
-    @Consumes("application/json")
-    public void create(Users entity) {
-    super.create(entity);
-    }*/
     
     /* Crée un nouvel utilisateur.
      * Utilisé par l'application Mac (module 'administrateur').
      */
     @POST
-    //@Override
     @Path("create")
     @RolesAllowed("administrator")
     @Consumes("application/json")
@@ -75,7 +67,6 @@ public class UserFacadeREST extends AbstractFacade<User> {
 
         em.flush();
         // return newly created user.        
-        //return this.findByUsername(entity.getUsername(), null);
         return generateUserJSONString(entity);
 
     }
@@ -143,12 +134,6 @@ public class UserFacadeREST extends AbstractFacade<User> {
         return retVal;
     }
 
-    /*@PUT
-    @Override
-    @Consumes("application/json")
-    public void edit(Users entity) {
-    super.edit(entity);
-    }*/
     @PUT
     @Override
     @Path("update")
@@ -191,8 +176,6 @@ public class UserFacadeREST extends AbstractFacade<User> {
                 super.edit(user);
             }
         }
-
-        //super.edit(entity);
     }
 
     @PUT
@@ -216,7 +199,6 @@ public class UserFacadeREST extends AbstractFacade<User> {
 
 
         return entity.getPassword();
-        //return "ok";
     }
 
     @DELETE
@@ -239,11 +221,7 @@ public class UserFacadeREST extends AbstractFacade<User> {
     @Path("exists/{username}")
     @Produces("application/json")
     public String userExists(@PathParam("username") String username) {
-
-        // minimum length of 2 characters.
-        //if (username.length() < 2)
-        //    return "1";
-
+        
         Query q = em.createNamedQuery("User.findByUsername");
         q.setParameter("username", username);
 
@@ -269,7 +247,6 @@ public class UserFacadeREST extends AbstractFacade<User> {
             String loggedInUsername = security.getUserPrincipal().getName();
 
             // get and return logged in User from username
-            //return this.findByUsername(loggedInUsername, null);
             username = loggedInUsername;
         }
 
@@ -315,77 +292,7 @@ public class UserFacadeREST extends AbstractFacade<User> {
 
     }
 
-    /*// return user roles by specifying username
-    @GET
-    @Path("username/{username}/roles")
-    @Produces("application/json")
-    public String roleByUsername(@PathParam("username") String username) {
-    
-    Query q = em.createNamedQuery("Users.findByUsername");
-    q.setParameter("username", username);
-    
-    List<Users> userList = new ArrayList<Users>();
-    userList = q.getResultList();
-    
-    if (userList.size() == 1) {
-    
-    // user
-    Users u = userList.get(0);
-    
-    // get roles for user
-    Collection<Role> roleList = u.getRoleCollection();
-    
-    ObjectMapper mapper = new ObjectMapper();
-    
-    List<Map> roleMap = new ArrayList<Map>();
-    
-    
-    for (Role r : roleList) {
-    
-    Map<String, Object> roleData = new HashMap<String, Object>();
-    
-    roleData.put("roleId", r.getRoleId().toString());
-    roleData.put("code", r.getCode());
-    
-    roleMap.add(roleData);
-    }
-    
-    
-    String retVal = "";
-    
-    HashMap<String, Object> retUserRoles = new HashMap<String, Object>();
-    retUserRoles.put("role", roleMap);
-    
-    try {
-    retVal = mapper.writeValueAsString(retUserRoles);
-    } catch (IOException ex) {
-    Logger.getLogger(UsersFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    
-    return retVal;
-    } else {
-    return "";
-    }
-    
-    }*/
-    // returns the logged in user
-    /*@GET
-    @Produces("application/json")
-    @Path("getLoggedInUser")
-    public String getLoggedInUser() {
-    
-    // get username of logged in user
-    String loggedInUsername = security.getUserPrincipal().getName();
-    
-    // get and return logged in User from username
-    return this.findByUsername(loggedInUsername);
-    }*/
-    /*@GET
-    @Override
-    @Produces("application/json")
-    public List<Users> findAll() {
-    return super.findAll();
-    }*/
+ 
     @GET
     @Produces("application/json")
     @Path("all")
@@ -564,7 +471,6 @@ public class UserFacadeREST extends AbstractFacade<User> {
 
 
         List<Role> roleList = new ArrayList<Role>(q.getResultList());
-        //roleList = q.getResultList();
         
         // obtenir les utilisateurs qui ont 'developer' comme rôle.
         List<User> users = new ArrayList<User>(roleList.get(0).getUserCollection());
