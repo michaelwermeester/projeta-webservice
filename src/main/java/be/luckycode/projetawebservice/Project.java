@@ -40,6 +40,7 @@ import javax.xml.bind.annotation.XmlTransient;
     
     @NamedQuery(name = "Project.getAssignedProjects", query = "SELECT p FROM Project p WHERE p.userAssigned.userId = :userAssignedId and (p.deleted = false or p.deleted is null)"),
     
+  
     @NamedQuery(name = "Project.findByFlagPublic", query = "SELECT p FROM Project p WHERE p.flagPublic = :flagPublic")})
 public class Project implements Serializable {
     @Column(name =     "date_created")

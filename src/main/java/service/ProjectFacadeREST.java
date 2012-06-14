@@ -67,7 +67,8 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         ObjectMapper mapper = new ObjectMapper();
         List<Map> projectList = new ArrayList<Map>();
 
-        getProjects(prjList, projectList, "Project.getChildProjects");
+        //getProjects(prjList, projectList, "Project.getChildProjects", "");
+        getProjects(prjList, projectList, em.createNamedQuery("Project.getChildProjects"), null);
 
 
         String retVal = "";
@@ -338,8 +339,8 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         prjList = q.getResultList();
 
         // get projects and its children
-        getProjects(prjList, projectList, "Project.getChildProjects");
-
+        //getProjects(prjList, projectList, "Project.getChildProjects", "");
+        getProjects(prjList, projectList, em.createNamedQuery("Project.getChildProjects"), null);
 
         HashMap<String, Object> retProjects = new HashMap<String, Object>();
         retProjects.put("project", projectList);
@@ -355,7 +356,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
     }
 
-    private void getProjects(List<Project> prjList, List<Map> projectList, String namedQuery) {
+    private void getProjects(List<Project> prjList, List<Map> projectList, Query namedsubquery, Query nativesubquery) {
         // if list is not empty
         if (prjList.isEmpty() == false) {
             for (Project p : prjList) {
@@ -436,9 +437,17 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                     }
 
                     // get child projects, if any
-                    if (namedQuery.length() > 0) {
-                        getChildProjects(p, userStruct, projectData, namedQuery);
-                    }
+                    if (namedsubquery != null || nativesubquery != null)
+                        getChildProjects(p, userStruct, projectData, namedsubquery, nativesubquery);
+                        
+//                    if (namedQuery.length() > 0) {
+//                        getChildProjects(p, userStruct, projectData, namedQuery, "");
+//                    }
+//                    
+//                    // get child projects, if any
+//                    if (nativeQuery.length() > 0) {
+//                        getChildProjects(p, userStruct, projectData, "", nativeQuery);
+//                    }
 
                     projectList.add(projectData);
                 }
@@ -448,20 +457,40 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     }
 
     // méthode getChildProjects principale. Utiliser celle-ci
-    private void getChildProjects(Project p, Map<String, Object> userStruct, Map<String, Object> projectData, String namedQuery) {
+    private void getChildProjects(Project p, Map<String, Object> userStruct, Map<String, Object> projectData, Query namedSubQuery, Query nativeSubQuery) {
 
         List<Map> childProjectList = new ArrayList<Map>();
 
+        Query qry_child_projects;
+        
         // get child projects
-        Query qry_child_projects = em.createNamedQuery(namedQuery);
-        qry_child_projects.setParameter(1, p);
+        if(namedSubQuery != null) {
+            //Query qry_child_projects = em.createNamedQuery(namedSubQuery);
+            qry_child_projects = namedSubQuery;
+            qry_child_projects.setParameter(1, p);
+            
+            List<Project> childPrjList = new ArrayList<Project>();
+            childPrjList = qry_child_projects.getResultList();
+
+            // get child projects
+            getProjects(childPrjList, childProjectList, qry_child_projects, null);
+        } else {
+            qry_child_projects = nativeSubQuery; 
+            qry_child_projects.setParameter(1, p.getProjectId());
+            
+            List<Project> childPrjList = new ArrayList<Project>();
+            childPrjList = qry_child_projects.getResultList();
+
+            // get child projects
+            getProjects(childPrjList, childProjectList, null, qry_child_projects);
+        }
 
 
-        List<Project> childPrjList = new ArrayList<Project>();
-        childPrjList = qry_child_projects.getResultList();
+        //List<Project> childPrjList = new ArrayList<Project>();
+        //childPrjList = qry_child_projects.getResultList();
 
-        // get child projects
-        getProjects(childPrjList, childProjectList, namedQuery);
+        //// get child projects
+        //getProjects(childPrjList, childProjectList, qry_child_projects, null);
 
         // 
         if (childProjectList.isEmpty() == false) {
@@ -523,7 +552,8 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         ObjectMapper mapper = new ObjectMapper();
         List<Map> projectList = new ArrayList<Map>();
 
-        getProjects(prjList, projectList, "Project.getChildProjects");
+        //getProjects(prjList, projectList, "Project.getChildProjects");
+        getProjects(prjList, projectList, em.createNamedQuery("Project.getChildProjects"), null);
 
         String retVal = "";
 
@@ -577,8 +607,8 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         prjList = q.getResultList();
 
         // get projects and its children
-        getProjects(prjList, projectList, "Project.getChildPublicProjects");
-
+        //getProjects(prjList, projectList, "Project.getChildPublicProjects", "");
+        getProjects(prjList, projectList, em.createNamedQuery("Project.getChildPublicProjects"), null);
 
         HashMap<String, Object> retProjects = new HashMap<String, Object>();
         retProjects.put("project", projectList);
@@ -720,7 +750,57 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         prjList = q.getResultList();
 
         // get projects. Pas des sous-projets. 
-        getProjects(prjList, projectList, "");
+        getProjects(prjList, projectList, null, null);
+
+
+        HashMap<String, Object> retProjects = new HashMap<String, Object>();
+        retProjects.put("project", projectList);
+
+        try {
+            retVal = mapper.writeValueAsString(retProjects);
+        } catch (IOException ex) {
+            Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retVal;
+    }
+    
+    
+    // retourne les projets assignés à un utilisateur. 
+    @GET
+    @RolesAllowed({"administrator", "developer"})
+    @Path("testproj")
+    @Produces("application/json")
+    public String findAllProjectsUser() {
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map> projectList = new ArrayList<Map>();
+
+        // get projets attribués à l'utilisateur. 
+        //Query q = em.createNamedQuery("Project.findAllProjectsUser");
+        // WORKS !!!
+        //Query q = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC FROM project_user_visible LEFT OUTER JOIN project ON project_user_visible.project_id = project.project_id", Project.class);
+
+        
+        Query q = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project LEFT OUTER JOIN project_user_visible ON project.project_id = project_user_visible.project_id LEFT OUTER JOIN project_usergroup_visible ON project_usergroup_visible.project_id = project.project_id LEFT OUTER JOIN project_client ON project_client.project_id = project.project_id LEFT OUTER JOIN client ON project_client.client_id = client.client_id LEFT OUTER JOIN client_user ON client_user.client_id = client.client_id LEFT OUTER JOIN usergroup ON usergroup.usergroup_id = project_usergroup_visible.usergroup_id LEFT OUTER JOIN user_usergroup ON usergroup.usergroup_id = user_usergroup.usergroup_id WHERE (project.deleted = false or project.deleted IS NULL) AND ((project.flag_public = TRUE) OR (user_usergroup.user_id = ?1) OR (client_user.user_id = ?1) OR (project_user_visible.user_id = ?1)) AND project.parent_project_id IS NULL", Project.class);
+        q.setParameter(1, getAuthenticatedUser().getUserId());
+        //q.setParameter(2, getAuthenticatedUser().getUserId());
+        //q.setParameter(3, getAuthenticatedUser().getUserId());
+                
+        //Query q = em.createNativeQuery("SELECT DISTINCT project as PROJECT FROM project_user_visible LEFT OUTER JOIN project ON project_user_visible.project_id = project.project_id", Project.class);
+        //q.setParameter("userAssignedId", getAuthenticatedUser().getUserId());
+
+        List<Project> prjList = new ArrayList<Project>();
+        prjList = q.getResultList();
+
+        Query subquery = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project LEFT OUTER JOIN project_user_visible ON project.project_id = project_user_visible.project_id LEFT OUTER JOIN project_usergroup_visible ON project_usergroup_visible.project_id = project.project_id LEFT OUTER JOIN project_client ON project_client.project_id = project.project_id LEFT OUTER JOIN client ON project_client.client_id = client.client_id LEFT OUTER JOIN client_user ON client_user.client_id = client.client_id LEFT OUTER JOIN usergroup ON usergroup.usergroup_id = project_usergroup_visible.usergroup_id LEFT OUTER JOIN user_usergroup ON usergroup.usergroup_id = user_usergroup.usergroup_id WHERE project.parent_project_id = ?1 AND (project.deleted = false or project.deleted IS NULL) AND ((project.flag_public = TRUE) OR (user_usergroup.user_id = ?2) OR (client_user.user_id = ?2) OR (project_user_visible.user_id = ?2))", Project.class);
+        subquery.setParameter(2, getAuthenticatedUser().getUserId());
+        
+        // get projects. Pas des sous-projets. 
+        getProjects(prjList, projectList, null, subquery);
 
 
         HashMap<String, Object> retProjects = new HashMap<String, Object>();

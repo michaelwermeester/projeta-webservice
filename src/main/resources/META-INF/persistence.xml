@@ -5,6 +5,8 @@
     <class>be.luckycode.projetawebservice.ProgressDummy</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
-    <properties/>
+    <properties>
+        <property name="eclipselink.jpa.uppercase-column-names" value="true"/>
+    </properties>
   </persistence-unit>
 </persistence>
