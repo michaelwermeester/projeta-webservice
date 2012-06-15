@@ -667,10 +667,52 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                     project.setUserCollection(users);
                 }
                 em.merge(project);
+                
+                // mettre à jour visibilité du projet parent. 
+                if (project.getParentProjectId() != null) {
+                    updateUsersVisibleForParentProject(project);
+                }
 
             } else {
             }
 
+        }
+    }
+    
+    // met à jour la visibilité des utilisateurs du projet parent. 
+    private void updateUsersVisibleForParentProject(Project p) {
+        
+        Query q = em.createNamedQuery("Project.findByProjectId");
+        q.setParameter("projectId", p.getParentProjectId().getProjectId());
+        
+        List<Project> projectList = q.getResultList();
+        Project parentProject = projectList.get(0);
+        
+        Boolean found = false;
+
+        for (User u : p.getUserCollection()) {
+                        
+            found = false;
+            
+            for (User uParent : parentProject.getUserCollection()) {
+                
+                if (uParent.getUserId() == u.getUserId()) {
+                    found = true;
+                    break;
+                } 
+            }
+            
+            if (found == false) {
+
+                parentProject.getUserCollection().add(u);
+                
+                em.merge(parentProject);
+            }
+        }
+                
+        // mettre à jour visibilité du projet parent. 
+        if (parentProject.getParentProjectId() != null) {
+            updateUsersVisibleForParentProject(parentProject);
         }
     }
 
@@ -703,9 +745,51 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                 }
                 em.merge(project);
 
+                // mettre à jour visibilité du projet parent. 
+                if (project.getParentProjectId() != null) {
+                    updateUsergroupsVisibleForParentProject(project);
+                }
+                
             } else {
             }
 
+        }
+    }
+    
+    // met à jour la visibilité des groupes d'utilisateurs du projet parent. 
+    private void updateUsergroupsVisibleForParentProject(Project p) {
+        
+        Query q = em.createNamedQuery("Project.findByProjectId");
+        q.setParameter("projectId", p.getParentProjectId().getProjectId());
+        
+        List<Project> projectList = q.getResultList();
+        Project parentProject = projectList.get(0);
+        
+        Boolean found = false;
+
+        for (Usergroup ug : p.getUsergroupCollection()) {
+                        
+            found = false;
+            
+            for (Usergroup ugParent : parentProject.getUsergroupCollection()) {
+                
+                if (ugParent.getUsergroupId() == ug.getUsergroupId()) {
+                    found = true;
+                    break;
+                } 
+            }
+            
+            if (found == false) {
+
+                parentProject.getUsergroupCollection().add(ug);
+                
+                em.merge(parentProject);
+            }
+        }
+                
+        // mettre à jour visibilité du projet parent. 
+        if (parentProject.getParentProjectId() != null) {
+            updateUsergroupsVisibleForParentProject(parentProject);
         }
     }
 
@@ -737,10 +821,53 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
                     project.setClientCollection(clients);
                 }
                 em.merge(project);
+                
+                // mettre à jour visibilité du projet parent. 
+                if (project.getParentProjectId() != null) {
+                    updateClientsVisibleForParentProject(project);
+                }
 
             } else {
             }
 
+        }
+    }
+    
+    // met à jour la visibilité des clients du projet parent. 
+    private void updateClientsVisibleForParentProject(Project p) {
+        
+        Query q = em.createNamedQuery("Project.findByProjectId");
+        q.setParameter("projectId", p.getParentProjectId().getProjectId());
+        
+        List<Project> projectList = q.getResultList();
+        Project parentProject = projectList.get(0);
+        
+        Boolean found = false;
+
+        for (Client c : p.getClientCollection()) {
+                        
+            found = false;
+            
+            for (Client cParent : parentProject.getClientCollection()) {
+                
+                if (cParent.getClientId() == c.getClientId()) {
+                    found = true;
+                    break;
+                } 
+            }
+            
+            if (found == false) {
+
+                parentProject.getClientCollection().add(c);
+                
+                em.merge(parentProject);
+            }
+        }
+                
+        // mettre à jour visibilité du projet parent. 
+        if (parentProject.getParentProjectId() != null) {
+
+            updateClientsVisibleForParentProject(parentProject);
         }
     }
 
