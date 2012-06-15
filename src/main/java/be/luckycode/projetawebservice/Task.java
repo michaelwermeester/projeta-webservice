@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Task.findAll", query = "SELECT t FROM Task t"),
     // get root projects (projects which have no parent) && exclude personal tasks.
-    @NamedQuery(name = "Task.getParentTasks", query = "SELECT t FROM Task t WHERE t.parentTaskId IS NULL and t.isPersonal = false and (t.deleted = false or t.deleted is null) and t.taskId > 1025"),
+    @NamedQuery(name = "Task.getParentTasks", query = "SELECT t FROM Task t WHERE t.parentTaskId IS NULL and t.isPersonal = false and (t.deleted = false or t.deleted is null) and t.taskId > 1025 and t.projectId is null"),
     // get root projects (projects which have no parent) which are personal
     @NamedQuery(name = "Task.getPersonalParentTasks", query = "SELECT t FROM Task t WHERE t.parentTaskId IS NULL and t.isPersonal = true and (t.deleted = false or t.deleted is null) and t.userCreated.userId = ?1 and t.taskId > 1025"),
     // get child projects
