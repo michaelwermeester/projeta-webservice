@@ -526,4 +526,43 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         
         em.persist(progress);
     }
+    
+    
+    // FOR WEBSITE !!!
+    @GET
+    @Path("wsprojecttasks")
+    public ProjectDummy findMyProjectTasksPOJO() {
+        
+        ProjectDummy projDummy = new ProjectDummy();
+
+        List<Task> taskList = new ArrayList<Task>();
+        Query q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.completed, task.deleted FROM task INNER JOIN project ON task.project_id = project.project_id INNER JOIN project_client ON project.project_id = project_client.project_id INNER JOIN client ON project_client.client_id = client.client_id INNER JOIN client_user ON client.client_id = client_user.client_id where client_user.user_id = ?1 and (task.deleted = false or task.deleted is null)", Task.class);
+        q.setParameter(1, getAuthenticatedUser().getUserId());
+        
+        taskList = q.getResultList();
+        
+        List<ProjectSimpleWebSite> listProj = new ArrayList<ProjectSimpleWebSite>();
+        
+        for (Task t_tmp : taskList) {
+            
+            ProjectSimpleWebSite p = new ProjectSimpleWebSite();
+            p.setProjectTitle(t_tmp.getTaskTitle());
+            p.setProjectId(t_tmp.getTaskId());
+            if (t_tmp.getStartDate() != null)
+                p.setStartDate(t_tmp.getStartDate());
+            if (t_tmp.getEndDate() != null)
+                p.setEndDate(t_tmp.getEndDate());
+
+            // statut.
+            p.setProjectStatus(getStatusForTaskId(t_tmp.getTaskId()));
+            
+            getChildTasksWebSite(p);
+            
+            listProj.add(p);
+        }
+        
+        projDummy.setListProject(listProj);
+        
+        return projDummy;
+    }
 }
