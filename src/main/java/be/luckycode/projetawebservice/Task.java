@@ -31,6 +31,9 @@ import javax.xml.bind.annotation.XmlTransient;
     // get root tasks by project ID & exclude personal tasks.
     @NamedQuery(name = "Task.getParentTasksByProjectId", query = "SELECT t FROM Task t WHERE t.parentTaskId IS NULL and t.isPersonal = false and t.projectId.projectId = :projectId and (t.deleted = false or t.deleted is null)"),
     //
+    
+    @NamedQuery(name = "Task.getAssignedTasks", query = "SELECT t FROM Task t where (t.deleted = false or t.deleted is null) and t.isPersonal = false and t.userAssigned.userId = :userAssignedId"),
+    
     @NamedQuery(name = "Task.getChildTasks", query = "SELECT t FROM Task t WHERE t.parentTaskId = ?1"),
     @NamedQuery(name = "Task.findByTaskId", query = "SELECT t FROM Task t WHERE t.taskId = :taskId")})
 public class Task implements Serializable {

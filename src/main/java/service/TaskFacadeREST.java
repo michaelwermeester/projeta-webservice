@@ -101,7 +101,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
 
         // get projects and its children
-        getTasks(tList, taskList);
+        getTasks(tList, taskList, em.createNamedQuery("Task.getChildTasks"), null);
 
 
         HashMap<String, Object> retTasks = new HashMap<String, Object>();
@@ -137,7 +137,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
 
         // get projects and its children
-        getTasks(tList, taskList);
+        getTasks(tList, taskList, em.createNamedQuery("Task.getChildTasks"), null);
 
 
         HashMap<String, Object> retTasks = new HashMap<String, Object>();
@@ -154,7 +154,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
     }
 
-    private void getTasks(List<Task> taskList, List<Map> taskMapList) {
+    private void getTasks(List<Task> taskList, List<Map> taskMapList, Query namedsubquery, Query nativesubquery) {
         // if list is not empty
         if (taskList.isEmpty() == false) {
             for (Task t : taskList) {
@@ -214,8 +214,12 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                     }
                     
 
+                    // get child tasks, if any
+                    if (namedsubquery != null || nativesubquery != null) {
+                        getChildTasks(t, userStruct, taskData, namedsubquery, nativesubquery);
+                    }
                     // get child projects, if any
-                    getChildTasks(t, userStruct, taskData);
+                    //getChildTasks(t, userStruct, taskData);
 
                     taskMapList.add(taskData);
                 }
@@ -223,7 +227,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         }
     }
 
-    private void getChildTasks(Task t, Map<String, Object> userStruct, Map<String, Object> taskData) {
+    private void getChildTasks(Task t, Map<String, Object> userStruct, Map<String, Object> taskData, Query namedSubQuery, Query nativeSubQuery) {
         List<Map> childTaskMapList = new ArrayList<Map>();
 
         // get child projects
@@ -235,7 +239,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         childTaskList = qry_child_tasks.getResultList();
 
         // get child projects
-        getTasks(childTaskList, childTaskMapList);
+        getTasks(childTaskList, childTaskMapList, namedSubQuery, nativeSubQuery);
 
         // 
         if (childTaskMapList.isEmpty() == false) {
@@ -287,7 +291,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         ObjectMapper mapper = new ObjectMapper();
         List<Map> taskList = new ArrayList<Map>();
 
-        getTasks(tskList, taskList);
+        getTasks(tskList, taskList, em.createNamedQuery("Task.getChildTasks"), null);
 
         String retVal = "";
 
@@ -365,7 +369,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         ObjectMapper mapper = new ObjectMapper();
         List<Map> taskList = new ArrayList<Map>();
 
-        getTasks(tskList, taskList);
+        getTasks(tskList, taskList, em.createNamedQuery("Task.getChildTasks"), null);
 
         String retVal = "";
 
@@ -564,5 +568,44 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         projDummy.setListProject(listProj);
         
         return projDummy;
+    }
+    
+    
+    @GET
+    @Path("assigned")
+    @Produces("application/json")
+    public String findAllAssignedTasks() {
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map> taskList = new ArrayList<Map>();
+
+
+        // get tasks attribués à l'utilisateur. 
+        Query q = em.createNamedQuery("Task.getAssignedTasks");
+        q.setParameter("userAssignedId", getAuthenticatedUser().getUserId());
+
+        List<Task> tList = new ArrayList<Task>();
+        tList = q.getResultList();
+
+
+        // get projects and its children
+        getTasks(tList, taskList, null, null);
+
+
+        HashMap<String, Object> retTasks = new HashMap<String, Object>();
+        retTasks.put("task", taskList);
+
+        try {
+            retVal = mapper.writeValueAsString(retTasks);
+        } catch (IOException ex) {
+            Logger.getLogger(TaskFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retVal;
+
+
     }
 }
