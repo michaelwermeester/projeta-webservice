@@ -352,4 +352,39 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         
         return bugDummy;
     }
+    
+    
+    // utilisé par le site web. 
+    // returns bugs belonging to projects assigned to user. 
+    @GET
+    @Path("wsprojectbugs")
+    public BugDummy findMyProjectBugsPOJO() {
+        
+        BugDummy bugDummy = new BugDummy();
+
+        List<Bug> bugList = new ArrayList<Bug>();
+        Query q = em.createNativeQuery("SELECT DISTINCT bug.bug_id, bug.user_reported, bug.user_assigned, bug.project_id, bug.priority, bug.date_reported, bug.title, bug.details, bug.bugcategory_id, bug.fixed, bug.canceled, bug.deleted FROM bug INNER JOIN project ON bug.project_id = project.project_id INNER JOIN project_client ON project.project_id = project_client.project_id INNER JOIN client ON project_client.client_id = client.client_id INNER JOIN client_user ON client.client_id = client_user.client_id where client_user.user_id = ?1", Bug.class);
+        q.setParameter(1, getAuthenticatedUser().getUserId());
+        
+        bugList = q.getResultList();
+        
+        List<BugSimpleWebSite> listBugs = new ArrayList<BugSimpleWebSite>();
+        
+        for (Bug b_tmp : bugList) {
+            
+            BugSimpleWebSite p = new BugSimpleWebSite();
+            p.setBugTitle(b_tmp.getTitle());
+            p.setBugId(b_tmp.getBugId());
+            if (b_tmp.getBugcategoryId() != null)
+                p.setBugType(b_tmp.getBugcategoryId().getCategoryName());
+            
+            //getChildBugsWebSite(p);
+            
+            listBugs.add(p);
+        }
+        
+        bugDummy.setListBug(listBugs);
+        
+        return bugDummy;
+    }
 }
