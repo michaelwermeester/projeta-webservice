@@ -387,4 +387,41 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         
         return bugDummy;
     }
+    
+    
+    // returns parent objects including its children
+    @GET
+    @Path("assigned")
+    @Produces("application/json")
+    public String findAllAssignedBugs() {
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map> bugListMap = new ArrayList<Map>();
+
+        // get all bugs from database.
+        Query q = em.createNamedQuery("Bug.getBugsAssigned");
+        q.setParameter("userAssignedId", getAuthenticatedUser().getUserId());
+
+        List<Bug> bugList = new ArrayList<Bug>();
+        bugList = q.getResultList();
+
+
+        // get bugs
+        getBugs(bugList, bugListMap);
+
+
+        HashMap<String, Object> retProjects = new HashMap<String, Object>();
+        retProjects.put("bug", bugListMap);
+
+        try {
+            retVal = mapper.writeValueAsString(retProjects);
+        } catch (IOException ex) {
+            Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retVal;
+    }
 }

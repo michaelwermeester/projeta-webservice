@@ -7,11 +7,7 @@ package service;
 import be.luckycode.projetawebservice.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.security.RolesAllowed;
@@ -77,15 +73,13 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
     /*
      * @GET @Override @Produces({"application/xml", "application/json"}) public
-     * List<Task> findAll() { return super.findAll();
-    }
+     * List<Task> findAll() { return super.findAll(); }
      */
-    
     @GET
     @Path("personal")
     @Produces("application/json")
     public String findPersonalTasks() {
-        
+
         String retVal = "";
 
         ObjectMapper mapper = new ObjectMapper();
@@ -115,8 +109,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
         return retVal;
     }
-    
-    
+
     @GET
     @Produces("application/json")
     public String findAllTasks() {
@@ -172,7 +165,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
                     taskData.put("endDate", CommonMethods.convertDate(t.getEndDate()));
                     taskData.put("startDate", CommonMethods.convertDate(t.getStartDate()));
-  
+
                     if (t.getTaskDescription() != null) {
                         taskData.put("taskDescription", t.getTaskDescription());
                     }
@@ -195,24 +188,26 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
                         userAssignedStruct.put("username", t.getUserAssigned().getUsername());
                         taskData.put("userAssigned", userAssignedStruct);
                     }
-                    
+
                     // état et pourcentage.
                     Progress progress = getProgressForTaskId(t.getTaskId());
-                    
+
                     if (progress != null) {
                         // état.
-                        if (progress.getStatusId() != null && progress.getStatusId().getStatusName() != null) 
+                        if (progress.getStatusId() != null && progress.getStatusId().getStatusName() != null) {
                             taskData.put("taskStatus", progress.getStatusId().getStatusName());
+                        }
                         // pourcentage.
                         taskData.put("taskPercentage", progress.getPercentageComplete().toString());
                     }
-                    
+
                     // nom du projet.
                     if (t.getProjectId() != null) {
-                        if (t.getProjectId().getProjectTitle() != null)
+                        if (t.getProjectId().getProjectTitle() != null) {
                             taskData.put("projectTitle", t.getProjectId().getProjectTitle());
+                        }
                     }
-                    
+
 
                     // get child tasks, if any
                     if (namedsubquery != null || nativesubquery != null) {
@@ -279,10 +274,10 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
         // Créer état, pourcentage d'avancement etc. par défaut.
         initDefaultProgressForNewTask(entity);
-        
+
         em.flush();
-        
-        
+
+
 
         // Retourne la tâche créé. 
         List<Task> tskList = new ArrayList<Task>();
@@ -330,7 +325,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         // enregistrer en DB.
         super.edit(task);
     }
-    
+
     @PUT
     @Path("update")
     @RolesAllowed("administrator")
@@ -360,7 +355,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
 
         super.edit(task);
-        
+
 
         // retourne la tâche qui vient d'être mis-à-jour. 
         List<Task> tskList = new ArrayList<Task>();
@@ -384,7 +379,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
         return retVal;
     }
-    
+
     // returns user ID of the authenticated user.
     public User getAuthenticatedUser() {
         String username;
@@ -402,46 +397,47 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             return null;
         }
     }
-    
-    
+
     // FOR WEBSITE !!!
     @GET
     @Path("wsproject/{id}")
     public ProjectDummy findTasksByProjectIdPOJO(@PathParam("id") Integer id) {
-        
+
         ProjectDummy projDummy = new ProjectDummy();
 
         List<Task> taskList = new ArrayList<Task>();
         Query q = em.createNamedQuery("Task.getParentTasksByProjectId");
         q.setParameter("projectId", id);
-        
+
         taskList = q.getResultList();
-        
+
         List<ProjectSimpleWebSite> listProj = new ArrayList<ProjectSimpleWebSite>();
-        
+
         for (Task t_tmp : taskList) {
-            
+
             ProjectSimpleWebSite p = new ProjectSimpleWebSite();
             p.setProjectTitle(t_tmp.getTaskTitle());
             p.setProjectId(t_tmp.getTaskId());
-            if (t_tmp.getStartDate() != null)
+            if (t_tmp.getStartDate() != null) {
                 p.setStartDate(t_tmp.getStartDate());
-            if (t_tmp.getEndDate() != null)
+            }
+            if (t_tmp.getEndDate() != null) {
                 p.setEndDate(t_tmp.getEndDate());
+            }
 
             // statut.
             p.setProjectStatus(getStatusForTaskId(t_tmp.getTaskId()));
-            
+
             getChildTasksWebSite(p);
-            
+
             listProj.add(p);
         }
-        
+
         projDummy.setListProject(listProj);
-        
+
         return projDummy;
     }
-    
+
     // utilisé par le site web. Retourne les tâches enfants d'un projet spécifié. 
     private void getChildTasksWebSite(ProjectSimpleWebSite p) {
         // get child projects
@@ -451,33 +447,35 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
         List<Task> childTaskList = new ArrayList<Task>();
         childTaskList = qry_child_tasks.getResultList();
-        
+
         List<ProjectSimpleWebSite> listSubProject = new ArrayList<ProjectSimpleWebSite>();
-        
+
         for (Task t_tmp : childTaskList) {
-            
+
             ProjectSimpleWebSite p_sub = new ProjectSimpleWebSite();
             p_sub.setProjectTitle(t_tmp.getTaskTitle());
             p_sub.setProjectId(t_tmp.getTaskId());
-            if (t_tmp.getStartDate() != null)
+            if (t_tmp.getStartDate() != null) {
                 p_sub.setStartDate(t_tmp.getStartDate());
-            if (t_tmp.getEndDate() != null)
+            }
+            if (t_tmp.getEndDate() != null) {
                 p_sub.setEndDate(t_tmp.getEndDate());
-            
+            }
+
             // statut.
             p_sub.setProjectStatus(getStatusForTaskId(t_tmp.getTaskId()));
-            
+
             getChildTasksWebSite(p_sub);
-            
+
             listSubProject.add(p_sub);
         }
-        
+
         p.setChildProject(listSubProject);
     }
-    
+
     // retourne le statut actuel du projet.
     private String getStatusForTaskId(Integer taskId) {
-        
+
         // liste des 'Progress' pour le projet.
         Query qryStatus = em.createNamedQuery("Progress.findByTaskId");
         qryStatus.setParameter("taskId", taskId);
@@ -486,22 +484,23 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         // lire en liste.
         List<Progress> listProgress = new ArrayList<Progress>();
         listProgress = qryStatus.getResultList();
-        
+
         // retourner le statut, s'il y'en a un.
         if (listProgress.size() > 0) {
             String status = "";
-            if (listProgress.get(0).getPercentageComplete() != null)
+            if (listProgress.get(0).getPercentageComplete() != null) {
                 status += listProgress.get(0).getPercentageComplete().toString() + "% - ";
-            
+            }
+
             return status + listProgress.get(0).getStatusId().getStatusName();
         } else {
             return "-";
         }
     }
-    
+
     // retourne le statut actuel de la tâche.
     private Progress getProgressForTaskId(Integer taskId) {
-        
+
         // liste des 'Progress' pour le projet.
         Query qryPercentage = em.createNamedQuery("Progress.findByTaskId");
         qryPercentage.setParameter("taskId", taskId);
@@ -510,7 +509,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         // lire en liste.
         List<Progress> listProgress = new ArrayList<Progress>();
         listProgress = qryPercentage.getResultList();
-        
+
         // retourner le statut, s'il y'en a un.
         if (listProgress.size() > 0) {
             return listProgress.get(0);
@@ -518,59 +517,59 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             return null;
         }
     }
-    
+
     // Créer état, pourcentage d'avancement etc. par défaut.
     private void initDefaultProgressForNewTask(Task entity) {
         Progress progress = new Progress();
-        progress.setPercentageComplete((short)0);
+        progress.setPercentageComplete((short) 0);
         progress.setProgressComment("Tâche créé.");
         progress.setStatusId(new Status(9));
         progress.setUserCreated(getAuthenticatedUser());
         progress.setTaskId(entity);
-        
+
         em.persist(progress);
     }
-    
-    
+
     // FOR WEBSITE !!!
     @GET
     @Path("wsprojecttasks")
     public ProjectDummy findMyProjectTasksPOJO() {
-        
+
         ProjectDummy projDummy = new ProjectDummy();
 
         List<Task> taskList = new ArrayList<Task>();
         Query q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.completed, task.deleted FROM task INNER JOIN project ON task.project_id = project.project_id INNER JOIN project_client ON project.project_id = project_client.project_id INNER JOIN client ON project_client.client_id = client.client_id INNER JOIN client_user ON client.client_id = client_user.client_id where client_user.user_id = ?1 and (task.deleted = false or task.deleted is null)", Task.class);
         q.setParameter(1, getAuthenticatedUser().getUserId());
-        
+
         taskList = q.getResultList();
-        
+
         List<ProjectSimpleWebSite> listProj = new ArrayList<ProjectSimpleWebSite>();
-        
+
         for (Task t_tmp : taskList) {
-            
+
             ProjectSimpleWebSite p = new ProjectSimpleWebSite();
             p.setProjectTitle(t_tmp.getTaskTitle());
             p.setProjectId(t_tmp.getTaskId());
-            if (t_tmp.getStartDate() != null)
+            if (t_tmp.getStartDate() != null) {
                 p.setStartDate(t_tmp.getStartDate());
-            if (t_tmp.getEndDate() != null)
+            }
+            if (t_tmp.getEndDate() != null) {
                 p.setEndDate(t_tmp.getEndDate());
+            }
 
             // statut.
             p.setProjectStatus(getStatusForTaskId(t_tmp.getTaskId()));
-            
+
             getChildTasksWebSite(p);
-            
+
             listProj.add(p);
         }
-        
+
         projDummy.setListProject(listProj);
-        
+
         return projDummy;
     }
-    
-    
+
     @GET
     @Path("assigned")
     @Produces("application/json")

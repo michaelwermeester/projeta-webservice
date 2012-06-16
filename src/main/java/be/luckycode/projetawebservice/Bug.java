@@ -22,12 +22,14 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @SequenceGenerator(name = "sequenceBug", sequenceName = "bug_bug_id_seq", allocationSize = 1)
 @NamedQueries({
-    @NamedQuery(name = "Bug.findAll", query = "SELECT b FROM Bug b"),
+    @NamedQuery(name = "Bug.findAll", query = "SELECT b FROM Bug b where (b.deleted = false or b.deleted is null)"),
     // get root tasks by project ID & exclude personal tasks.
     @NamedQuery(name = "Bug.getBugsByProjectId", query = "SELECT b FROM Bug b WHERE b.projectId.projectId = :projectId and (b.deleted = false or b.deleted is null)"),
     
     // get bugs reported by user.
     @NamedQuery(name = "Bug.getBugsReported", query = "SELECT b FROM Bug b WHERE b.userReported.userId = :userId and (b.deleted = false or b.deleted is null)"),
+    
+    @NamedQuery(name = "Bug.getBugsAssigned", query = "SELECT b FROM Bug b where (b.deleted = false or b.deleted is null) and b.userAssigned.userId = :userAssignedId"),
     
     @NamedQuery(name = "Bug.findByBugId", query = "SELECT b FROM Bug b WHERE b.bugId = :bugId")})
 public class Bug implements Serializable {
