@@ -640,7 +640,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     }
 
     @PUT
-    @RolesAllowed("administrator")
+    @RolesAllowed({"administrator", "developer"})
     @Path("updateUsersVisibleForProject")
     @Consumes("application/json")
     public void updateUsersVisibleForProject(@QueryParam("projectId") Integer projectId, ArrayList<User> users) {
@@ -717,7 +717,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     }
 
     @PUT
-    @RolesAllowed("administrator")
+    @RolesAllowed({"administrator", "developer"})
     @Path("updateUsergroupsVisibleForProject")
     @Consumes("application/json")
     public void updateUsergroupsVisibleForProject(@QueryParam("projectId") Integer projectId, ArrayList<Usergroup> usergroups) {
@@ -794,7 +794,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     }
 
     @PUT
-    @RolesAllowed("administrator")
+    @RolesAllowed({"administrator", "developer"})
     @Path("updateClientsVisibleForProject")
     @Consumes("application/json")
     public void updateClientsVisibleForProject(@QueryParam("projectId") Integer projectId, ArrayList<Client> clients) {
