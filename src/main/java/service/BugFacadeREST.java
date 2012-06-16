@@ -318,4 +318,38 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
             return null;
         }
     }
+    
+    // utilisé par le site web. 
+    // returns bugs reported by authenticated user.
+    @GET
+    @Path("wsbugsreported")
+    public BugDummy findBugsReportedPOJO() {
+        
+        BugDummy bugDummy = new BugDummy();
+
+        List<Bug> bugList = new ArrayList<Bug>();
+        Query q = em.createNamedQuery("Bug.getBugsReported");
+        q.setParameter("userId", getAuthenticatedUser().getUserId());
+        
+        bugList = q.getResultList();
+        
+        List<BugSimpleWebSite> listBugs = new ArrayList<BugSimpleWebSite>();
+        
+        for (Bug b_tmp : bugList) {
+            
+            BugSimpleWebSite p = new BugSimpleWebSite();
+            p.setBugTitle(b_tmp.getTitle());
+            p.setBugId(b_tmp.getBugId());
+            if (b_tmp.getBugcategoryId() != null)
+                p.setBugType(b_tmp.getBugcategoryId().getCategoryName());
+            
+            //getChildBugsWebSite(p);
+            
+            listBugs.add(p);
+        }
+        
+        bugDummy.setListBug(listBugs);
+        
+        return bugDummy;
+    }
 }

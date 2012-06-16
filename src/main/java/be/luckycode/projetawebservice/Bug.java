@@ -26,6 +26,9 @@ import javax.xml.bind.annotation.XmlTransient;
     // get root tasks by project ID & exclude personal tasks.
     @NamedQuery(name = "Bug.getBugsByProjectId", query = "SELECT b FROM Bug b WHERE b.projectId.projectId = :projectId and (b.deleted = false or b.deleted is null)"),
     
+    // get bugs reported by user.
+    @NamedQuery(name = "Bug.getBugsReported", query = "SELECT b FROM Bug b WHERE b.userReported.userId = :userId and (b.deleted = false or b.deleted is null)"),
+    
     @NamedQuery(name = "Bug.findByBugId", query = "SELECT b FROM Bug b WHERE b.bugId = :bugId")})
 public class Bug implements Serializable {
     @Basic(optional = false)
