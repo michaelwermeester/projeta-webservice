@@ -17,14 +17,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -393,7 +386,7 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
     @GET
     @Path("assigned")
     @Produces("application/json")
-    public String findAllAssignedBugs() {
+    public String findAllAssignedBugs(@QueryParam("status") String statusId, @QueryParam("category") String categoryId) {
 
         String retVal = "";
 
@@ -401,9 +394,20 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
 
         List<Map> bugListMap = new ArrayList<Map>();
 
+        String filterQuery = "";
+        if (statusId != null) {
+            filterQuery += " AND (" + statusId + "= (SELECT status_id FROM Progress p WHERE p.bug_id = bug.bug_id order by p.date_created DESC LIMIT 1))";
+        }
+        if (categoryId != null) {
+            filterQuery += " AND (bug.bugcategory_id = " + categoryId + ")";
+        }
+        
+        
         // get all bugs from database.
-        Query q = em.createNamedQuery("Bug.getBugsAssigned");
-        q.setParameter("userAssignedId", getAuthenticatedUser().getUserId());
+        //Query q = em.createNamedQuery("Bug.getBugsAssigned");
+        //q.setParameter("userAssignedId", getAuthenticatedUser().getUserId());
+        Query q = em.createNativeQuery("SELECT bug.bug_id, bug.user_reported, bug.user_assigned, bug.project_id, bug.priority, bug.date_reported, bug.title, bug.details, bug.bugcategory_id, bug.fixed, bug.canceled, bug.deleted FROM bug where (bug.deleted = false or bug.deleted is null) and bug.user_assigned = ?1" + filterQuery, Bug.class);
+        q.setParameter(1, getAuthenticatedUser().getUserId());
 
         List<Bug> bugList = new ArrayList<Bug>();
         bugList = q.getResultList();

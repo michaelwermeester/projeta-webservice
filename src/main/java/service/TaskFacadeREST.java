@@ -665,7 +665,8 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         if (security.isUserInRole("administrator")) {
             // get projets parents de la base de données. 
             //q = em.createNamedQuery("Project.getParentProjects");
-            q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025 and task.project_id is null" + filterQuery, Task.class);
+            //q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025 and task.project_id is null" + filterQuery, Task.class);
+            q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025" + filterQuery, Task.class);
 
             List<Task> tList = new ArrayList<Task>();
             tList = q.getResultList();
