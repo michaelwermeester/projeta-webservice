@@ -25,10 +25,10 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Progress.findByDateCreated", query = "SELECT p FROM Progress p WHERE p.dateCreated = :dateCreated"),
     @NamedQuery(name = "Progress.findByPercentageComplete", query = "SELECT p FROM Progress p WHERE p.percentageComplete = :percentageComplete"),
     // findByBugId
-    @NamedQuery(name = "Progress.findByBugId", query = "SELECT p FROM Progress p WHERE p.bugId.bugId = :bugId order by p.dateCreated ASC"),
+    @NamedQuery(name = "Progress.findByBugId", query = "SELECT p FROM Progress p WHERE p.bugId.bugId = :bugId order by p.dateCreated DESC"),
     
     // findByTaskId
-    @NamedQuery(name = "Progress.findByTaskId", query = "SELECT p FROM Progress p WHERE p.taskId.taskId = :taskId order by p.dateCreated ASC"),
+    @NamedQuery(name = "Progress.findByTaskId", query = "SELECT p FROM Progress p WHERE p.taskId.taskId = :taskId order by p.dateCreated DESC"),
     // findByProjectId
     @NamedQuery(name = "Progress.findByProjectId", query = "SELECT p FROM Progress p WHERE p.projectId.projectId = :projectId order by p.dateCreated DESC"),
     

@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlTransient;
     
     @NamedQuery(name = "Task.getAssignedTasks", query = "SELECT t FROM Task t where (t.deleted = false or t.deleted is null) and t.isPersonal = false and t.userAssigned.userId = :userAssignedId"),
     
-    @NamedQuery(name = "Task.getChildTasks", query = "SELECT t FROM Task t WHERE t.parentTaskId = ?1"),
+    @NamedQuery(name = "Task.getChildTasks", query = "SELECT t FROM Task t WHERE t.parentTaskId = ?1 and (t.deleted = false or t.deleted is null)"),
     @NamedQuery(name = "Task.findByTaskId", query = "SELECT t FROM Task t WHERE t.taskId = :taskId")})
 public class Task implements Serializable {
     @Column(name = "start_date")

@@ -15,14 +15,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -78,7 +71,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     @GET
     @Path("personal")
     @Produces("application/json")
-    public String findPersonalTasks() {
+    public String findPersonalTasks(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate) {
 
         String retVal = "";
 
@@ -86,10 +79,26 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
         List<Map> taskList = new ArrayList<Map>();
 
-        // get root tasks (tasks which have no parent) and which are personal.
-        Query q = em.createNamedQuery("Task.getPersonalParentTasks");
-        q.setParameter(1, this.getAuthenticatedUser().getUserId());
+        
+        // filter.
+        String filterQuery = "";
+        if (statusId != null) {
+            filterQuery += " AND (" + statusId + "= (SELECT status_id FROM Progress p WHERE p.task_id = task.task_id order by p.date_created DESC LIMIT 1))";
+        }
 
+
+        if (minDate != null) {
+            filterQuery += " AND (task.start_date >= " + minDate + ")";
+        }
+        if (maxDate != null) {
+            filterQuery += " AND (task.end_date <= " + maxDate + ")";
+        }
+        
+        // get root tasks (tasks which have no parent) and which are personal.
+        //Query q = em.createNamedQuery("Task.getPersonalParentTasks");
+        Query q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and task.is_personal = true and (task.deleted = false or task.deleted is null) and task.user_created = ?1 and task.task_id > 1025" + filterQuery, Task.class);
+        q.setParameter(1, this.getAuthenticatedUser().getUserId());
+        
         List<Task> tList = new ArrayList<Task>();
         tList = q.getResultList();
 
@@ -110,7 +119,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         return retVal;
     }
 
-    @GET
+    /*@GET
     @Produces("application/json")
     public String findAllTasks() {
 
@@ -145,7 +154,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         return retVal;
 
 
-    }
+    }*/
 
     private void getTasks(List<Task> taskList, List<Map> taskMapList, Query namedsubquery, Query nativesubquery) {
         // if list is not empty
@@ -573,7 +582,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     @GET
     @Path("assigned")
     @Produces("application/json")
-    public String findAllAssignedTasks() {
+    public String findAllAssignedTasks(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate) {
 
         String retVal = "";
 
@@ -581,10 +590,25 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
         List<Map> taskList = new ArrayList<Map>();
 
+        // filter.
+        String filterQuery = "";
+        if (statusId != null) {
+            filterQuery += " AND (" + statusId + "= (SELECT status_id FROM Progress p WHERE p.task_id = task.task_id order by p.date_created DESC LIMIT 1))";
+        }
 
+
+        if (minDate != null) {
+            filterQuery += " AND (task.start_date >= " + minDate + ")";
+        }
+        if (maxDate != null) {
+            filterQuery += " AND (task.end_date <= " + maxDate + ")";
+        }
+        
+        
         // get tasks attribués à l'utilisateur. 
-        Query q = em.createNamedQuery("Task.getAssignedTasks");
-        q.setParameter("userAssignedId", getAuthenticatedUser().getUserId());
+        //Query q = em.createNamedQuery("Task.getAssignedTasks");
+        Query q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task where (task.deleted = false or task.deleted is null) and task.is_personal = false and task.user_assigned = ?1" + filterQuery, Task.class);
+        q.setParameter(1, getAuthenticatedUser().getUserId());
 
         List<Task> tList = new ArrayList<Task>();
         tList = q.getResultList();
@@ -604,6 +628,105 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         }
 
         return retVal;
+
+
+    }
+    
+    
+    @GET
+    @Produces("application/json")
+    public String findAllTasks(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate) {
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map> taskList = new ArrayList<Map>();
+        Query q;
+
+        // filter.
+        String filterQuery = "";
+        if (statusId != null) {
+            filterQuery += " AND (" + statusId + "= (SELECT status_id FROM Progress p WHERE p.task_id = task.task_id order by p.date_created DESC LIMIT 1))";
+        }
+
+
+        if (minDate != null) {
+            filterQuery += " AND (task.start_date >= " + minDate + ")";
+        }
+        if (maxDate != null) {
+            filterQuery += " AND (task.end_date <= " + maxDate + ")";
+        }
+        
+        
+
+        
+        // si utilisateur authentifié est un administrateur -> afficher tous les projets. 
+        if (security.isUserInRole("administrator")) {
+            // get projets parents de la base de données. 
+            //q = em.createNamedQuery("Project.getParentProjects");
+            q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025 and task.project_id is null" + filterQuery, Task.class);
+
+            List<Task> tList = new ArrayList<Task>();
+            tList = q.getResultList();
+
+            // get projects and its children
+            //getProjects(prjList, projectList, "Project.getChildProjects", "");
+            getTasks(tList, taskList, em.createNamedQuery("Task.getChildTasks"), null);
+        } else {     // si pas administrateur, afficher que les projets qu'un utilisateur est autorisé de voir.   
+
+
+
+            /*q = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project LEFT OUTER JOIN project_user_visible ON project.project_id = project_user_visible.project_id LEFT OUTER JOIN project_usergroup_visible ON project_usergroup_visible.project_id = project.project_id LEFT OUTER JOIN project_client ON project_client.project_id = project.project_id LEFT OUTER JOIN client ON project_client.client_id = client.client_id LEFT OUTER JOIN client_user ON client_user.client_id = client.client_id LEFT OUTER JOIN usergroup ON usergroup.usergroup_id = project_usergroup_visible.usergroup_id LEFT OUTER JOIN user_usergroup ON usergroup.usergroup_id = user_usergroup.usergroup_id WHERE (project.deleted = false or project.deleted IS NULL) AND ((project.flag_public = TRUE) OR (user_usergroup.user_id = ?1) OR (client_user.user_id = ?1) OR (project_user_visible.user_id = ?1) OR (project.user_created = ?1) OR (project.user_assigned = ?1)) AND project.parent_project_id IS NULL" + filterQuery, Project.class);
+            //Query q = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project LEFT OUTER JOIN project_user_visible ON project.project_id = project_user_visible.project_id LEFT OUTER JOIN project_usergroup_visible ON project_usergroup_visible.project_id = project.project_id LEFT OUTER JOIN project_client ON project_client.project_id = project.project_id LEFT OUTER JOIN client ON project_client.client_id = client.client_id LEFT OUTER JOIN client_user ON client_user.client_id = client.client_id LEFT OUTER JOIN usergroup ON usergroup.usergroup_id = project_usergroup_visible.usergroup_id LEFT OUTER JOIN user_usergroup ON usergroup.usergroup_id = user_usergroup.usergroup_id WHERE (project.deleted = false or project.deleted IS NULL) AND ((project.flag_public = TRUE) OR (((user_usergroup.user_id = ?1) OR (client_user.user_id = ?1) OR (project_user_visible.user_id = ?1) OR (project.user_created = ?1) OR (project.user_assigned = ?1)) " + filterQuery + ")) AND project.parent_project_id IS NULL" + filterQuery, Project.class);
+            q.setParameter(1, getAuthenticatedUser().getUserId());
+
+
+
+            List<Project> prjList = new ArrayList<Project>();
+            prjList = q.getResultList();
+
+            Query subquery = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project LEFT OUTER JOIN project_user_visible ON project.project_id = project_user_visible.project_id LEFT OUTER JOIN project_usergroup_visible ON project_usergroup_visible.project_id = project.project_id LEFT OUTER JOIN project_client ON project_client.project_id = project.project_id LEFT OUTER JOIN client ON project_client.client_id = client.client_id LEFT OUTER JOIN client_user ON client_user.client_id = client.client_id LEFT OUTER JOIN usergroup ON usergroup.usergroup_id = project_usergroup_visible.usergroup_id LEFT OUTER JOIN user_usergroup ON usergroup.usergroup_id = user_usergroup.usergroup_id WHERE project.parent_project_id = ?1 AND (project.deleted = false or project.deleted IS NULL) AND ((project.flag_public = TRUE) OR (user_usergroup.user_id = ?2) OR (client_user.user_id = ?2) OR (project_user_visible.user_id = ?2) OR (project.user_created = ?1) OR (project.user_assigned = ?1))", Project.class);
+            subquery.setParameter(2, getAuthenticatedUser().getUserId());
+
+            // get projects. Pas des sous-projets. 
+            getProjects(prjList, projectList, null, subquery);*/
+        }
+
+        HashMap<String, Object> retProjects = new HashMap<String, Object>();
+        retProjects.put("task", taskList);
+
+        try {
+            retVal = mapper.writeValueAsString(retProjects);
+        } catch (IOException ex) {
+            Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retVal;
+
+
+
+//        // get root tasks (tasks which have no parent)
+//        q = em.createNamedQuery("Task.getParentTasks");
+//
+//        List<Task> tList = new ArrayList<Task>();
+//        tList = q.getResultList();
+//
+//
+//        // get projects and its children
+//        getTasks(tList, taskList, em.createNamedQuery("Task.getChildTasks"), null);
+//
+//
+//        HashMap<String, Object> retTasks = new HashMap<String, Object>();
+//        retTasks.put("task", taskList);
+//
+//        try {
+//            retVal = mapper.writeValueAsString(retTasks);
+//        } catch (IOException ex) {
+//            Logger.getLogger(TaskFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//        return retVal;
 
 
     }
