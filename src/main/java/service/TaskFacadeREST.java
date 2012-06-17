@@ -635,7 +635,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     
     @GET
     @Produces("application/json")
-    public String findAllTasks(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate) {
+    public String findAllTasks(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate, @QueryParam("projectId") String projectId) {
 
         String retVal = "";
 
@@ -658,6 +658,9 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             filterQuery += " AND (task.end_date <= " + maxDate + ")";
         }
         
+        if (projectId != null) {
+            filterQuery += " AND (task.project_id = " + projectId + ")";
+        }
         
 
         
