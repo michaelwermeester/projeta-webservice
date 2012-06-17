@@ -663,7 +663,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     @Path("public")
     @RolesAllowed({"user", "administrator", "developer"})
     @Produces("application/json")
-    public String findAllPublicProjects() {
+    public String findAllPublicProjects(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate) {
 
         String retVal = "";
 
@@ -671,9 +671,25 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         List<Map> projectList = new ArrayList<Map>();
 
-        // get root public projects (projects which have no parent)
-        Query q = em.createNamedQuery("Project.getParentPublicProjects");
+        // filter
+        String filterQuery = "";
+        if (statusId != null) {
+            filterQuery += " AND (" + statusId + "= (SELECT status_id FROM Progress p WHERE p.project_id = project.project_id order by p.date_created DESC LIMIT 1))";
+        }
 
+
+        if (minDate != null) {
+            filterQuery += " AND (project.start_date >= " + minDate + ")";
+        }
+        if (maxDate != null) {
+            filterQuery += " AND (project.end_date <= " + maxDate + ")";
+        }
+        
+        // get root public projects (projects which have no parent)
+        //Query q = em.createNamedQuery("Project.getParentPublicProjects");
+        Query q = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project WHERE project.parent_project_id IS NULL and project.flag_public = true and (project.deleted = false or project.deleted is null)" + filterQuery, Project.class);
+
+        
         List<Project> prjList = new ArrayList<Project>();
         prjList = q.getResultList();
 
@@ -932,7 +948,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     @RolesAllowed({"administrator", "developer"})
     @Path("assigned")
     @Produces("application/json")
-    public String findAllAssignedProjects() {
+    public String findAllAssignedProjects(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate) {
 
         String retVal = "";
 
@@ -940,9 +956,25 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         List<Map> projectList = new ArrayList<Map>();
 
+        // filter
+        String filterQuery = "";
+        if (statusId != null) {
+            filterQuery += " AND (" + statusId + "= (SELECT status_id FROM Progress p WHERE p.project_id = project.project_id order by p.date_created DESC LIMIT 1))";
+        }
+
+
+        if (minDate != null) {
+            filterQuery += " AND (project.start_date >= " + minDate + ")";
+        }
+        if (maxDate != null) {
+            filterQuery += " AND (project.end_date <= " + maxDate + ")";
+        }
+        
+        
         // get projets attribués à l'utilisateur. 
-        Query q = em.createNamedQuery("Project.getAssignedProjects");
-        q.setParameter("userAssignedId", getAuthenticatedUser().getUserId());
+        //Query q = em.createNamedQuery("Project.getAssignedProjects");
+        Query q = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project WHERE project.user_assigned = ?1 and (project.deleted = false or project.deleted is null)" + filterQuery, Project.class);
+        q.setParameter(1, getAuthenticatedUser().getUserId());
 
         List<Project> prjList = new ArrayList<Project>();
         prjList = q.getResultList();
@@ -1014,6 +1046,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     }
 
     // returns parent objects including its children
+    // exactly the same than findAllProjects (only difference is that it adds the filter).
     @GET
     @Path("filter")
     @Produces("application/json")
@@ -1031,17 +1064,13 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
             filterQuery += " AND (" + statusId + "= (SELECT status_id FROM Progress p WHERE p.project_id = project.project_id order by p.date_created DESC LIMIT 1))";
         }
 
-//        if (minDate != null && maxDate != null) {
-//            filterQuery += " AND (project.start_date BETWEEN " + minDate + " and " + maxDate + ")";
-//        } else {
 
-            if (minDate != null) {
-                filterQuery += " AND (project.start_date >= " + minDate + ")";
-            }
-            if (maxDate != null) {
-                filterQuery += " AND (project.end_date <= " + maxDate + ")";
-            }
-//        }
+        if (minDate != null) {
+            filterQuery += " AND (project.start_date >= " + minDate + ")";
+        }
+        if (maxDate != null) {
+            filterQuery += " AND (project.end_date <= " + maxDate + ")";
+        }
 
         // si utilisateur authentifié est un administrateur -> afficher tous les projets. 
         if (security.isUserInRole("administrator")) {

@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @SequenceGenerator(name = "sequenceProject", sequenceName = "project_project_id_seq", allocationSize = 1)
 @NamedQueries({
-    @NamedQuery(name = "Project.findAll", query = "SELECT p FROM Project p"),
+    @NamedQuery(name = "Project.findAll", query = "SELECT p FROM Project p where (p.deleted = false or p.deleted is null)"),
     @NamedQuery(name = "Project.findByProjectId", query = "SELECT p FROM Project p WHERE p.projectId = :projectId"),
     @NamedQuery(name = "Project.findByProjectTitle", query = "SELECT p FROM Project p WHERE p.projectTitle = :projectTitle"),
     @NamedQuery(name = "Project.findByProjectDescription", query = "SELECT p FROM Project p WHERE p.projectDescription = :projectDescription"),
@@ -30,18 +30,18 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Project.findByStartDate", query = "SELECT p FROM Project p WHERE p.startDate = :startDate"),
     @NamedQuery(name = "Project.findByEndDate", query = "SELECT p FROM Project p WHERE p.endDate = :endDate"),
     // get root projects (projects which have no parent)
-    @NamedQuery(name = "Project.getParentProjects", query = "SELECT p FROM Project p WHERE p.parentProjectId IS NULL"),
+    @NamedQuery(name = "Project.getParentProjects", query = "SELECT p FROM Project p WHERE p.parentProjectId IS NULL and (p.deleted = false or p.deleted is null)"),
     // get child projects
-    @NamedQuery(name = "Project.getChildProjects", query = "SELECT p FROM Project p WHERE p.parentProjectId = ?1"),
+    @NamedQuery(name = "Project.getChildProjects", query = "SELECT p FROM Project p WHERE p.parentProjectId = ?1 and (p.deleted = false or p.deleted is null)"),
     // get root public projects (projects which have no parent)
-    @NamedQuery(name = "Project.getParentPublicProjects", query = "SELECT p FROM Project p WHERE p.parentProjectId IS NULL and p.flagPublic = true"),
+    @NamedQuery(name = "Project.getParentPublicProjects", query = "SELECT p FROM Project p WHERE p.parentProjectId IS NULL and p.flagPublic = true and (p.deleted = false or p.deleted is null)"),
     // get public child projects
-    @NamedQuery(name = "Project.getChildPublicProjects", query = "SELECT p FROM Project p WHERE p.parentProjectId = ?1 and p.flagPublic = true"),
+    @NamedQuery(name = "Project.getChildPublicProjects", query = "SELECT p FROM Project p WHERE p.parentProjectId = ?1 and p.flagPublic = true and (p.deleted = false or p.deleted is null)"),
     
     @NamedQuery(name = "Project.getAssignedProjects", query = "SELECT p FROM Project p WHERE p.userAssigned.userId = :userAssignedId and (p.deleted = false or p.deleted is null)"),
     
   
-    @NamedQuery(name = "Project.findByFlagPublic", query = "SELECT p FROM Project p WHERE p.flagPublic = :flagPublic")})
+    @NamedQuery(name = "Project.findByFlagPublic", query = "SELECT p FROM Project p WHERE p.flagPublic = :flagPublic and (p.deleted = false or p.deleted is null)")})
 public class Project implements Serializable {
     @Column(name =     "date_created")
     @Temporal(TemporalType.TIMESTAMP)
