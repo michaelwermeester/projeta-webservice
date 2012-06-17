@@ -71,7 +71,7 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
     }
     
     // returns parent objects including its children
-    @GET
+    /*@GET
     @Produces("application/json")
     public String findAllBugs() {
 
@@ -102,7 +102,7 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         }
 
         return retVal;
-    }
+    }*/
 
     @GET
     @Path("{from}/{to}")
@@ -415,6 +415,95 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
 
         // get bugs
         getBugs(bugList, bugListMap);
+
+
+        HashMap<String, Object> retProjects = new HashMap<String, Object>();
+        retProjects.put("bug", bugListMap);
+
+        try {
+            retVal = mapper.writeValueAsString(retProjects);
+        } catch (IOException ex) {
+            Logger.getLogger(ProjectFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retVal;
+    }
+    
+    
+    @GET
+    @Produces("application/json")
+    public String findAllBugs(@QueryParam("status") String statusId, @QueryParam("category") String categoryId) {
+
+        String retVal = "";
+
+        String filterQuery = "";
+        if (statusId != null) {
+            filterQuery += " AND (" + statusId + "= (SELECT status_id FROM Progress p WHERE p.bug_id = bug.bug_id order by p.date_created DESC LIMIT 1))";
+        }
+        if (categoryId != null) {
+            filterQuery += " AND (bug.bugcategory_id = " + categoryId + ")";
+        }
+        
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map> bugListMap = new ArrayList<Map>();
+
+        Query q;
+        
+        if (security.isUserInRole("administrator")) {
+            // get projets parents de la base de données. 
+            //q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025" + filterQuery, Task.class);
+            q = em.createNativeQuery("SELECT DISTINCT bug.bug_id, bug.user_reported, bug.user_assigned, bug.project_id, bug.priority, bug.date_reported, bug.title, bug.details, bug.bugcategory_id, bug.fixed, bug.canceled, bug.deleted FROM bug where (bug.deleted = false or bug.deleted is null)" + filterQuery, Bug.class);
+            
+            List<Bug> bugList = new ArrayList<Bug>();
+            bugList = q.getResultList();
+
+            // get projects and its children
+            //getProjects(prjList, projectList, "Project.getChildProjects", "");
+            //getBugs(bugList, bugListMap, em.createNamedQuery("Task.getChildTasks"), null);
+            getBugs(bugList, bugListMap);
+        } else {     // si pas administrateur, afficher que les projets qu'un utilisateur est autorisé de voir.   
+
+
+            //q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025 and task.project_id is null" + filterQuery, Task.class);
+            //q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and (task.deleted = false or task.deleted is null) and task.task_id > 1025 and task.project_id IN (SELECT DISTINCT project.project_id as PROJECT_ID FROM project LEFT OUTER JOIN project_user_visible ON project.project_id = project_user_visible.project_id LEFT OUTER JOIN project_usergroup_visible ON project_usergroup_visible.project_id = project.project_id LEFT OUTER JOIN project_client ON project_client.project_id = project.project_id LEFT OUTER JOIN client ON project_client.client_id = client.client_id LEFT OUTER JOIN client_user ON client_user.client_id = client.client_id LEFT OUTER JOIN usergroup ON usergroup.usergroup_id = project_usergroup_visible.usergroup_id LEFT OUTER JOIN user_usergroup ON usergroup.usergroup_id = user_usergroup.usergroup_id WHERE (project.deleted = false or project.deleted IS NULL) AND ((project.flag_public = TRUE) OR (user_usergroup.user_id = ?1) OR (client_user.user_id = ?1) OR (project_user_visible.user_id = ?1) OR (project.user_created = ?1) OR (project.user_assigned = ?1)))" + filterQuery, Task.class);
+            q = em.createNativeQuery("SELECT DISTINCT bug.bug_id, bug.user_reported, bug.user_assigned, bug.project_id, bug.priority, bug.date_reported, bug.title, bug.details, bug.bugcategory_id, bug.fixed, bug.canceled, bug.deleted FROM project LEFT OUTER JOIN project_user_visible ON project.project_id = project_user_visible.project_id LEFT OUTER JOIN project_usergroup_visible ON project_usergroup_visible.project_id = project.project_id LEFT OUTER JOIN project_client ON project_client.project_id = project.project_id LEFT OUTER JOIN client ON project_client.client_id = client.client_id LEFT OUTER JOIN client_user ON client_user.client_id = client.client_id LEFT OUTER JOIN usergroup ON usergroup.usergroup_id = project_usergroup_visible.usergroup_id LEFT OUTER JOIN user_usergroup ON usergroup.usergroup_id = user_usergroup.usergroup_id INNER JOIN bug ON bug.project_id = project.project_id WHERE (project.deleted = false or project.deleted IS NULL) AND ((project.flag_public = TRUE) OR (user_usergroup.user_id = ?1) OR (client_user.user_id = ?1) OR (project_user_visible.user_id = ?1)) AND (bug.deleted = false or bug.deleted IS NULL)" + filterQuery, Bug.class);
+            q.setParameter(1, getAuthenticatedUser().getUserId());
+            
+            
+            
+            List<Bug> bugList = new ArrayList<Bug>();
+            bugList = q.getResultList();
+            
+            //getBugs(bugList, bugListMap, em.createNamedQuery("Task.getChildTasks"), null);
+            getBugs(bugList, bugListMap);
+            
+            /*q = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project LEFT OUTER JOIN project_user_visible ON project.project_id = project_user_visible.project_id LEFT OUTER JOIN project_usergroup_visible ON project_usergroup_visible.project_id = project.project_id LEFT OUTER JOIN project_client ON project_client.project_id = project.project_id LEFT OUTER JOIN client ON project_client.client_id = client.client_id LEFT OUTER JOIN client_user ON client_user.client_id = client.client_id LEFT OUTER JOIN usergroup ON usergroup.usergroup_id = project_usergroup_visible.usergroup_id LEFT OUTER JOIN user_usergroup ON usergroup.usergroup_id = user_usergroup.usergroup_id WHERE (project.deleted = false or project.deleted IS NULL) AND ((project.flag_public = TRUE) OR (user_usergroup.user_id = ?1) OR (client_user.user_id = ?1) OR (project_user_visible.user_id = ?1) OR (project.user_created = ?1) OR (project.user_assigned = ?1)) AND project.parent_project_id IS NULL" + filterQuery, Project.class);
+            //Query q = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project LEFT OUTER JOIN project_user_visible ON project.project_id = project_user_visible.project_id LEFT OUTER JOIN project_usergroup_visible ON project_usergroup_visible.project_id = project.project_id LEFT OUTER JOIN project_client ON project_client.project_id = project.project_id LEFT OUTER JOIN client ON project_client.client_id = client.client_id LEFT OUTER JOIN client_user ON client_user.client_id = client.client_id LEFT OUTER JOIN usergroup ON usergroup.usergroup_id = project_usergroup_visible.usergroup_id LEFT OUTER JOIN user_usergroup ON usergroup.usergroup_id = user_usergroup.usergroup_id WHERE (project.deleted = false or project.deleted IS NULL) AND ((project.flag_public = TRUE) OR (((user_usergroup.user_id = ?1) OR (client_user.user_id = ?1) OR (project_user_visible.user_id = ?1) OR (project.user_created = ?1) OR (project.user_assigned = ?1)) " + filterQuery + ")) AND project.parent_project_id IS NULL" + filterQuery, Project.class);
+            q.setParameter(1, getAuthenticatedUser().getUserId());
+
+
+
+            List<Project> prjList = new ArrayList<Project>();
+            prjList = q.getResultList();
+
+            Query subquery = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project LEFT OUTER JOIN project_user_visible ON project.project_id = project_user_visible.project_id LEFT OUTER JOIN project_usergroup_visible ON project_usergroup_visible.project_id = project.project_id LEFT OUTER JOIN project_client ON project_client.project_id = project.project_id LEFT OUTER JOIN client ON project_client.client_id = client.client_id LEFT OUTER JOIN client_user ON client_user.client_id = client.client_id LEFT OUTER JOIN usergroup ON usergroup.usergroup_id = project_usergroup_visible.usergroup_id LEFT OUTER JOIN user_usergroup ON usergroup.usergroup_id = user_usergroup.usergroup_id WHERE project.parent_project_id = ?1 AND (project.deleted = false or project.deleted IS NULL) AND ((project.flag_public = TRUE) OR (user_usergroup.user_id = ?2) OR (client_user.user_id = ?2) OR (project_user_visible.user_id = ?2) OR (project.user_created = ?1) OR (project.user_assigned = ?1))", Project.class);
+            subquery.setParameter(2, getAuthenticatedUser().getUserId());
+
+            // get projects. Pas des sous-projets. 
+            getProjects(prjList, projectList, null, subquery);*/
+        }
+        
+        
+        // get all bugs from database.
+        /*Query q = em.createNamedQuery("Bug.findAll");
+
+        List<Bug> bugList = new ArrayList<Bug>();
+        bugList = q.getResultList();
+
+
+        // get bugs
+        getBugs(bugList, bugListMap);*/
 
 
         HashMap<String, Object> retProjects = new HashMap<String, Object>();
