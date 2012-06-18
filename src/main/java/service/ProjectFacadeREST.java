@@ -47,7 +47,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
     @POST
     @Path("create")
-    @RolesAllowed("administrator")
+    @RolesAllowed({"administrator", "developer"})
     @Consumes("application/json")
     @Produces("application/json")
     public String createNewProject(Project entity) {
@@ -591,7 +591,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
     @PUT
     @Path("update")
-    @RolesAllowed("administrator")
+    @RolesAllowed({"administrator", "developer"})
     @Consumes("application/json")
     @Produces("application/json")
     public String updateProject(Project entity) {
@@ -610,6 +610,9 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         }
         if (entity.getEndDate() != null) {
             project.setEndDate(entity.getEndDate());
+        }
+        if (entity.getUserAssigned() != null) {
+            project.setUserAssigned(entity.getUserAssigned());
         }
 
         super.edit(project);

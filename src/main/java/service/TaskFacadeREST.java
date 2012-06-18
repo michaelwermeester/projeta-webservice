@@ -273,7 +273,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
     @POST
     @Path("create")
-    @RolesAllowed("administrator")
+    @RolesAllowed({"administrator", "developer", "user"})
     @Consumes("application/json")
     @Produces("application/json")
     public String createNewTask(Task entity) {
@@ -337,7 +337,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
 
     @PUT
     @Path("update")
-    @RolesAllowed("administrator")
+    @RolesAllowed({"administrator", "developer"})
     @Consumes("application/json")
     @Produces("application/json")
     public String updateTask(Task entity) {
@@ -360,6 +360,9 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         }
         if (entity.getEndDate() != null) {
             task.setEndDate(entity.getEndDate());
+        }
+        if (entity.getUserAssigned() != null) {
+            task.setUserAssigned(entity.getUserAssigned());
         }
 
 

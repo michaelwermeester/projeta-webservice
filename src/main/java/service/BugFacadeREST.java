@@ -40,6 +40,7 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
 
     @PUT
     @Path("update")
+    @RolesAllowed({"administrator", "developer"})
     @Consumes("application/json")
     @Produces("application/json")
     public void updateBug(Bug entity) {
@@ -52,6 +53,9 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         }
         if (entity.getDetails() != null) {
             bug.setDetails(entity.getDetails());
+        }
+        if (entity.getUserAssigned() != null) {
+            bug.setUserAssigned(entity.getUserAssigned());
         }
         
         super.edit(bug);
