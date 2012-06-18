@@ -432,7 +432,7 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
     
     @GET
     @Produces("application/json")
-    public String findAllBugs(@QueryParam("status") String statusId, @QueryParam("category") String categoryId) {
+    public String findAllBugs(@QueryParam("status") String statusId, @QueryParam("category") String categoryId, @QueryParam("projectId") String projectId) {
 
         String retVal = "";
 
@@ -442,6 +442,10 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         }
         if (categoryId != null) {
             filterQuery += " AND (bug.bugcategory_id = " + categoryId + ")";
+        }
+        
+        if (projectId != null) {
+            filterQuery += " AND (bug.project_id = " + projectId + ")";
         }
         
         ObjectMapper mapper = new ObjectMapper();
