@@ -4,10 +4,7 @@
  */
 package service;
 
-import be.luckycode.projetawebservice.Project;
-import be.luckycode.projetawebservice.Role;
-import be.luckycode.projetawebservice.User;
-import be.luckycode.projetawebservice.Usergroup;
+import be.luckycode.projetawebservice.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -522,6 +519,52 @@ public class UserFacadeREST extends AbstractFacade<User> {
         if (projectList.size() == 1) {
 
             Collection<User> users = projectList.get(0).getUserCollection();
+
+            List<Map> userList = new ArrayList<Map>();
+
+            for (User u : users) {
+
+                Map<String, Object> userData = generateUserJSON(u);
+
+                userList.add(userData);
+            }
+
+            HashMap<String, Object> retUsers = new HashMap<String, Object>();
+            retUsers.put("users", userList);
+
+            try {
+                retVal = mapper.writeValueAsString(retUsers);
+            } catch (IOException ex) {
+                Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            return retVal;
+        } else {
+            return "";
+        }
+    }
+    
+    
+    // return list of users by specifying usergroup id.
+    @GET
+    @Path("client/{clientid}")
+    @Produces("application/json")
+    public String findByClient(@PathParam("clientid") Integer clientid) {
+
+        String retVal = "";
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        Query q;
+        q = em.createNamedQuery("Client.findByClientId");
+        q.setParameter("clientId", clientid);
+
+        List<Client> usergroupList = new ArrayList<Client>();
+        usergroupList = q.getResultList();
+
+        if (usergroupList.size() == 1) {
+
+            Collection<User> users = usergroupList.get(0).getUserCollection();
 
             List<Map> userList = new ArrayList<Map>();
 

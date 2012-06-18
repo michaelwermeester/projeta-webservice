@@ -7,6 +7,7 @@ package service;
 import be.luckycode.projetawebservice.Client;
 import be.luckycode.projetawebservice.Project;
 import be.luckycode.projetawebservice.User;
+import be.luckycode.projetawebservice.Usergroup;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -16,14 +17,9 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -35,6 +31,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 public class ClientFacadeREST extends AbstractFacade<Client> {
     @PersistenceContext(unitName = "be.luckycode_projeta-webservice_war_1.0-SNAPSHOTPU")
     private EntityManager em;
+    @Context
+    SecurityContext security;
 
     public ClientFacadeREST() {
         super(Client.class);
@@ -180,6 +178,40 @@ public class ClientFacadeREST extends AbstractFacade<Client> {
             return retVal;
         } else {
             return "";
+        }
+    }
+    
+    @PUT
+    @RolesAllowed("administrator")
+    @Path("updateUsersForClient")
+    @Consumes("application/json")
+    public void updateUsersForClient(@QueryParam("clientId") Integer clientId, ArrayList<User> users) {
+
+        Query q;
+
+        if (clientId != null && security.isUserInRole("administrator")) {
+            q = em.createNamedQuery("Client.findByClientId");
+            q.setParameter("clientId", clientId);
+
+
+            List<Client> usergroupList = new ArrayList<Client>();
+            usergroupList = q.getResultList();
+
+            if (usergroupList.size() == 1) {
+
+                Client ug = usergroupList.get(0);
+
+                if (users.get(0).getUserId() == null) {
+                    ArrayList<User> list = new ArrayList<User>();
+                    ug.setUserCollection(list);
+                } else {
+                    ug.setUserCollection(users);
+                }
+
+                em.merge(ug);
+            } else {
+            }
+
         }
     }
 }
