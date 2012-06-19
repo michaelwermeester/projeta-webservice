@@ -1053,7 +1053,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     @GET
     @Path("filter")
     @Produces("application/json")
-    public String findAllProjectsFilter(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate, @QueryParam("clientId") String clientId) {
+    public String findAllProjectsFilter(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate, @QueryParam("clientId") String clientId, @QueryParam("devId") String devId) {
 
         String retVal = "";
 
@@ -1077,6 +1077,10 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         
         if (clientId != null) {
             filterQuery += " AND (project_client.client_id = " + clientId + ")";
+        }
+        
+        if (devId != null) {
+            filterQuery += " AND (project.user_assigned = " + devId + ")";
         }
 
         // si utilisateur authentifié est un administrateur -> afficher tous les projets. 
