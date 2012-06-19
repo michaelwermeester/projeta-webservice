@@ -1053,7 +1053,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
     @GET
     @Path("filter")
     @Produces("application/json")
-    public String findAllProjectsFilter(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate) {
+    public String findAllProjectsFilter(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate, @QueryParam("clientId") String clientId) {
 
         String retVal = "";
 
@@ -1074,12 +1074,17 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         if (maxDate != null) {
             filterQuery += " AND (project.end_date <= " + maxDate + ")";
         }
+        
+        if (clientId != null) {
+            filterQuery += " AND (project_client.client_id = " + clientId + ")";
+        }
 
         // si utilisateur authentifié est un administrateur -> afficher tous les projets. 
         if (security.isUserInRole("administrator")) {
             // get projets parents de la base de données. 
             //q = em.createNamedQuery("Project.getParentProjects");
-            q = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project WHERE project.parent_project_id IS NULL" + filterQuery, Project.class);
+            //q = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project WHERE project.parent_project_id IS NULL" + filterQuery, Project.class);
+            q = em.createNativeQuery("SELECT DISTINCT project.project_id as PROJECT_ID, project.project_title as PROJECT_TITLE, project.flag_public as FLAG_PUBLIC, project.project_description as PROJECT_DESCRIPTION, project.user_created as USER_CREATED, project.date_created as DATE_CREATED, project.start_date as START_DATE, project.end_date as END_DATE, project.start_date_real as START_DATE_REAL, project.end_date_real as END_DATE_REAL, project.parent_project_id as PARENT_PROJECT_ID, project.completed as COMPLETED, project.canceled as CANCELED, project.deleted as DELETED, project.user_assigned as USER_ASSIGNED FROM project_client RIGHT OUTER JOIN project ON project_client.project_id = project.project_id WHERE project.parent_project_id IS NULL and (project.deleted = false or project.deleted IS NULL)" + filterQuery, Project.class);
 
             List<Project> prjList = new ArrayList<Project>();
             prjList = q.getResultList();
