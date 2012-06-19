@@ -436,7 +436,7 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
     
     @GET
     @Produces("application/json")
-    public String findAllBugs(@QueryParam("status") String statusId, @QueryParam("category") String categoryId, @QueryParam("projectId") String projectId) {
+    public String findAllBugs(@QueryParam("status") String statusId, @QueryParam("category") String categoryId, @QueryParam("projectId") String projectId, @QueryParam("clientId") String clientId, @QueryParam("devId") String devId) {
 
         String retVal = "";
 
@@ -452,6 +452,14 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
             filterQuery += " AND (bug.project_id = " + projectId + ")";
         }
         
+        if (clientId != null) {
+            filterQuery += " AND (project_client.client_id = " + clientId + ")";
+        }
+        
+        if (devId != null) {
+            filterQuery += " AND (bug.user_assigned = " + devId + ")";
+        }
+        
         ObjectMapper mapper = new ObjectMapper();
 
         List<Map> bugListMap = new ArrayList<Map>();
@@ -461,7 +469,8 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         if (security.isUserInRole("administrator")) {
             // get projets parents de la base de données. 
             //q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025" + filterQuery, Task.class);
-            q = em.createNativeQuery("SELECT DISTINCT bug.bug_id, bug.user_reported, bug.user_assigned, bug.project_id, bug.priority, bug.date_reported, bug.title, bug.details, bug.bugcategory_id, bug.fixed, bug.canceled, bug.deleted FROM bug where (bug.deleted = false or bug.deleted is null)" + filterQuery, Bug.class);
+            //q = em.createNativeQuery("SELECT DISTINCT bug.bug_id, bug.user_reported, bug.user_assigned, bug.project_id, bug.priority, bug.date_reported, bug.title, bug.details, bug.bugcategory_id, bug.fixed, bug.canceled, bug.deleted FROM bug where (bug.deleted = false or bug.deleted is null)" + filterQuery, Bug.class
+            q = em.createNativeQuery("SELECT DISTINCT bug.bug_id, bug.user_reported, bug.user_assigned, bug.project_id, bug.priority, bug.date_reported, bug.title, bug.details, bug.bugcategory_id, bug.fixed, bug.canceled, bug.deleted FROM project RIGHT OUTER JOIN bug ON project.project_id = bug.project_id LEFT OUTER JOIN project_client ON project_client.project_id = project.project_id where (bug.deleted = false or bug.deleted is null)" + filterQuery, Bug.class);
             
             List<Bug> bugList = new ArrayList<Bug>();
             bugList = q.getResultList();

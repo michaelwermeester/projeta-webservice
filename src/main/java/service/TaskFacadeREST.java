@@ -638,7 +638,7 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     
     @GET
     @Produces("application/json")
-    public String findAllTasks(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate, @QueryParam("projectId") String projectId) {
+    public String findAllTasks(@QueryParam("status") String statusId, @QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate, @QueryParam("projectId") String projectId, @QueryParam("clientId") String clientId, @QueryParam("devId") String devId) {
 
         String retVal = "";
 
@@ -665,6 +665,13 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             filterQuery += " AND (task.project_id = " + projectId + ")";
         }
         
+        if (clientId != null) {
+            filterQuery += " AND (project_client.client_id = " + clientId + ")";
+        }
+        
+        if (devId != null) {
+            filterQuery += " AND (task.user_assigned = " + devId + ")";
+        }
 
         
         // si utilisateur authentifié est un administrateur -> afficher tous les projets. 
@@ -672,8 +679,10 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
             // get projets parents de la base de données. 
             //q = em.createNamedQuery("Project.getParentProjects");
             //q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025 and task.project_id is null" + filterQuery, Task.class);
-            q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025" + filterQuery, Task.class);
-
+            //q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025" + filterQuery, Task.class);
+            //q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task LEFT OUTER JOIN project ON task.project_id = project.project_id LEFT OUTER JOIN project_client ON project.project_id = project_client.project_id WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025" + filterQuery, Task.class);
+            q = em.createNativeQuery("SELECT DISTINCT task.task_id, task.user_created, task.user_assigned, task.priority, task.start_date, task.end_date, task.start_date_real, task.end_date_real, task.parent_task_id, task.task_title, task.task_description, task.project_id, task.is_personal, task.canceled, task.deleted, task.completed FROM task LEFT OUTER JOIN project ON task.project_id = project.project_id LEFT OUTER JOIN project_client ON project.project_id = project_client.project_id WHERE task.parent_task_id IS NULL and task.is_personal = false and (task.deleted = false or task.deleted is null) and task.task_id > 1025" + filterQuery, Task.class);
+            
             List<Task> tList = new ArrayList<Task>();
             tList = q.getResultList();
 
