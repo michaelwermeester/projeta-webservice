@@ -57,6 +57,15 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         if (entity.getUserAssigned() != null) {
             bug.setUserAssigned(entity.getUserAssigned());
         }
+        if (entity.getPriority() != null) {
+            bug.setPriority(entity.getPriority());
+        }
+        if (entity.getFixed() != null) {
+            bug.setFixed(entity.getFixed());
+        }
+        if (entity.getBugcategoryId() != null) {
+            bug.setBugcategoryId(entity.getBugcategoryId());
+        }
         
         super.edit(bug);
     }
