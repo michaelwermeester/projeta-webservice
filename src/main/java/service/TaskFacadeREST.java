@@ -361,8 +361,17 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         if (entity.getEndDate() != null) {
             task.setEndDate(entity.getEndDate());
         }
+        if (entity.getStartDateReal() != null) {
+            task.setStartDateReal(entity.getStartDateReal());
+        }
+        if (entity.getEndDateReal() != null) {
+            task.setEndDateReal(entity.getEndDateReal());
+        }
         if (entity.getUserAssigned() != null) {
             task.setUserAssigned(entity.getUserAssigned());
+        }
+        if (entity.getPriority() != null) {
+            task.setPriority(entity.getPriority());
         }
 
 
