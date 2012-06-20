@@ -611,9 +611,22 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
         if (entity.getEndDate() != null) {
             project.setEndDate(entity.getEndDate());
         }
+        if (entity.getStartDateReal() != null) {
+            project.setStartDateReal(entity.getStartDateReal());
+        }
+        if (entity.getEndDateReal() != null) {
+            project.setEndDateReal(entity.getEndDateReal());
+        }
         if (entity.getUserAssigned() != null) {
             project.setUserAssigned(entity.getUserAssigned());
         }
+        if (entity.getCompleted() != null) {
+            project.setCompleted(entity.getCompleted());
+        }
+        if (entity.getFlagPublic() != null) {
+            project.setFlagPublic(entity.getFlagPublic());
+        }
+        
 
         super.edit(project);
 
