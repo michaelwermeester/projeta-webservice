@@ -234,4 +234,24 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
             return null;
         }
     }
+    
+    
+    
+    @GET
+    @Path("wsbug/{id}")
+    public CommentDummy findCommentsByBugIdWebsite(@PathParam("id") Integer id) {
+        
+        CommentDummy retCommentDummy = new CommentDummy();
+        
+        
+        Query q = em.createNamedQuery("Comment.findByBugId");
+        q.setParameter("bugId", id);
+        
+        List<Comment> cList = new ArrayList<Comment>(q.getResultList());
+        
+        
+        retCommentDummy.setListComment(cList);
+        
+        return retCommentDummy;
+    }
 }

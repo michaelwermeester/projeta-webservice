@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Comment.findByComment", query = "SELECT c FROM Comment c WHERE c.comment = :comment"),
     // retourner les commentaires liés à un tâche.
     @NamedQuery(name = "Comment.findByTaskId", query = "SELECT c FROM Comment c WHERE c.taskId.taskId = :taskId order by c.dateCreated ASC"),
+    @NamedQuery(name = "Comment.findByBugId", query = "SELECT c FROM Comment c WHERE c.bugId.bugId = :bugId order by c.dateCreated ASC"),
     // retourner les commentaires liés à un projet.
     @NamedQuery(name = "Comment.findByProjectId", query = "SELECT c FROM Comment c WHERE c.projectId.projectId = :projectId order by c.dateCreated ASC"),
     
