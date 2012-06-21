@@ -20,6 +20,7 @@ public class BugSimpleWebSite {
     private Date endDate;
     private String bugType;
     private Integer bugId;
+    private String projectStatus;
 
     /**
      * @return the bugTitle
@@ -89,5 +90,19 @@ public class BugSimpleWebSite {
      */
     public void setBugId(Integer bugId) {
         this.bugId = bugId;
+    }
+    
+    /**
+     * @return the projectStatus
+     */
+    public String getProjectStatus() {
+        return projectStatus;
+    }
+
+    /**
+     * @param projectStatus the projectStatus to set
+     */
+    public void setProjectStatus(String projectStatus) {
+        this.projectStatus = projectStatus;
     }
 }

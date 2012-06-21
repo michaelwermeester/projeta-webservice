@@ -199,6 +199,8 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
                 p.setBugType(b_tmp.getBugcategoryId().getCategoryName());
             
             //getChildBugsWebSite(p);
+            // statut.
+            p.setProjectStatus(getStatusForBugId(b_tmp.getBugId()));
             
             listBugs.add(p);
         }
@@ -350,6 +352,8 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
                 p.setBugType(b_tmp.getBugcategoryId().getCategoryName());
             
             //getChildBugsWebSite(p);
+            // statut.
+            p.setProjectStatus(getStatusForBugId(b_tmp.getBugId()));
             
             listBugs.add(p);
         }
@@ -385,6 +389,9 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
                 p.setBugType(b_tmp.getBugcategoryId().getCategoryName());
             
             //getChildBugsWebSite(p);
+            
+            // statut.
+            p.setProjectStatus(getStatusForBugId(b_tmp.getBugId()));
             
             listBugs.add(p);
         }
@@ -542,5 +549,30 @@ public class BugFacadeREST extends AbstractFacade<Bug> {
         }
 
         return retVal;
+    }
+    
+    // retourne le statut actuel du projet.
+    private String getStatusForBugId(Integer bugId) {
+
+        // liste des 'Progress' pour le projet.
+        Query qryStatus = em.createNamedQuery("Progress.findByBugId");
+        qryStatus.setParameter("bugId", bugId);
+        // obtenir le plus récent.
+        qryStatus.setMaxResults(1); // top 1 result
+        // lire en liste.
+        List<Progress> listProgress = new ArrayList<Progress>();
+        listProgress = qryStatus.getResultList();
+
+        // retourner le statut, s'il y'en a un.
+        if (listProgress.size() > 0) {
+            String status = "";
+            if (listProgress.get(0).getPercentageComplete() != null) {
+                status += listProgress.get(0).getPercentageComplete().toString() + "% - ";
+            }
+
+            return status + listProgress.get(0).getStatusId().getStatusName();
+        } else {
+            return "-";
+        }
     }
 }
