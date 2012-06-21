@@ -735,7 +735,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         Query q;
 
-        if (projectId != null && security.isUserInRole("administrator")) {
+        if (projectId != null && (security.isUserInRole("administrator") || security.isUserInRole("developer"))) {
             q = em.createNamedQuery("Project.findByProjectId");
             q.setParameter("projectId", projectId);
 
@@ -812,7 +812,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         Query q;
 
-        if (projectId != null && security.isUserInRole("administrator")) {
+        if (projectId != null && (security.isUserInRole("administrator") || security.isUserInRole("developer"))) {
             q = em.createNamedQuery("Project.findByProjectId");
             q.setParameter("projectId", projectId);
 
@@ -889,7 +889,7 @@ public class ProjectFacadeREST extends AbstractFacade<Project> {
 
         Query q;
 
-        if (projectId != null && security.isUserInRole("administrator")) {
+        if (projectId != null && (security.isUserInRole("administrator") || security.isUserInRole("developer"))) {
             q = em.createNamedQuery("Project.findByProjectId");
             q.setParameter("projectId", projectId);
 

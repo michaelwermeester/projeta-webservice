@@ -138,7 +138,7 @@ public class ClientFacadeREST extends AbstractFacade<Client> {
     // return list of clients assigned to a project.
     @GET
     @Path("project/{projectid}")
-    @RolesAllowed("administrator")
+    @RolesAllowed({"administrator", "developer"})
     @Produces("application/json")
     public String findByProject(@PathParam("projectid") Integer projectid) {
 

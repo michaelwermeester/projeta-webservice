@@ -502,7 +502,7 @@ public class UserFacadeREST extends AbstractFacade<User> {
     @GET
     @Path("project/{projectid}")
     @Produces("application/json")
-    @RolesAllowed("administrator")
+    @RolesAllowed({"administrator", "developer"})
     public String findByProject(@PathParam("projectid") Integer projectid) {
 
         String retVal = "";
