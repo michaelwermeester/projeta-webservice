@@ -214,4 +214,51 @@ public class ClientFacadeREST extends AbstractFacade<Client> {
 
         }
     }
+    
+    
+    @GET
+    @Path("allclients")
+    @Produces("application/json")
+    public String getClientsAll() {
+        List<Client> clients = super.findAll();
+
+        String retVal = "";
+        
+        ObjectMapper mapper = new ObjectMapper();
+        
+        List<Map> clientList = new ArrayList<Map>();
+                
+        for (Client cli : clients) {
+            
+            Map<String, Object> clientData = generateClientJSONFull(cli);
+            
+            clientList.add(clientData);
+        }
+        
+        HashMap<String, Object> retClients = new HashMap<String, Object>();
+        retClients.put("clients", clientList);
+        
+        try {
+            retVal = mapper.writeValueAsString(retClients);
+        } catch (IOException ex) {
+            Logger.getLogger(UserFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return retVal;
+    }
+    
+    private Map<String, Object> generateClientJSONFull(Client client) {
+        
+        Map<String, Object> clientData = new HashMap<String, Object>();
+        
+        clientData.put("clientId", client.getClientId().toString());
+        clientData.put("clientName", client.getClientName());
+        clientData.put("address", client.getAddress());
+        clientData.put("comment", client.getComment());
+        clientData.put("faxNumber", client.getFaxNumber());
+        clientData.put("phoneNumber", client.getPhoneNumber());
+        clientData.put("vatNumber", client.getVatNumber());
+        
+        return clientData;
+    }
 }
