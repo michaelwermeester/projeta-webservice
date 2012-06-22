@@ -181,7 +181,7 @@ public class CommentFacadeREST extends AbstractFacade<Comment> {
     
     @POST
     @Path("create")
-    @RolesAllowed("administrator")
+    @RolesAllowed({"administrator", "developer", "user"})
     @Consumes("application/json")
     @Produces("application/json")
     public Comment createNewComment(Comment entity) {
